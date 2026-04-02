@@ -11,18 +11,19 @@ class FeatureService {
 
   SubscriptionPlan? _plan;
   UserSubscription? _subscription;
+  // Default: alles frei bis Abo-System live ist
   Map<String, dynamic> _mergedFeatures = {
     'kunden': true,
     'offerten': true,
     'auftraege': true,
     'zeiterfassung': true,
     'rapporte': true,
-    'rechnungen': false,
-    'buchhaltung': false,
-    'auftrag_dashboard': false,
-    'auto_website': false,
-    'max_kunden': 20,
-    'max_offerten': 10,
+    'rechnungen': true,
+    'buchhaltung': true,
+    'auftrag_dashboard': true,
+    'auto_website': true,
+    'max_kunden': -1,
+    'max_offerten': -1,
   };
 
   SubscriptionPlan? get currentPlan => _plan;
@@ -79,18 +80,20 @@ class FeatureService {
   void _setFreePlan() {
     _plan = null;
     _subscription = null;
+    // Solange subscription_plans-Tabelle nicht existiert: alles freischalten
+    // TODO: Auf Free-Plan zurücksetzen wenn Abo-System live ist
     _mergedFeatures = {
       'kunden': true,
       'offerten': true,
       'auftraege': true,
       'zeiterfassung': true,
       'rapporte': true,
-      'rechnungen': false,
-      'buchhaltung': false,
-      'auftrag_dashboard': false,
-      'auto_website': false,
-      'max_kunden': 20,
-      'max_offerten': 10,
+      'rechnungen': true,
+      'buchhaltung': true,
+      'auftrag_dashboard': true,
+      'auto_website': true,
+      'max_kunden': -1,
+      'max_offerten': -1,
     };
   }
 
