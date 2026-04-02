@@ -11,7 +11,19 @@ class FeatureService {
 
   SubscriptionPlan? _plan;
   UserSubscription? _subscription;
-  Map<String, dynamic> _mergedFeatures = {};
+  Map<String, dynamic> _mergedFeatures = {
+    'kunden': true,
+    'offerten': true,
+    'auftraege': true,
+    'zeiterfassung': true,
+    'rapporte': true,
+    'rechnungen': false,
+    'buchhaltung': false,
+    'auftrag_dashboard': false,
+    'auto_website': false,
+    'max_kunden': 20,
+    'max_offerten': 10,
+  };
 
   SubscriptionPlan? get currentPlan => _plan;
   UserSubscription? get currentSubscription => _subscription;
@@ -118,6 +130,6 @@ class FeatureService {
     _plan = null;
     _subscription = null;
     _mergedFeatures = {};
-    _instance = null;
+    _instance = null; // Nächster Zugriff erstellt neue Instanz mit Free-Plan-Default
   }
 }

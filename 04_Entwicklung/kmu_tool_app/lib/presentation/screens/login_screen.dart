@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/services/feature/feature_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -35,6 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      // Feature-Service laden nach Login
+      await FeatureService.instance.load();
 
       if (mounted) {
         context.go('/');
