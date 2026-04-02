@@ -30,9 +30,10 @@ class KundeKontaktMapper {
       'funktion': local.funktion,
       'telefon': local.telefon,
       'email': local.email,
-      'anrede': local.anrede,
-      'rolle': local.rolle,
-      'notizen': local.notizen,
+      // Migration 012 Spalten - erst senden wenn Migration ausgefuehrt:
+      // 'anrede': local.anrede,
+      // 'rolle': local.rolle,
+      // 'notizen': local.notizen,
     };
     if (local.serverId != null) json['id'] = local.serverId;
     return json;

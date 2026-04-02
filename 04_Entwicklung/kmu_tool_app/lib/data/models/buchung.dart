@@ -72,9 +72,10 @@ class Buchung {
       'beschreibung': beschreibung,
       'beleg_nr': belegNr,
       'rechnung_id': rechnungId,
-      'mwst_code': mwstCode,
-      'mwst_satz': mwstSatz,
-      'mwst_betrag': mwstBetrag,
+      // Migration 014 Spalten - erst senden wenn Migration ausgefuehrt:
+      // 'mwst_code': mwstCode,
+      // 'mwst_satz': mwstSatz,
+      // 'mwst_betrag': mwstBetrag,
     };
   }
 }

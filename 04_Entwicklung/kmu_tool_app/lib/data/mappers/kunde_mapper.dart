@@ -44,16 +44,17 @@ class KundeMapper {
       'telefon': local.telefon,
       'email': local.email,
       'notizen': local.notizen,
-      're_abweichend': local.reAbweichend,
-      're_firma': local.reFirma,
-      're_vorname': local.reVorname,
-      're_nachname': local.reNachname,
-      're_strasse': local.reStrasse,
-      're_plz': local.rePlz,
-      're_ort': local.reOrt,
-      're_email': local.reEmail,
-      'rechnungsstellung': local.rechnungsstellung,
       'is_deleted': local.isDeleted,
+      // Migration 012 Spalten - erst senden wenn Migration ausgefuehrt:
+      // 're_abweichend': local.reAbweichend,
+      // 're_firma': local.reFirma,
+      // 're_vorname': local.reVorname,
+      // 're_nachname': local.reNachname,
+      // 're_strasse': local.reStrasse,
+      // 're_plz': local.rePlz,
+      // 're_ort': local.reOrt,
+      // 're_email': local.reEmail,
+      // 'rechnungsstellung': local.rechnungsstellung,
     };
     if (local.serverId != null) json['id'] = local.serverId;
     return json;

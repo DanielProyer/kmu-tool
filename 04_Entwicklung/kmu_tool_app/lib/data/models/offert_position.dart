@@ -58,8 +58,9 @@ class OffertPosition {
       'einheit': einheit,
       'einheitspreis': einheitspreis,
       'betrag': betrag,
-      'typ': typ,
-      'artikel_id': artikelId,
+      // Migration 013 Spalten - erst senden wenn Migration ausgefuehrt:
+      // 'typ': typ,
+      // 'artikel_id': artikelId,
     };
   }
 
