@@ -247,7 +247,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppStatusColors.error),
             const SizedBox(height: 16),
             Text(
               'Fehler beim Laden',
@@ -257,7 +257,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
             Text(
               error.toString(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -297,7 +297,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
           'Uebersicht',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
         ),
         const SizedBox(height: 12),
@@ -305,7 +305,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         // Bilanz-Uebersicht
         _OverviewCard(
           icon: Icons.balance,
-          iconColor: AppColors.primary,
+          iconColor: Theme.of(context).colorScheme.primary,
           title: 'Bilanz',
           rows: [
             _OverviewRow('Aktiven', _formatCHF(data.totalAktiven)),
@@ -317,7 +317,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         // Erfolgsrechnung
         _OverviewCard(
           icon: Icons.trending_up,
-          iconColor: isGewinn ? AppColors.success : AppColors.error,
+          iconColor: isGewinn ? AppStatusColors.success : AppStatusColors.error,
           title: 'Erfolgsrechnung',
           rows: [
             _OverviewRow('Ertrag', _formatCHF(data.totalErtrag)),
@@ -325,7 +325,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
             _OverviewRow(
               isGewinn ? 'Gewinn' : 'Verlust',
               _formatCHF(gewinnVerlust.abs()),
-              valueColor: isGewinn ? AppColors.success : AppColors.error,
+              valueColor: isGewinn ? AppStatusColors.success : AppStatusColors.error,
               isBold: true,
             ),
           ],
@@ -338,13 +338,13 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
             Expanded(
               child: _CompactCard(
                 icon: Icons.receipt_long,
-                iconColor: AppColors.secondary,
+                iconColor: Theme.of(context).colorScheme.secondary,
                 title: 'Offene Debitoren',
                 subtitle: 'Konto 1100',
                 value: _formatCHF(data.offeneDebitoren),
                 valueColor: data.offeneDebitoren > 0
-                    ? AppColors.warning
-                    : AppColors.textSecondary,
+                    ? AppStatusColors.warning
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(width: 8),
@@ -356,8 +356,8 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
                 subtitle: 'Konto 2200',
                 value: _formatCHF(data.mwstSchuld),
                 valueColor: data.mwstSchuld > 0
-                    ? AppColors.error
-                    : AppColors.textSecondary,
+                    ? AppStatusColors.error
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -370,14 +370,14 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
           'Bereiche',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
         ),
         const SizedBox(height: 12),
 
         _NavigationTile(
           icon: Icons.list_alt,
-          iconColor: AppColors.primary,
+          iconColor: Theme.of(context).colorScheme.primary,
           title: 'Kontenplan',
           subtitle: 'Schweizer KMU-Kontenrahmen',
           onTap: () => context.push('/buchhaltung/konten'),
@@ -385,7 +385,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         _NavigationTile(
           icon: Icons.menu_book,
-          iconColor: AppColors.info,
+          iconColor: AppStatusColors.info,
           title: 'Journal',
           subtitle: 'Alle Buchungen anzeigen',
           onTap: () => context.push('/buchhaltung/buchungen'),
@@ -393,7 +393,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         _NavigationTile(
           icon: Icons.add_circle_outline,
-          iconColor: AppColors.success,
+          iconColor: AppStatusColors.success,
           title: 'Neue Buchung',
           subtitle: 'Manuelle Buchung erfassen',
           onTap: () => context.push('/buchhaltung/buchungen/neu'),
@@ -409,7 +409,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         _NavigationTile(
           icon: Icons.assessment,
-          iconColor: AppColors.secondary,
+          iconColor: Theme.of(context).colorScheme.secondary,
           title: 'Berichte',
           subtitle: 'Bilanz & Erfolgsrechnung',
           onTap: () => context.push('/buchhaltung/berichte'),
@@ -466,11 +466,11 @@ class _KpiLineChart extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.show_chart,
-                      color: AppColors.primary, size: 20),
+                  child: Icon(Icons.show_chart,
+                      color: Theme.of(context).colorScheme.primary, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -550,9 +550,9 @@ class _KpiLineChart extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 6),
                             child: Text(
                               _months[idx],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.textSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           );
@@ -567,9 +567,9 @@ class _KpiLineChart extends StatelessWidget {
                         getTitlesWidget: (value, meta) {
                           return Text(
                             _formatCompact(value),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           );
                         },
@@ -581,8 +581,8 @@ class _KpiLineChart extends StatelessWidget {
                     horizontalInterval: max(interval, 1),
                     getDrawingHorizontalLine: (value) => FlLine(
                       color: value == 0
-                          ? AppColors.textSecondary.withValues(alpha: 0.3)
-                          : AppColors.divider,
+                          ? Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3)
+                          : Theme.of(context).dividerColor,
                       strokeWidth: value == 0 ? 1 : 0.5,
                     ),
                     drawVerticalLine: false,
@@ -701,9 +701,9 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -776,8 +776,8 @@ class _OverviewCard extends StatelessWidget {
                       row.label,
                       style: TextStyle(
                         color: row.isBold
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight:
                             row.isBold ? FontWeight.w600 : FontWeight.normal,
                         fontSize: 14,
@@ -786,7 +786,7 @@ class _OverviewCard extends StatelessWidget {
                     Text(
                       row.value,
                       style: TextStyle(
-                        color: row.valueColor ?? AppColors.textPrimary,
+                        color: row.valueColor ?? Theme.of(context).colorScheme.onSurface,
                         fontWeight:
                             row.isBold ? FontWeight.w700 : FontWeight.w500,
                         fontSize: 14,
@@ -840,18 +840,18 @@ class _CompactCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -920,17 +920,17 @@ class _NavigationTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),

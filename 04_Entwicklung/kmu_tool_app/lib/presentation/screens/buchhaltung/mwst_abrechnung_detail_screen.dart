@@ -144,7 +144,7 @@ class MwstAbrechnungDetailScreen extends ConsumerWidget {
                           ? 'Effektive Methode'
                           : 'Saldosteuersatz',
                       style: TextStyle(
-                          fontSize: 13, color: AppColors.textSecondary),
+                          fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -222,7 +222,7 @@ class _StatusChip extends StatelessWidget {
 
   const _StatusChip({required this.status, required this.label});
 
-  Color get _color {
+  Color _color(BuildContext context) {
     switch (status) {
       case 'entwurf':
         return AppStatusColors.warning;
@@ -231,16 +231,17 @@ class _StatusChip extends StatelessWidget {
       case 'bezahlt':
         return AppStatusColors.success;
       default:
-        return AppColors.textSecondary;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final color = _color(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -248,7 +249,7 @@ class _StatusChip extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: _color,
+          color: color,
         ),
       ),
     );
@@ -268,7 +269,7 @@ class _SectionTitle extends StatelessWidget {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: AppColors.primary,
+          color: Theme.of(context).colorScheme.primary,
           letterSpacing: 0.5,
         ),
       ),
@@ -313,7 +314,7 @@ class _FormRow extends StatelessWidget {
       ),
       decoration: highlight
           ? BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(6),
             )
           : null,
@@ -326,7 +327,7 @@ class _FormRow extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -389,7 +390,7 @@ class _FormRowDouble extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -401,7 +402,7 @@ class _FormRowDouble extends StatelessWidget {
             children: [
               Text(
                 _chf.format(umsatz),
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               Text(
                 _chf.format(steuer),

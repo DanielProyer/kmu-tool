@@ -65,7 +65,7 @@ class _RapportFormScreenState extends State<RapportFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Rapport gespeichert'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -77,7 +77,7 @@ class _RapportFormScreenState extends State<RapportFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -213,7 +213,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       label,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
           ),

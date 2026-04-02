@@ -144,7 +144,7 @@ class _MwstOverviewScreenState extends ConsumerState<MwstOverviewScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 letterSpacing: 0.5,
               ),
             ),
@@ -161,7 +161,7 @@ class _MwstOverviewScreenState extends ConsumerState<MwstOverviewScreen> {
                       child: Column(
                         children: [
                           Icon(Icons.receipt_long,
-                              size: 48, color: AppColors.textSecondary),
+                              size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
                           const SizedBox(height: 12),
                           const Text('Noch keine Abrechnungen vorhanden'),
                         ],
@@ -213,7 +213,7 @@ class _NoSettingsCard extends StatelessWidget {
               'Saldosteuersatz konfigurieren.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+                  fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -247,11 +247,11 @@ class _SettingsCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.account_balance_wallet,
-                      color: AppColors.primary, size: 20),
+                  child: Icon(Icons.account_balance_wallet,
+                      color: Theme.of(context).colorScheme.primary, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -310,7 +310,7 @@ class _InfoRow extends StatelessWidget {
         children: [
           Text(label,
               style: TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary)),
+                  fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant)),
           Flexible(
             child: Text(
               value,
@@ -336,7 +336,7 @@ class _AbrechnungCard extends StatelessWidget {
     required this.onTap,
   });
 
-  Color get _statusColor {
+  Color _statusColor(BuildContext context) {
     switch (abrechnung.status) {
       case 'entwurf':
         return AppStatusColors.warning;
@@ -345,7 +345,7 @@ class _AbrechnungCard extends StatelessWidget {
       case 'bezahlt':
         return AppStatusColors.success;
       default:
-        return AppColors.textSecondary;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
@@ -354,6 +354,7 @@ class _AbrechnungCard extends StatelessWidget {
     final zahlung = abrechnung.istZahllast
         ? chf.format(abrechnung.ziff500)
         : '-${chf.format(abrechnung.ziff510)}';
+    final statusColor = _statusColor(context);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -382,7 +383,7 @@ class _AbrechnungCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: _statusColor.withValues(alpha: 0.1),
+                            color: statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -390,7 +391,7 @@ class _AbrechnungCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: _statusColor,
+                              color: statusColor,
                             ),
                           ),
                         ),
@@ -401,7 +402,7 @@ class _AbrechnungCard extends StatelessWidget {
                               : 'SSS',
                           style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -419,8 +420,8 @@ class _AbrechnungCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right,
-                  color: AppColors.textSecondary),
+              Icon(Icons.chevron_right,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant),
             ],
           ),
         ),

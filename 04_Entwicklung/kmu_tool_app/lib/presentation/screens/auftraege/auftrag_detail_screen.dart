@@ -43,15 +43,15 @@ class _AuftragDetailScreenState
   Color _statusColor(String status) {
     switch (status) {
       case 'offen':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'in_arbeit':
-        return AppColors.inBearbeitung;
+        return AppStatusColors.inBearbeitung;
       case 'abgeschlossen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'storniert':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -121,7 +121,7 @@ class _AuftragDetailScreenState
           SnackBar(
             content:
                 Text('Status geaendert zu "${labels[selected]}"'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
       }
@@ -140,7 +140,7 @@ class _AuftragDetailScreenState
           SnackBar(
             content: Text(
                 'Rechnung ${rechnung.rechnungsNr} erstellt'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
         context.push('/rechnungen/${rechnung.id}');
@@ -150,7 +150,7 @@ class _AuftragDetailScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Erstellen der Rechnung: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -188,7 +188,7 @@ class _AuftragDetailScreenState
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.error_outline,
-                    size: 48, color: AppColors.error),
+                    size: 48, color: AppStatusColors.error),
                 const SizedBox(height: 16),
                 Text('Fehler: $error'),
                 const SizedBox(height: 16),
@@ -322,14 +322,14 @@ class _AuftragDetailScreenState
                 ),
 
                 // ─── Zeiterfassungen ───
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                   child: Text(
                     'ZEITERFASSUNGEN',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -347,13 +347,13 @@ class _AuftragDetailScreenState
                   ),
                   data: (zeiterfassungen) {
                     if (zeiterfassungen.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Zeiterfassungen vorhanden',
                           style: TextStyle(
-                              color: AppColors.textSecondary),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -377,7 +377,7 @@ class _AuftragDetailScreenState
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.primary
+                              color: Theme.of(context).colorScheme.primary
                                   .withValues(alpha: 0.05),
                               borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(12),
@@ -429,14 +429,14 @@ class _AuftragDetailScreenState
                 ),
 
                 // ─── Rapporte ───
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Text(
                     'RAPPORTE',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -454,13 +454,13 @@ class _AuftragDetailScreenState
                   ),
                   data: (rapporte) {
                     if (rapporte.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Rapporte vorhanden',
                           style: TextStyle(
-                              color: AppColors.textSecondary),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -500,27 +500,27 @@ class _AuftragDetailScreenState
 
                 // ─── Verknuepfte Offerte ───
                 if (auftrag.offerteId != null) ...[
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       'VERKNUEPFTE OFFERTE',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
                   ),
                   Card(
                     child: ListTile(
-                      leading: const Icon(Icons.description_outlined,
-                          color: AppColors.primary),
+                      leading: Icon(Icons.description_outlined,
+                          color: Theme.of(context).colorScheme.primary),
                       title: Text(
                           'Offerte ${auftrag.offerteId!.substring(0, 8)}...'),
                       subtitle: const Text('Tippen zum Oeffnen'),
-                      trailing: const Icon(Icons.chevron_right,
-                          color: AppColors.textSecondary),
+                      trailing: Icon(Icons.chevron_right,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                       onTap: () {
                         context.push(
                             '/offerten/${auftrag.offerteId}');
@@ -594,11 +594,11 @@ class _AuftragDetailScreenState
   Color _rapportStatusColor(String status) {
     switch (status) {
       case 'entwurf':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       case 'abgeschlossen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -655,19 +655,20 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final secondaryColor = Theme.of(context).colorScheme.onSurfaceVariant;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
+          Icon(icon, size: 18, color: secondaryColor),
           const SizedBox(width: 8),
           SizedBox(
             width: 90,
             child: Text(
               label,
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(
+                  fontSize: 13, color: secondaryColor),
             ),
           ),
           Expanded(child: Text(value)),
@@ -695,11 +696,12 @@ class _ZeiterfassungRow extends StatelessWidget {
         ? '${zeiterfassung.startZeit} – ${zeiterfassung.endZeit}'
         : null;
 
+    final secondaryColor = Theme.of(context).colorScheme.onSurfaceVariant;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-            bottom: BorderSide(color: AppColors.divider, width: 0.5)),
+            bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -715,8 +717,8 @@ class _ZeiterfassungRow extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   zeitraum,
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 13),
+                  style: TextStyle(
+                      color: secondaryColor, fontSize: 13),
                 ),
               ],
               const Spacer(),
@@ -735,8 +737,8 @@ class _ZeiterfassungRow extends StatelessWidget {
                 zeiterfassung.beschreibung!,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13),
+                style: TextStyle(
+                    color: secondaryColor, fontSize: 13),
               ),
             ),
         ],
@@ -762,9 +764,9 @@ class _RapportRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-            bottom: BorderSide(color: AppColors.divider, width: 0.5)),
+            bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -791,8 +793,8 @@ class _RapportRow extends StatelessWidget {
                 rapport.beschreibung!,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13),
               ),
             ),
         ],

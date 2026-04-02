@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/core/theme/app_theme_registry.dart';
 import 'package:kmu_tool_app/presentation/providers/theme_provider.dart';
 

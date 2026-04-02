@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(child: Text(message)),
               ],
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
           content: const Text(
             'Bitte zuerst E-Mail-Adresse eingeben',
           ),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
         ),
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
             content: const Text(
               'Link zum Zurücksetzen wurde gesendet',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -145,11 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                     ),
                     const SizedBox(height: 8),
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Für Schweizer Handwerksbetriebe',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 48),
@@ -273,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Noch kein Konto? Kontaktiere deinen Administrator.',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 24),

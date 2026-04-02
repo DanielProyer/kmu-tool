@@ -73,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (!_isOnline) {
       icon = Icons.cloud_off;
-      color = AppColors.offline;
+      color = AppStatusColors.offline;
       tooltip = 'Offline';
     } else {
       switch (_syncState) {
@@ -85,17 +85,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.syncing,
+                color: AppStatusColors.syncing,
               ),
             ),
           );
         case SyncState.error:
           icon = Icons.sync_problem;
-          color = AppColors.warning;
+          color = AppStatusColors.warning;
           tooltip = 'Sync-Fehler';
         case SyncState.idle:
           icon = Icons.cloud_done;
-          color = AppColors.online;
+          color = AppStatusColors.online;
           tooltip = 'Synchronisiert';
       }
     }
@@ -164,7 +164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Icon(
               Icons.error_outline,
               size: 48,
-              color: AppColors.error,
+              color: AppStatusColors.error,
             ),
             const SizedBox(height: 16),
             Text(
@@ -176,7 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               error.toString(),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
             const SizedBox(height: 24),
@@ -198,13 +198,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasRechnungen = ref.watch(hasFeatureProvider(AppFeature.rechnungen));
     final hasBuchhaltung = ref.watch(hasFeatureProvider(AppFeature.buchhaltung));
 
+    final colorScheme = Theme.of(context).colorScheme;
     final allTiles = <_DashboardTileData>[
       if (hasKunden)
         _DashboardTileData(
           label: 'Kunden',
           icon: Icons.people,
           value: '${data.kundenCount}',
-          color: AppColors.primary,
+          color: colorScheme.primary,
           route: '/kunden',
         ),
       if (hasOfferten)
@@ -212,7 +213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           label: 'Offene Offerten',
           icon: Icons.description,
           value: '${data.offeneOffertenCount}',
-          color: AppColors.secondary,
+          color: colorScheme.secondary,
           route: '/offerten',
         ),
       if (hasAuftraege)
@@ -220,7 +221,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           label: 'Aktive Auftraege',
           icon: Icons.work,
           value: '${data.aktiveAuftraegeCount}',
-          color: AppColors.inBearbeitung,
+          color: AppStatusColors.inBearbeitung,
           route: '/auftraege',
         ),
       if (hasRechnungen)
@@ -228,7 +229,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           label: 'Offene Rechnungen',
           icon: Icons.receipt_long,
           value: _formatCHF(data.offeneRechnungenBetrag),
-          color: AppColors.error,
+          color: AppStatusColors.error,
           route: '/rechnungen',
         ),
       if (hasBuchhaltung)
@@ -243,7 +244,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         label: 'Sync Status',
         icon: _isOnline ? Icons.cloud_done : Icons.cloud_off,
         value: _isOnline ? 'Online' : 'Offline',
-        color: _isOnline ? AppColors.online : AppColors.offline,
+        color: _isOnline ? AppStatusColors.online : AppStatusColors.offline,
         route: null,
       ),
     ];
@@ -262,14 +263,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _greeting(),
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               ),
               const SizedBox(height: 4),
               Text(
                 _formattedDate(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
             ],
@@ -385,7 +386,7 @@ class _DashboardTile extends StatelessWidget {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.divider),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -418,7 +419,7 @@ class _DashboardTile extends StatelessWidget {
                   data.value,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: data.value.length > 10 ? 16 : 22,
                       ),
                   maxLines: 1,
@@ -430,7 +431,7 @@ class _DashboardTile extends StatelessWidget {
               Text(
                 data.label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                 maxLines: 1,

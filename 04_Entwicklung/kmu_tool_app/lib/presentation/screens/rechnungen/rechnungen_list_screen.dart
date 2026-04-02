@@ -71,13 +71,13 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
       case 'entwurf':
         return Colors.grey;
       case 'gesendet':
-        return AppColors.info;
+        return AppStatusColors.info;
       case 'bezahlt':
-        return AppColors.success;
+        return AppStatusColors.success;
       case 'storniert':
         return Colors.grey;
       case 'gemahnt':
-        return AppColors.error;
+        return AppStatusColors.error;
       default:
         return Colors.grey;
     }
@@ -163,13 +163,13 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 48, color: AppColors.error),
+                      Icon(Icons.error_outline,
+                          size: 48, color: AppStatusColors.error),
                       const SizedBox(height: 12),
                       Text(
                         'Fehler beim Laden: $e',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.textSecondary),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -189,14 +189,14 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.receipt_long_outlined,
-                            size: 64, color: AppColors.divider),
+                            size: 64, color: Theme.of(context).dividerColor),
                         const SizedBox(height: 16),
                         Text(
                           _filter == 'alle'
                               ? 'Noch keine Rechnungen'
                               : 'Keine Rechnungen mit Status "${_statusLabels[_filter]}"',
                           style:
-                              const TextStyle(color: AppColors.textSecondary),
+                              TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -227,8 +227,8 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color: isUeberfaellig
-                                ? AppColors.error.withValues(alpha: 0.5)
-                                : AppColors.divider,
+                                ? AppStatusColors.error.withValues(alpha: 0.5)
+                                : Theme.of(context).dividerColor,
                             width: isUeberfaellig ? 1.5 : 1,
                           ),
                         ),
@@ -266,9 +266,9 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                 // Kunde
                                 Row(
                                   children: [
-                                    const Icon(Icons.person_outlined,
+                                    Icon(Icons.person_outlined,
                                         size: 16,
-                                        color: AppColors.textSecondary),
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     const SizedBox(width: 6),
                                     Expanded(
                                       child: Text(
@@ -277,7 +277,7 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                             .textTheme
                                             .bodyMedium
                                             ?.copyWith(
-                                              color: AppColors.textSecondary,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -296,7 +296,7 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(
-                                            color: AppColors.textSecondary,
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           ),
                                     ),
                                     const SizedBox(width: 12),
@@ -306,8 +306,8 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                       Icons.event_outlined,
                                       size: 14,
                                       color: isUeberfaellig
-                                          ? AppColors.error
-                                          : AppColors.textSecondary,
+                                          ? AppStatusColors.error
+                                          : Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
@@ -317,8 +317,8 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                           .bodySmall
                                           ?.copyWith(
                                             color: isUeberfaellig
-                                                ? AppColors.error
-                                                : AppColors.textSecondary,
+                                                ? AppStatusColors.error
+                                                : Theme.of(context).colorScheme.onSurfaceVariant,
                                             fontWeight: isUeberfaellig
                                                 ? FontWeight.w600
                                                 : null,
@@ -349,14 +349,14 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                         horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
                                       color:
-                                          AppColors.error.withValues(alpha: 0.1),
+                                          AppStatusColors.error.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Icons.warning_amber_rounded,
-                                            size: 14, color: AppColors.error),
+                                        Icon(Icons.warning_amber_rounded,
+                                            size: 14, color: AppStatusColors.error),
                                         const SizedBox(width: 4),
                                         Text(
                                           'Überfällig',
@@ -364,7 +364,7 @@ class _RechnungenListScreenState extends ConsumerState<RechnungenListScreen> {
                                               .textTheme
                                               .labelSmall
                                               ?.copyWith(
-                                                color: AppColors.error,
+                                                color: AppStatusColors.error,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                         ),

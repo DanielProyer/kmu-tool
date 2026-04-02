@@ -75,13 +75,13 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
       case 'entwurf':
         return Colors.grey;
       case 'gesendet':
-        return AppColors.info;
+        return AppStatusColors.info;
       case 'bezahlt':
-        return AppColors.success;
+        return AppStatusColors.success;
       case 'storniert':
         return Colors.grey;
       case 'gemahnt':
-        return AppColors.error;
+        return AppStatusColors.error;
       default:
         return Colors.grey;
     }
@@ -137,7 +137,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Rechnung als bezahlt markiert'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -148,7 +148,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -210,7 +210,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Status auf "${_statusLabel(selected)}" geändert'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -221,7 +221,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -242,7 +242,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Benutzerprofil nicht geladen'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
         ),
@@ -253,7 +253,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Kundendaten nicht geladen'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
         ),
@@ -272,7 +272,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('PDF-Fehler: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -322,7 +322,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Text('Fehler: $e',
-              style: const TextStyle(color: AppColors.error)),
+              style: TextStyle(color: AppStatusColors.error)),
         ),
         data: (rechnung) {
           if (rechnung == null) {
@@ -390,7 +390,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                           value: _dateFormat.format(rechnung.faelligAm),
                           valueColor: rechnung.status == 'gesendet' &&
                                   rechnung.faelligAm.isBefore(DateTime.now())
-                              ? AppColors.error
+                              ? AppStatusColors.error
                               : null,
                         ),
 
@@ -430,10 +430,10 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                               Text('Fehler: $e'),
                           data: (positionen) {
                             if (positionen.isEmpty) {
-                              return const Text(
+                              return Text(
                                 'Keine Positionen vorhanden',
                                 style: TextStyle(
-                                    color: AppColors.textSecondary),
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                               );
                             }
                             return Column(
@@ -442,10 +442,10 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 8, horizontal: 4),
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     border: Border(
                                       bottom: BorderSide(
-                                          color: AppColors.divider),
+                                          color: Theme.of(context).dividerColor),
                                     ),
                                   ),
                                   child: Row(
@@ -495,10 +495,10 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                                 ...positionen.map((p) => Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 8, horizontal: 4),
-                                      decoration: const BoxDecoration(
+                                      decoration: BoxDecoration(
                                         border: Border(
                                           bottom: BorderSide(
-                                              color: AppColors.divider,
+                                              color: Theme.of(context).dividerColor,
                                               width: 0.5),
                                         ),
                                       ),
@@ -524,10 +524,9 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                                                                 13)),
                                                 Text(p.einheit,
                                                     style:
-                                                        const TextStyle(
+                                                        TextStyle(
                                                             fontSize: 11,
-                                                            color: AppColors
-                                                                .textSecondary)),
+                                                            color: Theme.of(context).colorScheme.onSurfaceVariant)),
                                               ],
                                             ),
                                           ),
@@ -581,7 +580,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
@@ -637,8 +636,8 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
                       rechnung.status == 'gemahnt')
                     OutlinedButton.icon(
                       onPressed: () => _markAsBezahlt(rechnung),
-                      icon: const Icon(Icons.check_circle_outlined,
-                          color: AppColors.success),
+                      icon: Icon(Icons.check_circle_outlined,
+                          color: AppStatusColors.success),
                       label: const Text('Als bezahlt markieren'),
                     ),
                   const SizedBox(height: 12),
@@ -705,14 +704,14 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppColors.textSecondary),
+          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(width: 8),
           SizedBox(
             width: 80,
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ),

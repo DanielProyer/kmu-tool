@@ -57,6 +57,7 @@ class _KundenListScreenState extends ConsumerState<KundenListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final kundenAsync = ref.watch(kundenListProvider);
 
     return Scaffold(
@@ -107,8 +108,8 @@ class _KundenListScreenState extends ConsumerState<KundenListScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline,
-                    size: 48, color: AppColors.error),
+                Icon(Icons.error_outline,
+                    size: 48, color: AppStatusColors.error),
                 const SizedBox(height: 16),
                 Text(
                   'Fehler beim Laden',
@@ -118,7 +119,7 @@ class _KundenListScreenState extends ConsumerState<KundenListScreen> {
                 Text(
                   error.toString(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 16),
                 FilledButton.icon(
@@ -143,21 +144,21 @@ class _KundenListScreenState extends ConsumerState<KundenListScreen> {
                     Icon(
                       Icons.people_outline,
                       size: 72,
-                      color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Noch keine Kunden erfasst',
                       style:
                           Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppColors.textSecondary,
+                                color: colorScheme.onSurfaceVariant,
                               ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Erstelle deinen ersten Kunden mit dem + Button',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -175,13 +176,13 @@ class _KundenListScreenState extends ConsumerState<KundenListScreen> {
                     Icon(
                       Icons.search_off,
                       size: 48,
-                      color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Keine Ergebnisse fuer "$_searchQuery"',
                       style:
-                          const TextStyle(color: AppColors.textSecondary),
+                          TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -238,6 +239,8 @@ class _KundeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -247,13 +250,13 @@ class _KundeCard extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                 child: Text(
                   displayName.isNotEmpty
                       ? displayName[0].toUpperCase()
                       : '?',
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: TextStyle(
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -274,8 +277,8 @@ class _KundeCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -285,16 +288,16 @@ class _KundeCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.phone_outlined,
                             size: 14,
-                            color: AppColors.textSecondary,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             kunde.telefon!,
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
                               fontSize: 13,
                             ),
                           ),
@@ -304,9 +307,9 @@ class _KundeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurfaceVariant,
               ),
             ],
           ),

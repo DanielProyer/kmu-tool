@@ -38,15 +38,15 @@ class _AuftraegeListScreenState
   Color _statusColor(String status) {
     switch (status) {
       case 'offen':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'in_arbeit':
-        return AppColors.inBearbeitung;
+        return AppStatusColors.inBearbeitung;
       case 'abgeschlossen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'storniert':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -102,7 +102,7 @@ class _AuftraegeListScreenState
                           ? (entry.key == 'alle'
                               ? Theme.of(context).colorScheme.primary
                               : _statusColor(entry.key))
-                          : AppColors.textSecondary,
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -125,7 +125,7 @@ class _AuftraegeListScreenState
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.error_outline,
-                          size: 48, color: AppColors.error),
+                          size: 48, color: AppStatusColors.error),
                       const SizedBox(height: 16),
                       Text('Fehler beim Laden: $error'),
                       const SizedBox(height: 16),
@@ -152,7 +152,7 @@ class _AuftraegeListScreenState
                           Icon(
                             Icons.assignment_outlined,
                             size: 72,
-                            color: AppColors.textSecondary
+                            color: Theme.of(context).colorScheme.onSurfaceVariant
                                 .withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
@@ -162,14 +162,14 @@ class _AuftraegeListScreenState
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(
-                                    color: AppColors.textSecondary),
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'Erstelle deinen ersten Auftrag mit dem + Button',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: AppColors.textSecondary),
+                                color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -181,8 +181,8 @@ class _AuftraegeListScreenState
                   return Center(
                     child: Text(
                       'Keine Auftraege mit Status "${_statusLabel(_selectedFilter)}"',
-                      style: const TextStyle(
-                          color: AppColors.textSecondary),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                   );
                 }
@@ -296,14 +296,14 @@ class _AuftragCard extends StatelessWidget {
               if (kundeName.isNotEmpty)
                 Row(
                   children: [
-                    const Icon(Icons.person_outline,
-                        size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.person_outline,
+                        size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         kundeName,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -317,8 +317,8 @@ class _AuftragCard extends StatelessWidget {
                   auftrag.beschreibung!,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 13,
                   ),
                 ),
@@ -328,13 +328,13 @@ class _AuftragCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.date_range_outlined,
-                        size: 14, color: AppColors.textSecondary),
+                    Icon(Icons.date_range_outlined,
+                        size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Text(
                       _buildZeitraumText(),
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
                     ),

@@ -63,7 +63,7 @@ class KontenplanScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppStatusColors.error),
             const SizedBox(height: 16),
             Text(
               'Fehler beim Laden',
@@ -73,7 +73,7 @@ class KontenplanScreen extends ConsumerWidget {
             Text(
               error.toString(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -108,20 +108,20 @@ class KontenplanScreen extends ConsumerWidget {
               Icon(
                 Icons.list_alt,
                 size: 72,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
                 'Noch kein Kontenplan vorhanden',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Der Kontenplan wird beim ersten Login automatisch erstellt.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -178,30 +178,30 @@ class _KontenklasseSection extends StatelessWidget {
     this.initiallyExpanded = false,
   });
 
-  Color _klasseColor() {
+  Color _klasseColor(BuildContext context) {
     switch (klasse) {
       case 1:
-        return AppColors.primary;
+        return Theme.of(context).colorScheme.primary;
       case 2:
         return const Color(0xFF7C3AED); // Purple
       case 3:
-        return AppColors.success;
+        return AppStatusColors.success;
       case 4:
-        return AppColors.secondary;
+        return Theme.of(context).colorScheme.secondary;
       case 5:
-        return AppColors.warning;
+        return AppStatusColors.warning;
       case 6:
-        return AppColors.error;
+        return AppStatusColors.error;
       case 8:
-        return AppColors.textSecondary;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
       default:
-        return AppColors.textSecondary;
+        return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = _klasseColor();
+    final color = _klasseColor(context);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -236,9 +236,9 @@ class _KontenklasseSection extends StatelessWidget {
         ),
         subtitle: Text(
           '${konten.length} Konten  |  ${formatCHF(totalSaldo)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         children: konten.map((konto) {
@@ -270,10 +270,10 @@ class _KontoListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final saldoColor = konto.saldo > 0
-        ? AppColors.success
+        ? AppStatusColors.success
         : konto.saldo < 0
-            ? AppColors.error
-            : AppColors.textSecondary;
+            ? AppStatusColors.error
+            : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
@@ -286,11 +286,11 @@ class _KontoListTile extends StatelessWidget {
               width: 52,
               child: Text(
                 '${konto.kontonummer}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                   fontFamily: 'monospace',
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

@@ -156,13 +156,13 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
                 index == 0 ? _monthNames[0] : _monthNames[index],
                 style: TextStyle(
                   fontSize: 13,
-                  color: isSelected ? Colors.white : AppColors.textPrimary,
+                  color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               selected: isSelected,
-              selectedColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceCard,
-              side: const BorderSide(color: AppColors.divider),
+              selectedColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              side: BorderSide(color: Theme.of(context).dividerColor),
               onSelected: (_) {
                 setState(() {
                   _selectedMonth = index == 0 ? null : index;
@@ -182,7 +182,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppStatusColors.error),
             const SizedBox(height: 16),
             Text(
               'Fehler beim Laden',
@@ -192,7 +192,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
             Text(
               error.toString(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ],
         ),
@@ -215,7 +215,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
               Icon(
                 Icons.menu_book,
                 size: 72,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -223,7 +223,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
                     ? 'Keine Buchungen im ${_monthNames[_selectedMonth!]}'
                     : 'Noch keine Buchungen vorhanden',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -282,7 +282,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.divider,
+                      color: Theme.of(context).dividerColor,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -340,8 +340,8 @@ class _DetailRow extends StatelessWidget {
             width: 110,
             child: Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -396,17 +396,17 @@ class _BuchungCard extends StatelessWidget {
                 children: [
                   Text(
                     formatDate(buchung.datum),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   if (buchung.belegNr != null && buchung.belegNr!.isNotEmpty)
                     Text(
                       buchung.belegNr!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontFamily: 'monospace',
                       ),
                     ),
@@ -432,9 +432,9 @@ class _BuchungCard extends StatelessWidget {
                   Expanded(
                     child: RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         children: [
                           TextSpan(
@@ -446,11 +446,11 @@ class _BuchungCard extends StatelessWidget {
                           ),
                           const TextSpan(text: ' '),
                           TextSpan(text: sollName),
-                          const TextSpan(
+                          TextSpan(
                             text: '  an  ',
                             style: TextStyle(
                               fontStyle: FontStyle.italic,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                           TextSpan(
@@ -471,10 +471,10 @@ class _BuchungCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     formatCHF(buchung.betrag),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],

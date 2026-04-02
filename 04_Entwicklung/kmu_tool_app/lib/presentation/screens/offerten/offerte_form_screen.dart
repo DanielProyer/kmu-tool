@@ -119,7 +119,7 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Laden: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -172,9 +172,9 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedKundeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bitte einen Kunden auswaehlen'),
-          backgroundColor: AppColors.error,
+        SnackBar(
+          content: const Text('Bitte einen Kunden auswaehlen'),
+          backgroundColor: AppStatusColors.error,
         ),
       );
       return;
@@ -186,9 +186,9 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
         .toList();
     if (validPositionen.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bitte mindestens eine Position erfassen'),
-          backgroundColor: AppColors.error,
+        SnackBar(
+          content: const Text('Bitte mindestens eine Position erfassen'),
+          backgroundColor: AppStatusColors.error,
         ),
       );
       return;
@@ -271,7 +271,7 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
           SnackBar(
             content: Text(
                 _isEdit ? 'Offerte aktualisiert' : 'Offerte erstellt'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
         ref.invalidate(offertenListProvider);
@@ -287,7 +287,7 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -457,12 +457,12 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
                     const SizedBox(height: 24),
 
                     // ─── Positionen ───
-                    const Text(
+                    Text(
                       'POSITIONEN',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -563,12 +563,12 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
                     const SizedBox(height: 24),
 
                     // ─── Bemerkung ───
-                    const Text(
+                    Text(
                       'BEMERKUNG',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -661,7 +661,7 @@ class _PositionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isArbeit = position.isArbeit;
-    final typColor = isArbeit ? AppColors.info : AppColors.secondary;
+    final typColor = isArbeit ? AppStatusColors.info : Theme.of(context).colorScheme.secondary;
     final typIcon = isArbeit ? Icons.build_outlined : Icons.inventory_2_outlined;
     final typLabel = isArbeit ? 'Arbeit' : 'Material';
 
@@ -711,16 +711,16 @@ class _PositionCard extends StatelessWidget {
                 const Spacer(),
                 Text(
                   'Pos. $posNr',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 if (onDelete != null)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline,
-                        size: 20, color: AppColors.error),
+                    icon: Icon(Icons.delete_outline,
+                        size: 20, color: AppStatusColors.error),
                     onPressed: onDelete,
                     visualDensity: VisualDensity.compact,
                   ),
@@ -915,7 +915,7 @@ class _ArtikelSearchFieldState extends State<_ArtikelSearchField> {
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: AppColors.textSecondary.withValues(alpha: 0.2),
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
               ),
             ),
             child: ListView.builder(

@@ -38,15 +38,15 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
   Color _statusColor(String status) {
     switch (status) {
       case 'entwurf':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       case 'gesendet':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'angenommen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'abgelehnt':
-        return AppColors.error;
+        return AppStatusColors.error;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -101,7 +101,7 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
                           ? (entry.key == 'alle'
                               ? Theme.of(context).colorScheme.primary
                               : _statusColor(entry.key))
-                          : AppColors.textSecondary,
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -123,8 +123,8 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 48, color: AppColors.error),
+                      Icon(Icons.error_outline,
+                          size: 48, color: AppStatusColors.error),
                       const SizedBox(height: 16),
                       Text('Fehler beim Laden: $error'),
                       const SizedBox(height: 16),
@@ -151,7 +151,7 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
                           Icon(
                             Icons.description_outlined,
                             size: 72,
-                            color: AppColors.textSecondary
+                            color: Theme.of(context).colorScheme.onSurfaceVariant
                                 .withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
@@ -161,14 +161,14 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
                                 .textTheme
                                 .titleMedium
                                 ?.copyWith(
-                                    color: AppColors.textSecondary),
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'Erstelle deine erste Offerte mit dem + Button',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: AppColors.textSecondary),
+                                color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -180,8 +180,8 @@ class _OffertenListScreenState extends ConsumerState<OffertenListScreen> {
                   return Center(
                     child: Text(
                       'Keine Offerten mit Status "${_statusLabel(_selectedFilter)}"',
-                      style: const TextStyle(
-                          color: AppColors.textSecondary),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                   );
                 }
@@ -297,14 +297,14 @@ class _OfferteCardState extends State<_OfferteCard> {
               if (_kundeName.isNotEmpty)
                 Row(
                   children: [
-                    const Icon(Icons.person_outline,
-                        size: 16, color: AppColors.textSecondary),
+                    Icon(Icons.person_outline,
+                        size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         _kundeName,
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -314,13 +314,13 @@ class _OfferteCardState extends State<_OfferteCard> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.calendar_today_outlined,
-                      size: 14, color: AppColors.textSecondary),
+                  Icon(Icons.calendar_today_outlined,
+                      size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   const SizedBox(width: 6),
                   Text(
                     widget.dateFormat.format(widget.offerte.datum),
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 13,
                     ),
                   ),

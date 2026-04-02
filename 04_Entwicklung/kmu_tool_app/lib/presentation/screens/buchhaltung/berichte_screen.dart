@@ -218,13 +218,13 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                   entry.value,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 selected: isSelected,
-                selectedColor: AppColors.primary,
-                backgroundColor: AppColors.surfaceCard,
-                side: const BorderSide(color: AppColors.divider),
+                selectedColor: Theme.of(context).colorScheme.primary,
+                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                side: BorderSide(color: Theme.of(context).dividerColor),
                 visualDensity: VisualDensity.compact,
                 onSelected: (_) {
                   setState(() => _periode = entry.key);
@@ -247,7 +247,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppStatusColors.error),
             const SizedBox(height: 16),
             Text('Fehler: $error'),
           ],
@@ -270,23 +270,23 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
+                color: AppStatusColors.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.3),
+                  color: AppStatusColors.warning.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.warning_amber,
-                      color: AppColors.warning, size: 20),
+                      color: AppStatusColors.warning, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Bilanz ist nicht ausgeglichen. '
                       'Differenz: ${_chf.format((data.totalAktiven - data.totalPassiven).abs())}',
                       style: const TextStyle(
-                        color: AppColors.warning,
+                        color: AppStatusColors.warning,
                         fontSize: 13,
                       ),
                     ),
@@ -296,7 +296,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
             ),
 
           // Aktiven
-          _SectionHeader(title: 'AKTIVEN', color: AppColors.primary),
+          _SectionHeader(title: 'AKTIVEN', color: Theme.of(context).colorScheme.primary),
           _KontenTable(
             konten: data.aktiven,
             formatCHF: _chf.format,
@@ -304,7 +304,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           _TotalRow(
             label: 'Total Aktiven',
             amount: _chf.format(data.totalAktiven),
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
 
           const SizedBox(height: 24),
@@ -330,8 +330,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           Card(
             margin: EdgeInsets.zero,
             color: data.bilanzStimmt
-                ? AppColors.success.withValues(alpha: 0.05)
-                : AppColors.warning.withValues(alpha: 0.05),
+                ? AppStatusColors.success.withValues(alpha: 0.05)
+                : AppStatusColors.warning.withValues(alpha: 0.05),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -344,8 +344,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                             ? Icons.check_circle
                             : Icons.info_outline,
                         color: data.bilanzStimmt
-                            ? AppColors.success
-                            : AppColors.warning,
+                            ? AppStatusColors.success
+                            : AppStatusColors.warning,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -356,8 +356,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: data.bilanzStimmt
-                              ? AppColors.success
-                              : AppColors.warning,
+                              ? AppStatusColors.success
+                              : AppStatusColors.warning,
                         ),
                       ),
                     ],
@@ -368,7 +368,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                           (data.totalAktiven - data.totalPassiven).abs()),
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.warning,
+                        color: AppStatusColors.warning,
                       ),
                     ),
                 ],
@@ -394,7 +394,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Erträge
-          _SectionHeader(title: 'ERTRAEGE', color: AppColors.success),
+          _SectionHeader(title: 'ERTRAEGE', color: AppStatusColors.success),
           _KontenTable(
             konten: data.ertraege,
             formatCHF: _chf.format,
@@ -402,7 +402,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           _TotalRow(
             label: 'Total Ertrag',
             amount: _chf.format(data.totalErtrag),
-            color: AppColors.success,
+            color: AppStatusColors.success,
           ),
 
           const SizedBox(height: 24),
@@ -410,7 +410,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           // Aufwand: Materialaufwand
           if (data.aufwand4.isNotEmpty) ...[
             _SectionHeader(
-                title: 'MATERIALAUFWAND', color: AppColors.secondary),
+                title: 'MATERIALAUFWAND', color: Theme.of(context).colorScheme.secondary),
             _KontenTable(
               konten: data.aufwand4,
               formatCHF: _chf.format,
@@ -419,7 +419,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
               label: 'Total Materialaufwand',
               amount: _chf.format(
                   data.aufwand4.fold<double>(0, (s, k) => s + k.saldo)),
-              color: AppColors.secondary,
+              color: Theme.of(context).colorScheme.secondary,
             ),
             const SizedBox(height: 16),
           ],
@@ -427,7 +427,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           // Aufwand: Personalaufwand
           if (data.aufwand5.isNotEmpty) ...[
             _SectionHeader(
-                title: 'PERSONALAUFWAND', color: AppColors.warning),
+                title: 'PERSONALAUFWAND', color: AppStatusColors.warning),
             _KontenTable(
               konten: data.aufwand5,
               formatCHF: _chf.format,
@@ -436,7 +436,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
               label: 'Total Personalaufwand',
               amount: _chf.format(
                   data.aufwand5.fold<double>(0, (s, k) => s + k.saldo)),
-              color: AppColors.warning,
+              color: AppStatusColors.warning,
             ),
             const SizedBox(height: 16),
           ],
@@ -445,7 +445,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           if (data.aufwand6.isNotEmpty) ...[
             _SectionHeader(
                 title: 'SONSTIGER BETRIEBSAUFWAND',
-                color: AppColors.error),
+                color: AppStatusColors.error),
             _KontenTable(
               konten: data.aufwand6,
               formatCHF: _chf.format,
@@ -454,7 +454,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
               label: 'Total Sonstiger Aufwand',
               amount: _chf.format(
                   data.aufwand6.fold<double>(0, (s, k) => s + k.saldo)),
-              color: AppColors.error,
+              color: AppStatusColors.error,
             ),
             const SizedBox(height: 16),
           ],
@@ -463,7 +463,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           if (data.aufwand8.isNotEmpty) ...[
             _SectionHeader(
                 title: 'AUSSERORDENTLICH',
-                color: AppColors.textSecondary),
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
             _KontenTable(
               konten: data.aufwand8,
               formatCHF: _chf.format,
@@ -472,7 +472,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
               label: 'Total Ausserordentlich',
               amount: _chf.format(
                   data.aufwand8.fold<double>(0, (s, k) => s + k.saldo)),
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
           ],
@@ -483,7 +483,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           _TotalRow(
             label: 'Total Aufwand',
             amount: _chf.format(data.totalAufwand),
-            color: AppColors.error,
+            color: AppStatusColors.error,
           ),
 
           const SizedBox(height: 24),
@@ -492,8 +492,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
           Card(
             margin: EdgeInsets.zero,
             color: isGewinn
-                ? AppColors.success.withValues(alpha: 0.08)
-                : AppColors.error.withValues(alpha: 0.08),
+                ? AppStatusColors.success.withValues(alpha: 0.08)
+                : AppStatusColors.error.withValues(alpha: 0.08),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -506,8 +506,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                             ? Icons.trending_up
                             : Icons.trending_down,
                         color: isGewinn
-                            ? AppColors.success
-                            : AppColors.error,
+                            ? AppStatusColors.success
+                            : AppStatusColors.error,
                         size: 28,
                       ),
                       const SizedBox(width: 12),
@@ -517,8 +517,8 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: isGewinn
-                              ? AppColors.success
-                              : AppColors.error,
+                              ? AppStatusColors.success
+                              : AppStatusColors.error,
                         ),
                       ),
                     ],
@@ -529,7 +529,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color:
-                          isGewinn ? AppColors.success : AppColors.error,
+                          isGewinn ? AppStatusColors.success : AppStatusColors.error,
                     ),
                   ),
                 ],
@@ -792,7 +792,7 @@ class _KontenTable extends StatelessWidget {
           'Keine Konten mit Saldo',
           style: TextStyle(
             fontSize: 13,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -802,10 +802,10 @@ class _KontenTable extends StatelessWidget {
     return Column(
       children: konten.map((konto) {
         final saldoColor = konto.saldo > 0
-            ? AppColors.success
+            ? AppStatusColors.success
             : konto.saldo < 0
-                ? AppColors.error
-                : AppColors.textSecondary;
+                ? AppStatusColors.error
+                : Theme.of(context).colorScheme.onSurfaceVariant;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -815,10 +815,10 @@ class _KontenTable extends StatelessWidget {
                 width: 52,
                 child: Text(
                   '${konto.kontonummer}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontFamily: 'monospace',
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),

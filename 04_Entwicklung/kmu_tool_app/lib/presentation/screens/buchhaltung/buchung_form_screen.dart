@@ -128,7 +128,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Bitte Soll- und Haben-Konto auswählen'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -139,7 +139,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Soll- und Haben-Konto dürfen nicht identisch sein'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppStatusColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -152,7 +152,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Betrag muss grösser als 0 sein'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppStatusColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -190,7 +190,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Buchung gespeichert'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -201,7 +201,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -254,7 +254,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.error_outline,
-                    size: 48, color: AppColors.error),
+                    size: 48, color: AppStatusColors.error),
                 const SizedBox(height: 16),
                 Text('Fehler: $error'),
                 const SizedBox(height: 16),
@@ -300,14 +300,14 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                         _showVorlagen
                             ? Icons.expand_less
                             : Icons.expand_more,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         'Buchungsvorlagen',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -315,8 +315,8 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                       const Spacer(),
                       Text(
                         '${vorlagen.length} Vorlagen',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 12,
                         ),
                       ),
@@ -340,16 +340,16 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                             fontSize: 13,
                             color: isSelected
                                 ? Colors.white
-                                : AppColors.textPrimary,
+                                : Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         backgroundColor: isSelected
-                            ? AppColors.primary
-                            : AppColors.surfaceCard,
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.surfaceContainerHighest,
                         side: BorderSide(
                           color: isSelected
-                              ? AppColors.primary
-                              : AppColors.divider,
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).dividerColor,
                         ),
                         onPressed: () => _applyVorlage(v),
                       );
@@ -366,7 +366,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 6),
@@ -391,7 +391,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 6),
@@ -418,7 +418,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 6),
@@ -445,7 +445,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 6),
@@ -489,7 +489,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                   'MWST ${_mwstSatz?.toStringAsFixed(1) ?? "-"}% wird automatisch berechnet',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -657,7 +657,7 @@ class _KontoSearchDropdownState extends State<_KontoSearchDropdown> {
               prefixIcon: const Icon(Icons.account_balance_outlined, size: 20),
               suffixIcon: Icon(
                 _isExpanded ? Icons.expand_less : Icons.expand_more,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             child: selected != null
@@ -668,7 +668,7 @@ class _KontoSearchDropdownState extends State<_KontoSearchDropdown> {
                 : Text(
                     'Konto auswählen',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 15,
                     ),
                   ),
@@ -694,9 +694,9 @@ class _KontoSearchDropdownState extends State<_KontoSearchDropdown> {
           Container(
             constraints: const BoxConstraints(maxHeight: 200),
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.divider),
+              border: Border.all(color: Theme.of(context).dividerColor),
               borderRadius: BorderRadius.circular(10),
-              color: AppColors.surfaceCard,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
             ),
             child: ListView.builder(
               shrinkWrap: true,
@@ -718,7 +718,7 @@ class _KontoSearchDropdownState extends State<_KontoSearchDropdown> {
                       vertical: 10,
                     ),
                     color: isActive
-                        ? AppColors.primary.withValues(alpha: 0.08)
+                        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
                         : null,
                     child: Row(
                       children: [
@@ -731,8 +731,8 @@ class _KontoSearchDropdownState extends State<_KontoSearchDropdown> {
                               fontFamily: 'monospace',
                               fontSize: 13,
                               color: isActive
-                                  ? AppColors.primary
-                                  : AppColors.textSecondary,
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ),

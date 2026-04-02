@@ -43,15 +43,15 @@ class _OfferteDetailScreenState
   Color _statusColor(String status) {
     switch (status) {
       case 'entwurf':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       case 'gesendet':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'angenommen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'abgelehnt':
-        return AppColors.error;
+        return AppStatusColors.error;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -121,7 +121,7 @@ class _OfferteDetailScreenState
           SnackBar(
             content:
                 Text('Status geaendert zu "${labels[selected]}"'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
       }
@@ -147,8 +147,8 @@ class _OfferteDetailScreenState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline,
-                    size: 48, color: AppColors.error),
+                Icon(Icons.error_outline,
+                    size: 48, color: AppStatusColors.error),
                 const SizedBox(height: 16),
                 Text('Fehler: $error'),
                 const SizedBox(height: 16),
@@ -272,14 +272,14 @@ class _OfferteDetailScreenState
                 ),
 
                 // ─── Positionen ───
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
                   child: Text(
                     'POSITIONEN',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -297,13 +297,13 @@ class _OfferteDetailScreenState
                   ),
                   data: (positionen) {
                     if (positionen.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Positionen',
                           style: TextStyle(
-                              color: AppColors.textSecondary),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -314,13 +314,13 @@ class _OfferteDetailScreenState
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 10),
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
-                                    color: AppColors.divider),
+                                    color: Theme.of(context).dividerColor),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
                                 SizedBox(
                                     width: 32,
@@ -329,16 +329,18 @@ class _OfferteDetailScreenState
                                             fontWeight:
                                                 FontWeight.w600,
                                             fontSize: 12,
-                                            color: AppColors
-                                                .textSecondary))),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant))),
                                 Expanded(
                                     child: Text('Bezeichnung',
                                         style: TextStyle(
                                             fontWeight:
                                                 FontWeight.w600,
                                             fontSize: 12,
-                                            color: AppColors
-                                                .textSecondary))),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant))),
                                 SizedBox(
                                     width: 80,
                                     child: Text('Betrag',
@@ -348,8 +350,9 @@ class _OfferteDetailScreenState
                                             fontWeight:
                                                 FontWeight.w600,
                                             fontSize: 12,
-                                            color: AppColors
-                                                .textSecondary))),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant))),
                               ],
                             ),
                           ),
@@ -394,14 +397,14 @@ class _OfferteDetailScreenState
                 // ─── Bemerkung ───
                 if (offerte.bemerkung != null &&
                     offerte.bemerkung!.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       'BEMERKUNG',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -490,18 +493,19 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final secondaryColor = Theme.of(context).colorScheme.onSurfaceVariant;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.textSecondary),
+          Icon(icon, size: 18, color: secondaryColor),
           const SizedBox(width: 8),
           SizedBox(
             width: 80,
             child: Text(
               label,
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(
+                  fontSize: 13, color: secondaryColor),
             ),
           ),
           Expanded(child: Text(value)),
@@ -518,11 +522,12 @@ class _PositionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final secondaryColor = Theme.of(context).colorScheme.onSurfaceVariant;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border:
-            Border(bottom: BorderSide(color: AppColors.divider, width: 0.5)),
+            Border(bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,8 +538,8 @@ class _PositionRow extends StatelessWidget {
                 width: 32,
                 child: Text(
                   '${position.positionNr}',
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 13),
+                  style: TextStyle(
+                      color: secondaryColor, fontSize: 13),
                 ),
               ),
               Expanded(
@@ -558,8 +563,8 @@ class _PositionRow extends StatelessWidget {
             padding: const EdgeInsets.only(left: 32, top: 2),
             child: Text(
               '${position.menge.toStringAsFixed(position.menge == position.menge.roundToDouble() ? 0 : 2)} ${position.einheit ?? 'Stk'} x CHF ${position.einheitspreis.toStringAsFixed(2)}',
-              style: const TextStyle(
-                  fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle(
+                  fontSize: 12, color: secondaryColor),
             ),
           ),
         ],

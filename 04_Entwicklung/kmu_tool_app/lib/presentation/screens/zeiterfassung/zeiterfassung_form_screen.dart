@@ -109,7 +109,7 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Bitte Start- und End-Zeit angeben'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
         ),
@@ -123,7 +123,7 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
         SnackBar(
           content: const Text(
               'End-Zeit muss nach Start-Zeit liegen (abzüglich Pause)'),
-          backgroundColor: AppColors.warning,
+          backgroundColor: AppStatusColors.warning,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
         ),
@@ -153,7 +153,7 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Zeiterfassung gespeichert'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -165,7 +165,7 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
           ),
@@ -236,8 +236,8 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
                                   : 'HH:mm',
                               style: TextStyle(
                                 color: _startZeit != null
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary,
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -266,8 +266,8 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
                                   : 'HH:mm',
                               style: TextStyle(
                                 color: _endZeit != null
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary,
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),
@@ -310,22 +310,22 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.divider),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.timer_outlined,
-                        color: AppColors.textSecondary),
+                    Icon(Icons.timer_outlined,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(width: 12),
                     Text(
                       _dauerAnzeige,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: _berechnungDauerMinuten != null
-                                ? AppColors.primary
-                                : AppColors.textSecondary,
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -384,7 +384,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       label,
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
           ),

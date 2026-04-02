@@ -212,7 +212,7 @@ class _MwstEinstellungenScreenState
                   style: TextStyle(
                     color: _mwstPflichtigSeit != null
                         ? null
-                        : AppColors.textSecondary,
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -259,9 +259,9 @@ class _MwstEinstellungenScreenState
               const SizedBox(height: 8),
 
               // Branchenauswahl als Chips
-              const Text(
+              Text(
                 'Branche waehlen:',
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -279,7 +279,7 @@ class _MwstEinstellungenScreenState
                       ),
                     ),
                     backgroundColor: isSelected
-                        ? AppColors.primary
+                        ? Theme.of(context).colorScheme.primary
                         : null,
                     onPressed: () {
                       setState(() {
@@ -367,7 +367,7 @@ class _MwstEinstellungenScreenState
                 'braucht eigenen SSS.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -410,7 +410,7 @@ class _MwstEinstellungenScreenState
                 'max. CHF 108\'000 Steuerschuld.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -451,12 +451,13 @@ class _MethodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isSelected ? AppColors.primary : AppColors.divider,
+          color: isSelected ? colorScheme.primary : Theme.of(context).dividerColor,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -471,7 +472,7 @@ class _MethodeCard extends StatelessWidget {
                 isSelected
                     ? Icons.radio_button_checked
                     : Icons.radio_button_off,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -483,16 +484,16 @@ class _MethodeCard extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textPrimary,
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

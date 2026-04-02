@@ -16,6 +16,7 @@ class KundeDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final kundeAsync = ref.watch(kundeProvider(kundeId));
     final kontakteAsync = ref.watch(kundeKontakteProvider(kundeId));
     final offertenAsync = ref.watch(offertenByKundeProvider(kundeId));
@@ -34,8 +35,8 @@ class KundeDetailScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline,
-                    size: 48, color: AppColors.error),
+                Icon(Icons.error_outline,
+                    size: 48, color: AppStatusColors.error),
                 const SizedBox(height: 16),
                 Text('Fehler beim Laden: $error'),
                 const SizedBox(height: 16),
@@ -95,7 +96,7 @@ class KundeDetailScreen extends ConsumerWidget {
                           child: _ActionButton(
                             icon: Icons.phone,
                             label: 'Anrufen',
-                            color: AppColors.success,
+                            color: AppStatusColors.success,
                             onTap: () => _launchPhone(kunde.telefon!),
                           ),
                         ),
@@ -109,7 +110,7 @@ class KundeDetailScreen extends ConsumerWidget {
                           child: _ActionButton(
                             icon: Icons.email_outlined,
                             label: 'E-Mail',
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                             onTap: () => _launchEmail(kunde.email!),
                           ),
                         ),
@@ -125,7 +126,7 @@ class KundeDetailScreen extends ConsumerWidget {
                         child: _ActionButton(
                           icon: Icons.description_outlined,
                           label: 'Neue Offerte',
-                          color: AppColors.info,
+                          color: AppStatusColors.info,
                           onTap: () async {
                             await context
                                 .push('/offerten/neu?kundeId=$kundeId');
@@ -139,7 +140,7 @@ class KundeDetailScreen extends ConsumerWidget {
                         child: _ActionButton(
                           icon: Icons.assignment_outlined,
                           label: 'Neuer Auftrag',
-                          color: AppColors.secondary,
+                          color: colorScheme.secondary,
                           onTap: () async {
                             await context.push('/auftraege/neu');
                             ref.invalidate(
@@ -229,8 +230,8 @@ class KundeDetailScreen extends ConsumerWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.notes_outlined,
-                              size: 20, color: AppColors.textSecondary),
+                          Icon(Icons.notes_outlined,
+                              size: 20, color: colorScheme.onSurfaceVariant),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
@@ -268,12 +269,12 @@ class KundeDetailScreen extends ConsumerWidget {
                   ),
                   data: (kontakte) {
                     if (kontakte.isEmpty) {
-                      return const Padding(
+                      return Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Kontaktpersonen',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -307,12 +308,12 @@ class KundeDetailScreen extends ConsumerWidget {
                   ),
                   data: (offerten) {
                     if (offerten.isEmpty) {
-                      return const Padding(
+                      return Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Offerten vorhanden',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -342,12 +343,12 @@ class KundeDetailScreen extends ConsumerWidget {
                   ),
                   data: (auftraege) {
                     if (auftraege.isEmpty) {
-                      return const Padding(
+                      return Padding(
                         padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
                           'Keine Auftraege vorhanden',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       );
                     }
@@ -413,10 +414,10 @@ class _SectionHeader extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 letterSpacing: 0.5,
               ),
             ),
@@ -441,19 +442,21 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppColors.textSecondary),
+          Icon(icon, size: 20, color: onSurfaceVariant),
           const SizedBox(width: 12),
           SizedBox(
             width: 72,
             child: Text(
               label,
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(
+                  fontSize: 13, color: onSurfaceVariant),
             ),
           ),
           Expanded(
@@ -517,6 +520,8 @@ class _KontaktCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -528,9 +533,9 @@ class _KontaktCard extends StatelessWidget {
               CircleAvatar(
                 radius: 18,
                 backgroundColor:
-                    AppColors.secondary.withValues(alpha: 0.1),
-                child: const Icon(Icons.person_outline,
-                    size: 18, color: AppColors.secondary),
+                    colorScheme.secondary.withValues(alpha: 0.1),
+                child: Icon(Icons.person_outline,
+                    size: 18, color: colorScheme.secondary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -545,8 +550,8 @@ class _KontaktCard extends StatelessWidget {
                         kontakt.funktion!.isNotEmpty)
                       Text(
                         kontakt.funktion!,
-                        style: const TextStyle(
-                            fontSize: 13, color: AppColors.textSecondary),
+                        style: TextStyle(
+                            fontSize: 13, color: colorScheme.onSurfaceVariant),
                       ),
                   ],
                 ),
@@ -579,15 +584,15 @@ class _OfferteCard extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status) {
       case 'entwurf':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       case 'gesendet':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'angenommen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'abgelehnt':
-        return AppColors.error;
+        return AppStatusColors.error;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -616,7 +621,7 @@ class _OfferteCard extends StatelessWidget {
         title: Text(offerte.offertNr ?? 'Offerte'),
         subtitle: Text(
           'CHF ${offerte.totalBrutto.toStringAsFixed(2)}',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
         trailing: _StatusBadge(
           label: _statusLabel(offerte.status),
@@ -636,15 +641,15 @@ class _AuftragCard extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status) {
       case 'offen':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'in_arbeit':
-        return AppColors.inBearbeitung;
+        return AppStatusColors.inBearbeitung;
       case 'abgeschlossen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'storniert':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 
@@ -676,7 +681,7 @@ class _AuftragCard extends StatelessWidget {
                 auftrag.beschreibung!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               )
             : null,
         trailing: _StatusBadge(

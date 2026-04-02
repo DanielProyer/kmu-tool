@@ -121,7 +121,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Laden: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -158,7 +158,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Bitte einen Kunden auswaehlen'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppStatusColors.error,
         ),
       );
       return;
@@ -191,7 +191,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
           SnackBar(
             content: Text(
                 _isEdit ? 'Auftrag aktualisiert' : 'Auftrag erstellt'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
         ref.invalidate(auftraegeListProvider);
@@ -205,7 +205,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -260,22 +260,22 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                     // ─── Verknuepfte Offerte (info only) ───
                     if (_linkedOfferteNr != null) ...[
                       Card(
-                        color: AppColors.primary
+                        color: Theme.of(context).colorScheme.primary
                             .withValues(alpha: 0.05),
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Row(
                             children: [
-                              const Icon(Icons.link,
+                              Icon(Icons.link,
                                   size: 20,
-                                  color: AppColors.primary),
+                                  color: Theme.of(context).colorScheme.primary),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Verknuepft mit Offerte: $_linkedOfferteNr',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -342,12 +342,12 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                     const SizedBox(height: 16),
 
                     // ─── Beschreibung ───
-                    const Text(
+                    Text(
                       'BESCHREIBUNG',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -365,12 +365,12 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                     const SizedBox(height: 24),
 
                     // ─── Zeitraum ───
-                    const Text(
+                    Text(
                       'ZEITRAUM',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -394,7 +394,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                                 style: TextStyle(
                                   color: _geplantVon != null
                                       ? null
-                                      : AppColors.textSecondary,
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -418,7 +418,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                                 style: TextStyle(
                                   color: _geplantBis != null
                                       ? null
-                                      : AppColors.textSecondary,
+                                      : Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -430,12 +430,12 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
 
                     // ─── Status (nur bei Bearbeitung) ───
                     if (_isEdit) ...[
-                      const Text(
+                      Text(
                         'STATUS',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -484,15 +484,15 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
   Color _statusColor(String status) {
     switch (status) {
       case 'offen':
-        return AppColors.offen;
+        return AppStatusColors.offen;
       case 'in_arbeit':
-        return AppColors.inBearbeitung;
+        return AppStatusColors.inBearbeitung;
       case 'abgeschlossen':
-        return AppColors.abgeschlossen;
+        return AppStatusColors.abgeschlossen;
       case 'storniert':
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
       default:
-        return AppColors.storniert;
+        return AppStatusColors.storniert;
     }
   }
 }
