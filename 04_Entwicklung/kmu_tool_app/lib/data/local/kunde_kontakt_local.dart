@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:isar/isar.dart';
 
 part 'kunde_kontakt_local.g.dart';
@@ -5,6 +6,9 @@ part 'kunde_kontakt_local.g.dart';
 @collection
 class KundeKontaktLocal {
   Id id = Isar.autoIncrement;
+
+  @ignore
+  String get routeId => kIsWeb ? serverId! : id.toString();
 
   // Supabase Sync
   @Index()

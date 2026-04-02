@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
 import 'package:kmu_tool_app/services/storage/isar_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
 
@@ -49,7 +50,7 @@ class SyncResult {
 
 class SyncService {
   static Isar get _isar => IsarService.instance;
-  static get _client => SupabaseService.client;
+  static SupabaseClient get _client => SupabaseService.client;
 
   // === State ===
   static final _stateController = StreamController<SyncState>.broadcast();

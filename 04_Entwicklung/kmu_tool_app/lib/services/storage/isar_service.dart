@@ -9,6 +9,7 @@ import 'package:kmu_tool_app/data/local/auftrag_local.dart';
 import 'package:kmu_tool_app/data/local/zeiterfassung_local.dart';
 import 'package:kmu_tool_app/data/local/rapport_local.dart';
 import 'package:kmu_tool_app/data/local/sync_meta_local.dart';
+import 'package:kmu_tool_app/data/local/artikel_local.dart';
 
 class IsarService {
   static Isar? _instance;
@@ -35,6 +36,7 @@ class IsarService {
         ZeiterfassungLocalSchema,
         RapportLocalSchema,
         SyncMetaLocalSchema,
+        ArtikelLocalSchema,
       ],
       directory: dir.path,
     );

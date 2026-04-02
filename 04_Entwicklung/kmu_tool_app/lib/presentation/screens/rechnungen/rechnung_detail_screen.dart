@@ -40,7 +40,7 @@ final _kundeForRechnungProvider =
     userId: k.userId,
     firma: k.firma,
     vorname: k.vorname,
-    nachname: k.nachname ?? '',
+    nachname: k.nachname,
     strasse: k.strasse,
     plz: k.plz,
     ort: k.ort,
@@ -161,8 +161,6 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
 
   Future<void> _changeStatus(Rechnung rechnung) async {
     final statuses = ['entwurf', 'gesendet', 'bezahlt', 'gemahnt', 'storniert'];
-    final currentIndex = statuses.indexOf(rechnung.status);
-
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(

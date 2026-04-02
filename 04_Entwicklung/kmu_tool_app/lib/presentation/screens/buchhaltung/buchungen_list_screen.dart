@@ -54,7 +54,7 @@ class _BuchungenListScreenState extends ConsumerState<BuchungenListScreen> {
   int? _selectedMonth;
 
   /// Currently selected year
-  int _selectedYear = DateTime.now().year;
+  final int _selectedYear = DateTime.now().year;
 
   static const _monthNames = [
     'Alle',

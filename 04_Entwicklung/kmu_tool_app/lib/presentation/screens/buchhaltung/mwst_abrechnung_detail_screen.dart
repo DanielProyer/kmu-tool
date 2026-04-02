@@ -19,12 +19,6 @@ class MwstAbrechnungDetailScreen extends ConsumerWidget {
     required this.abrechnungId,
   });
 
-  static final _chf = NumberFormat.currency(
-    locale: 'de_CH',
-    symbol: 'CHF',
-    decimalDigits: 2,
-  );
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final abrechnungAsync = ref.watch(_abrechnungProvider(abrechnungId));

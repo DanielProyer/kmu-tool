@@ -21,44 +21,6 @@ class AppStatusColors {
   static const storniert = Color(0xFF9CA3AF);
 }
 
-/// Backwards-Kompatibilität – wird schrittweise ersetzt durch
-/// Theme.of(context).colorScheme.* und AppStatusColors.
-class AppColors {
-  // Primary
-  static const primary = Color(0xFF2563EB);
-  static const primaryLight = Color(0xFF60A5FA);
-  static const primaryDark = Color(0xFF1D4ED8);
-
-  // Secondary
-  static const secondary = Color(0xFFF97316);
-  static const secondaryLight = Color(0xFFFBBF24);
-  static const secondaryDark = Color(0xFFEA580C);
-
-  // Neutral
-  static const surface = Color(0xFFF8F9FA);
-  static const surfaceCard = Colors.white;
-  static const textPrimary = Color(0xFF1A1A1A);
-  static const textSecondary = Color(0xFF6B7280);
-  static const divider = Color(0xFFE5E7EB);
-
-  // Status (delegieren an AppStatusColors)
-  static const success = AppStatusColors.success;
-  static const warning = AppStatusColors.warning;
-  static const error = AppStatusColors.error;
-  static const info = AppStatusColors.info;
-
-  // Sync
-  static const online = AppStatusColors.online;
-  static const offline = AppStatusColors.offline;
-  static const syncing = AppStatusColors.syncing;
-
-  // Auftrags-Status
-  static const offen = AppStatusColors.offen;
-  static const inBearbeitung = AppStatusColors.inBearbeitung;
-  static const abgeschlossen = AppStatusColors.abgeschlossen;
-  static const storniert = AppStatusColors.storniert;
-}
-
 /// Baut ThemeData aus einer [AppThemeConfig].
 class AppTheme {
   /// Legacy-Zugang für bestehenden Code.

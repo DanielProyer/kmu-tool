@@ -9,9 +9,7 @@ import 'package:kmu_tool_app/data/local/offert_position_local_export.dart';
 import 'package:kmu_tool_app/data/local/artikel_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offert_position_repository.dart';
-import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 
 class OfferteFormScreen extends ConsumerStatefulWidget {

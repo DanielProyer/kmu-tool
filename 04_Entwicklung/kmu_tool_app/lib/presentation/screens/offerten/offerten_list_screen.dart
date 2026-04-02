@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/offerte_local_export.dart';
-import 'package:kmu_tool_app/data/local/kunde_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 

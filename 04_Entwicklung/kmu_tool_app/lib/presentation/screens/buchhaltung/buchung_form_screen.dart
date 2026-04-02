@@ -43,6 +43,11 @@ final _mwstCodesProvider = FutureProvider<List<MwstCode>>((ref) async {
   return MwstRepository().getCodes();
 });
 
+final _mwstEinstellungProvider = FutureProvider<bool>((ref) async {
+  final einstellung = await MwstRepository().getEinstellung();
+  return einstellung?.isEffektiv ?? true;
+});
+
 // ─── Screen ───
 
 class BuchungFormScreen extends ConsumerStatefulWidget {
@@ -78,15 +83,6 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
     _beschreibungController.dispose();
     _belegNrController.dispose();
     super.dispose();
-  }
-
-  List<Konto> _filterKonten(List<Konto> konten, String query) {
-    if (query.isEmpty) return konten;
-    final q = query.toLowerCase();
-    return konten.where((k) {
-      return k.kontonummer.toString().contains(q) ||
-          k.bezeichnung.toLowerCase().contains(q);
-    }).toList();
   }
 
   Future<void> _pickDate() async {
@@ -217,9 +213,9 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
     final mwstCodes = ref.read(_mwstCodesProvider).valueOrNull;
     if (mwstCodes == null) return;
 
-    // TODO: Check user's MWST method setting
+    final isEffektiv = ref.read(_mwstEinstellungProvider).valueOrNull ?? true;
     final suggestedCode = MwstService.defaultMwstCodeForKonto(
-        kontonummer, isEffektiv: true);
+        kontonummer, isEffektiv: isEffektiv);
     final code = mwstCodes.where((c) => c.code == suggestedCode).firstOrNull;
     if (code != null) {
       setState(() {

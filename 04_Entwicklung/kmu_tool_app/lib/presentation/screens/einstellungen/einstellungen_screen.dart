@@ -56,14 +56,7 @@ class EinstellungenScreen extends ConsumerWidget {
             title: const Text('Aktueller Plan'),
             subtitle: Text(planName),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Abo-Verwaltung Screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Abo-Verwaltung kommt bald'),
-                ),
-              );
-            },
+            onTap: () => context.push('/einstellungen/abo'),
           ),
 
           const Divider(height: 1),

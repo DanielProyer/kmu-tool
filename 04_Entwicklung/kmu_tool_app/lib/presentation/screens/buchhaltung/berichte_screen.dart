@@ -7,13 +7,12 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/konto.dart';
-import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
 import 'package:kmu_tool_app/data/models/buchung.dart';
+import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
 import 'package:kmu_tool_app/data/repositories/buchung_repository.dart';
-
 // ─── Types ───
 
-enum _Periode { ganzes_jahr, q1, q2, q3, q4, custom }
+enum _Periode { ganzes_jahr, q1, q2, q3, q4 }
 
 class _BerichtData {
   final List<Konto> aktiven; // Klasse 1
@@ -55,12 +54,100 @@ class _BerichtData {
       (totalAktiven - totalPassiven).abs() < 0.01;
 }
 
+// ─── Helpers ───
+
+DateTimeRange _periodRange(_Periode periode) {
+  final year = DateTime.now().year;
+  switch (periode) {
+    case _Periode.ganzes_jahr:
+      return DateTimeRange(
+        start: DateTime(year, 1, 1),
+        end: DateTime(year + 1, 1, 1),
+      );
+    case _Periode.q1:
+      return DateTimeRange(
+        start: DateTime(year, 1, 1),
+        end: DateTime(year, 4, 1),
+      );
+    case _Periode.q2:
+      return DateTimeRange(
+        start: DateTime(year, 4, 1),
+        end: DateTime(year, 7, 1),
+      );
+    case _Periode.q3:
+      return DateTimeRange(
+        start: DateTime(year, 7, 1),
+        end: DateTime(year, 10, 1),
+      );
+    case _Periode.q4:
+      return DateTimeRange(
+        start: DateTime(year, 10, 1),
+        end: DateTime(year + 1, 1, 1),
+      );
+  }
+}
+
+/// Berechnet Saldi pro Konto aus den Buchungen der Periode.
+/// Buchungslogik (doppelte Buchhaltung):
+/// - Aktiven (Kl. 1) + Aufwand (Kl. 4-8): Soll = +, Haben = -
+/// - Passiven (Kl. 2) + Ertrag (Kl. 3): Haben = +, Soll = -
+Map<int, double> _computeSaldi(
+  List<Buchung> buchungen,
+  Map<int, int> kontenKlasseMap,
+) {
+  final saldi = <int, double>{};
+
+  for (final b in buchungen) {
+    final sollKlasse = kontenKlasseMap[b.sollKonto] ?? (b.sollKonto ~/ 1000);
+    final habenKlasse =
+        kontenKlasseMap[b.habenKonto] ?? (b.habenKonto ~/ 1000);
+
+    // Soll-Seite
+    if (sollKlasse == 1 || sollKlasse >= 4) {
+      // Aktiven + Aufwand: Soll erhoeht
+      saldi[b.sollKonto] = (saldi[b.sollKonto] ?? 0) + b.betrag;
+    } else {
+      // Passiven + Ertrag: Soll verringert
+      saldi[b.sollKonto] = (saldi[b.sollKonto] ?? 0) - b.betrag;
+    }
+
+    // Haben-Seite
+    if (habenKlasse == 1 || habenKlasse >= 4) {
+      // Aktiven + Aufwand: Haben verringert
+      saldi[b.habenKonto] = (saldi[b.habenKonto] ?? 0) - b.betrag;
+    } else {
+      // Passiven + Ertrag: Haben erhoeht
+      saldi[b.habenKonto] = (saldi[b.habenKonto] ?? 0) + b.betrag;
+    }
+  }
+
+  return saldi;
+}
+
 // ─── Provider ───
 
-final _berichtProvider = FutureProvider<_BerichtData>((ref) async {
+final _berichtProvider =
+    FutureProvider.family<_BerichtData, _Periode>((ref, periode) async {
   try {
     final konten = await KontoRepository().getAll();
+    final allBuchungen = await BuchungRepository().getAll();
 
+    // Kontonummer → Klasse Map
+    final klasseMap = <int, int>{};
+    for (final k in konten) {
+      klasseMap[k.kontonummer] = k.kontenklasse;
+    }
+
+    // Buchungen nach Periode filtern
+    final range = _periodRange(periode);
+    final buchungen = allBuchungen.where((b) {
+      return !b.datum.isBefore(range.start) && b.datum.isBefore(range.end);
+    }).toList();
+
+    // Saldi aus Buchungen berechnen
+    final saldi = _computeSaldi(buchungen, klasseMap);
+
+    // Konten mit berechneten Saldi zuordnen
     final aktiven = <Konto>[];
     final passiven = <Konto>[];
     final ertraege = <Konto>[];
@@ -70,22 +157,35 @@ final _berichtProvider = FutureProvider<_BerichtData>((ref) async {
     final aufwand8 = <Konto>[];
 
     for (final k in konten) {
-      // Only include accounts with non-zero saldo in the report
+      final computedSaldo = saldi[k.kontonummer] ?? 0;
+      if (computedSaldo.abs() < 0.005) continue; // Null-Saldi ueberspringen
+
+      // Konto mit berechnetem Saldo erstellen
+      final konto = Konto(
+        id: k.id,
+        userId: k.userId,
+        kontonummer: k.kontonummer,
+        bezeichnung: k.bezeichnung,
+        kontenklasse: k.kontenklasse,
+        typ: k.typ,
+        saldo: computedSaldo,
+      );
+
       switch (k.kontenklasse) {
         case 1:
-          aktiven.add(k);
+          aktiven.add(konto);
         case 2:
-          passiven.add(k);
+          passiven.add(konto);
         case 3:
-          ertraege.add(k);
+          ertraege.add(konto);
         case 4:
-          aufwand4.add(k);
+          aufwand4.add(konto);
         case 5:
-          aufwand5.add(k);
+          aufwand5.add(konto);
         case 6:
-          aufwand6.add(k);
+          aufwand6.add(konto);
         case 8:
-          aufwand8.add(k);
+          aufwand8.add(konto);
       }
     }
 
@@ -146,7 +246,7 @@ class _BerichteScreenState extends ConsumerState<BerichteScreen>
 
   @override
   Widget build(BuildContext context) {
-    final berichtAsync = ref.watch(_berichtProvider);
+    final berichtAsync = ref.watch(_berichtProvider(_periode));
 
     return Scaffold(
       appBar: AppBar(

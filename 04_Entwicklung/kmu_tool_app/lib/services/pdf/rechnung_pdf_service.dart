@@ -17,7 +17,6 @@ class RechnungPdfService {
   static const double _mmToPt = PdfPageFormat.mm;
   static const double _qrSlipHeight = 105 * _mmToPt;
   static const double _empfangsscheinWidth = 62 * _mmToPt;
-  static const double _zahlteilWidth = 148 * _mmToPt; // rest of A4 width
 
   /// Generate the PDF and open the preview / print dialog.
   static Future<void> generateAndPreview({

@@ -26,6 +26,7 @@ import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_einstellungen
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_abrechnung_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/abo_verwaltung_screen.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/feature/feature_service.dart';
 
@@ -237,6 +238,10 @@ final router = GoRouter(
     GoRoute(
       path: '/einstellungen/theme',
       builder: (context, state) => const ThemeSelectionScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/abo',
+      builder: (context, state) => const AboVerwaltungScreen(),
     ),
   ],
 );

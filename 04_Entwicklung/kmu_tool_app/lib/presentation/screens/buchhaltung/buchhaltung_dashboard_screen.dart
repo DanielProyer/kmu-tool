@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
-import 'package:kmu_tool_app/data/models/konto.dart';
 import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
 import 'package:kmu_tool_app/data/repositories/buchung_repository.dart';
 

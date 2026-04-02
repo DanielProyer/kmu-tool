@@ -7,7 +7,6 @@ import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/auftrag_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/auftrag_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 
 class AuftragFormScreen extends ConsumerStatefulWidget {

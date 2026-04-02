@@ -26,7 +26,7 @@ final _kundenMapProvider =
       userId: kl.userId,
       firma: kl.firma,
       vorname: kl.vorname,
-      nachname: kl.nachname ?? '',
+      nachname: kl.nachname,
       strasse: kl.strasse,
       plz: kl.plz,
       ort: kl.ort,
