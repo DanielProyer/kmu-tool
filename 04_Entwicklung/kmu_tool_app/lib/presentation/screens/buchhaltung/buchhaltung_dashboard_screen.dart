@@ -79,66 +79,115 @@ final _buchhaltungOverviewProvider =
   }
 });
 
-// Monthly Ertrag/Aufwand data for chart
-class _MonthlyData {
-  final List<double> ertragMonthly; // index 0=Jan, 11=Dec
-  final List<double> aufwandMonthly;
+// Monthly KPI data for line chart: Aktiven, Passiven, Kontostand (=Eigenkapital)
+class _MonthlyKpiData {
+  final List<double> aktivenMonthly; // cumulative end-of-month Aktiven
+  final List<double> passivenMonthly; // cumulative end-of-month Passiven
+  final List<double> kontostandMonthly; // Aktiven - Passiven = Eigenkapital
   final int year;
+  final int currentMonth; // 1-based, nur bis hierhin anzeigen
 
-  const _MonthlyData({
-    required this.ertragMonthly,
-    required this.aufwandMonthly,
+  const _MonthlyKpiData({
+    required this.aktivenMonthly,
+    required this.passivenMonthly,
+    required this.kontostandMonthly,
     required this.year,
+    required this.currentMonth,
   });
 
   double get maxValue {
     double m = 0;
-    for (int i = 0; i < 12; i++) {
-      m = max(m, ertragMonthly[i]);
-      m = max(m, aufwandMonthly[i]);
+    for (int i = 0; i < currentMonth; i++) {
+      m = max(m, aktivenMonthly[i]);
+      m = max(m, passivenMonthly[i]);
+      m = max(m, kontostandMonthly[i].abs());
     }
     return m;
   }
 
-  bool get hasData => ertragMonthly.any((v) => v > 0) ||
-      aufwandMonthly.any((v) => v > 0);
+  double get minValue {
+    double m = 0;
+    for (int i = 0; i < currentMonth; i++) {
+      m = min(m, kontostandMonthly[i]);
+    }
+    return m;
+  }
 }
 
-final _monthlyDataProvider = FutureProvider<_MonthlyData>((ref) async {
+final _monthlyKpiProvider = FutureProvider<_MonthlyKpiData>((ref) async {
   try {
-    final year = DateTime.now().year;
+    final now = DateTime.now();
+    final year = now.year;
+    final currentMonth = now.month;
     final buchungen = await BuchungRepository().getAll();
 
-    final ertrag = List.filled(12, 0.0);
-    final aufwand = List.filled(12, 0.0);
+    // Monthly deltas for Aktiven (Klasse 1) and Passiven (Klasse 2)
+    final aktivenDelta = List.filled(12, 0.0);
+    final passivenDelta = List.filled(12, 0.0);
 
     for (final b in buchungen) {
       if (b.datum.year != year) continue;
       final month = b.datum.month - 1; // 0-indexed
 
-      // Ertrag: Haben-Konto in Kontenklasse 3 (3000-3999)
-      final habenKlasse = b.habenKonto ~/ 1000;
-      if (habenKlasse == 3) {
-        ertrag[month] += b.betrag;
-      }
-
-      // Aufwand: Soll-Konto in Kontenklasse 4-8
       final sollKlasse = b.sollKonto ~/ 1000;
-      if (sollKlasse >= 4 && sollKlasse <= 8) {
-        aufwand[month] += b.betrag;
-      }
+      final habenKlasse = b.habenKonto ~/ 1000;
+
+      // Soll-Seite: Aktiven steigen, Passiven steigen
+      if (sollKlasse == 1) aktivenDelta[month] += b.betrag;
+      if (sollKlasse == 2) passivenDelta[month] += b.betrag;
+
+      // Haben-Seite: Aktiven sinken, Passiven sinken
+      if (habenKlasse == 1) aktivenDelta[month] -= b.betrag;
+      if (habenKlasse == 2) passivenDelta[month] -= b.betrag;
     }
 
-    return _MonthlyData(
-      ertragMonthly: ertrag,
-      aufwandMonthly: aufwand,
+    // Kumulative Werte berechnen (inkl. Startsaldo aus Konten)
+    // Startsaldo = aktuelle Kontensalden minus laufende Buchungen des Jahres
+    final konten = await KontoRepository().getAll();
+    double startAktiven = 0;
+    double startPassiven = 0;
+    for (final k in konten) {
+      if (k.kontenklasse == 1) startAktiven += k.saldo;
+      if (k.kontenklasse == 2) startPassiven += k.saldo;
+    }
+    // Aktuelle Salden enthalten alle Buchungen des Jahres → Startsaldo berechnen
+    double jahresAktiven = 0;
+    double jahresPassiven = 0;
+    for (int i = 0; i < 12; i++) {
+      jahresAktiven += aktivenDelta[i];
+      jahresPassiven += passivenDelta[i];
+    }
+    startAktiven -= jahresAktiven;
+    startPassiven -= jahresPassiven;
+
+    final aktiven = List.filled(12, 0.0);
+    final passiven = List.filled(12, 0.0);
+    final kontostand = List.filled(12, 0.0);
+
+    double cumAktiven = startAktiven;
+    double cumPassiven = startPassiven;
+    for (int i = 0; i < 12; i++) {
+      cumAktiven += aktivenDelta[i];
+      cumPassiven += passivenDelta[i];
+      aktiven[i] = cumAktiven;
+      passiven[i] = cumPassiven;
+      kontostand[i] = cumAktiven - cumPassiven;
+    }
+
+    return _MonthlyKpiData(
+      aktivenMonthly: aktiven,
+      passivenMonthly: passiven,
+      kontostandMonthly: kontostand,
       year: year,
+      currentMonth: currentMonth,
     );
   } catch (_) {
-    return _MonthlyData(
-      ertragMonthly: List.filled(12, 0.0),
-      aufwandMonthly: List.filled(12, 0.0),
+    return _MonthlyKpiData(
+      aktivenMonthly: List.filled(12, 0.0),
+      passivenMonthly: List.filled(12, 0.0),
+      kontostandMonthly: List.filled(12, 0.0),
       year: DateTime.now().year,
+      currentMonth: DateTime.now().month,
     );
   }
 });
@@ -179,7 +228,7 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(_buchhaltungOverviewProvider);
-          ref.invalidate(_monthlyDataProvider);
+          ref.invalidate(_monthlyKpiProvider);
           await ref.read(_buchhaltungOverviewProvider.future);
         },
         child: overviewAsync.when(
@@ -226,11 +275,23 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, _BuchhaltungOverview data) {
     final gewinnVerlust = data.gewinnVerlust;
     final isGewinn = gewinnVerlust >= 0;
-    final monthlyAsync = ref.watch(_monthlyDataProvider);
+    final kpiAsync = ref.watch(_monthlyKpiProvider);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // ── KPI Line Chart ──
+        kpiAsync.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (kpi) => _KpiLineChart(
+            data: kpi,
+            formatAmount: (v) => _chfShort.format(v),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
         // ── Overview Cards ──
         Text(
           'Uebersicht',
@@ -302,21 +363,6 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
           ],
         ),
 
-        const SizedBox(height: 24),
-
-        // ── Monthly Chart ──
-        monthlyAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (monthly) {
-            if (!monthly.hasData) return const SizedBox.shrink();
-            return _MonthlyChart(
-              data: monthly,
-              formatAmount: (v) => _chfShort.format(v),
-            );
-          },
-        ),
-
         const SizedBox(height: 28),
 
         // ── Navigation ──
@@ -375,10 +421,10 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
   }
 }
 
-// ─── Monthly Chart Widget ───
+// ─── KPI Line Chart Widget ───
 
-class _MonthlyChart extends StatelessWidget {
-  final _MonthlyData data;
+class _KpiLineChart extends StatelessWidget {
+  final _MonthlyKpiData data;
   final String Function(double) formatAmount;
 
   static const _months = [
@@ -386,7 +432,11 @@ class _MonthlyChart extends StatelessWidget {
     'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez',
   ];
 
-  const _MonthlyChart({
+  static const _colorAktiven = Color(0xFF2563EB); // Blau
+  static const _colorPassiven = Color(0xFFEF4444); // Rot
+  static const _colorKontostand = Color(0xFF22C55E); // Gruen
+
+  const _KpiLineChart({
     required this.data,
     required this.formatAmount,
   });
@@ -394,10 +444,14 @@ class _MonthlyChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final maxVal = data.maxValue;
-    if (maxVal == 0) return const SizedBox.shrink();
+    final minVal = data.minValue;
+    final interval = _niceInterval(max(maxVal, minVal.abs()));
+    final chartMaxY = interval * ((maxVal / max(interval, 1)).ceil() + 0.5);
+    final chartMinY = minVal < 0
+        ? -(interval * ((minVal.abs() / max(interval, 1)).ceil() + 0.5))
+        : 0.0;
 
-    // Round up to nice interval
-    final interval = _niceInterval(maxVal);
+    final spots = data.currentMonth;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -415,12 +469,12 @@ class _MonthlyChart extends StatelessWidget {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.bar_chart,
+                  child: const Icon(Icons.show_chart,
                       color: AppColors.primary, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Ertrag / Aufwand ${data.year}',
+                  'Finanzverlauf ${data.year}',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -432,31 +486,49 @@ class _MonthlyChart extends StatelessWidget {
             Row(
               children: [
                 const SizedBox(width: 48),
-                _LegendDot(color: AppColors.success, label: 'Ertrag'),
-                const SizedBox(width: 16),
-                _LegendDot(color: AppColors.error, label: 'Aufwand'),
+                _LegendDot(color: _colorAktiven, label: 'Aktiven'),
+                const SizedBox(width: 12),
+                _LegendDot(color: _colorPassiven, label: 'Passiven'),
+                const SizedBox(width: 12),
+                _LegendDot(color: _colorKontostand, label: 'Eigenkapital'),
               ],
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: interval * ((maxVal / interval).ceil()).toDouble(),
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
+              height: 220,
+              child: LineChart(
+                LineChartData(
+                  minX: 0,
+                  maxX: (spots - 1).toDouble().clamp(0, 11),
+                  minY: chartMinY,
+                  maxY: chartMaxY,
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
                       tooltipRoundedRadius: 8,
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final label = rodIndex == 0 ? 'Ertrag' : 'Aufwand';
-                        return BarTooltipItem(
-                          '$label\n${formatAmount(rod.toY)} CHF',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((spot) {
+                          String label;
+                          Color color;
+                          switch (spot.barIndex) {
+                            case 0:
+                              label = 'Aktiven';
+                              color = _colorAktiven;
+                            case 1:
+                              label = 'Passiven';
+                              color = _colorPassiven;
+                            default:
+                              label = 'Eigenkapital';
+                              color = _colorKontostand;
+                          }
+                          return LineTooltipItem(
+                            '$label\n${formatAmount(spot.y)} CHF',
+                            TextStyle(
+                              color: color,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        }).toList();
                       },
                     ),
                   ),
@@ -468,16 +540,20 @@ class _MonthlyChart extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        interval: 1,
                         getTitlesWidget: (value, meta) {
                           final idx = value.toInt();
-                          if (idx < 0 || idx >= 12) {
+                          if (idx < 0 || idx >= spots) {
                             return const SizedBox.shrink();
                           }
-                          return Text(
-                            _months[idx],
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: AppColors.textSecondary,
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _months[idx],
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           );
                         },
@@ -486,10 +562,9 @@ class _MonthlyChart extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 44,
-                        interval: interval,
+                        reservedSize: 48,
+                        interval: max(interval, 1),
                         getTitlesWidget: (value, meta) {
-                          if (value == 0) return const SizedBox.shrink();
                           return Text(
                             _formatCompact(value),
                             style: const TextStyle(
@@ -503,35 +578,80 @@ class _MonthlyChart extends StatelessWidget {
                   ),
                   gridData: FlGridData(
                     show: true,
-                    horizontalInterval: interval,
+                    horizontalInterval: max(interval, 1),
                     getDrawingHorizontalLine: (value) => FlLine(
-                      color: AppColors.divider,
-                      strokeWidth: 0.5,
+                      color: value == 0
+                          ? AppColors.textSecondary.withValues(alpha: 0.3)
+                          : AppColors.divider,
+                      strokeWidth: value == 0 ? 1 : 0.5,
                     ),
                     drawVerticalLine: false,
                   ),
                   borderData: FlBorderData(show: false),
-                  barGroups: List.generate(12, (i) {
-                    return BarChartGroupData(
-                      x: i,
-                      barRods: [
-                        BarChartRodData(
-                          toY: data.ertragMonthly[i],
-                          color: AppColors.success,
-                          width: 6,
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(3)),
-                        ),
-                        BarChartRodData(
-                          toY: data.aufwandMonthly[i],
-                          color: AppColors.error,
-                          width: 6,
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(3)),
-                        ),
-                      ],
-                    );
-                  }),
+                  lineBarsData: [
+                    // Aktiven
+                    LineChartBarData(
+                      spots: List.generate(spots, (i) =>
+                          FlSpot(i.toDouble(), data.aktivenMonthly[i])),
+                      isCurved: true,
+                      curveSmoothness: 0.2,
+                      color: _colorAktiven,
+                      barWidth: 2.5,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, bar, index) =>
+                            FlDotCirclePainter(
+                              radius: 3,
+                              color: _colorAktiven,
+                              strokeWidth: 0,
+                            ),
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: _colorAktiven.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    // Passiven
+                    LineChartBarData(
+                      spots: List.generate(spots, (i) =>
+                          FlSpot(i.toDouble(), data.passivenMonthly[i])),
+                      isCurved: true,
+                      curveSmoothness: 0.2,
+                      color: _colorPassiven,
+                      barWidth: 2.5,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, bar, index) =>
+                            FlDotCirclePainter(
+                              radius: 3,
+                              color: _colorPassiven,
+                              strokeWidth: 0,
+                            ),
+                      ),
+                    ),
+                    // Kontostand (Eigenkapital)
+                    LineChartBarData(
+                      spots: List.generate(spots, (i) =>
+                          FlSpot(i.toDouble(), data.kontostandMonthly[i])),
+                      isCurved: true,
+                      curveSmoothness: 0.2,
+                      color: _colorKontostand,
+                      barWidth: 3,
+                      dotData: FlDotData(
+                        show: true,
+                        getDotPainter: (spot, percent, bar, index) =>
+                            FlDotCirclePainter(
+                              radius: 3.5,
+                              color: _colorKontostand,
+                              strokeWidth: 0,
+                            ),
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: _colorKontostand.withValues(alpha: 0.06),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -542,6 +662,7 @@ class _MonthlyChart extends StatelessWidget {
   }
 
   static double _niceInterval(double maxVal) {
+    if (maxVal <= 0) return 1000;
     if (maxVal <= 1000) return 500;
     if (maxVal <= 5000) return 1000;
     if (maxVal <= 10000) return 2000;
@@ -551,7 +672,7 @@ class _MonthlyChart extends StatelessWidget {
   }
 
   static String _formatCompact(double value) {
-    if (value >= 1000) {
+    if (value.abs() >= 1000) {
       return '${(value / 1000).toStringAsFixed(0)}k';
     }
     return value.toStringAsFixed(0);
