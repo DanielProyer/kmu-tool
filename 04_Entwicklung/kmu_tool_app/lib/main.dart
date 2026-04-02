@@ -53,9 +53,11 @@ Future<void> main() async {
     await FeatureService.instance.load();
   }
 
+  // Connectivity auf allen Plattformen initialisieren
+  await ConnectivityService.initialize();
+
   if (!kIsWeb) {
     await IsarService.initialize();
-    await ConnectivityService.initialize();
 
     if (SupabaseService.isAuthenticated) {
       SyncService.startListening();
