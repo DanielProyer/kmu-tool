@@ -1,0 +1,30 @@
+# Flutter/Dart
+04_Entwicklung/kmu_tool_app/.dart_tool/
+04_Entwicklung/kmu_tool_app/.packages
+04_Entwicklung/kmu_tool_app/build/
+04_Entwicklung/kmu_tool_app/.flutter-plugins
+04_Entwicklung/kmu_tool_app/.flutter-plugins-dependencies
+04_Entwicklung/kmu_tool_app/.pub-cache/
+04_Entwicklung/kmu_tool_app/.pub/
+04_Entwicklung/kmu_tool_app/pubspec.lock
+
+# Generated files
+*.g.dart
+
+# Environment
+04_Entwicklung/kmu_tool_app/.env
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude
+.claude/

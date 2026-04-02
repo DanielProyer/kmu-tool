@@ -1,0 +1,426 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
+import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
+import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/sync/sync_service_export.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  SyncState _syncState = SyncState.idle;
+  bool _isOnline = ConnectivityService.isOnline;
+  late final StreamSubscription<SyncState> _syncSub;
+  late final StreamSubscription<bool> _connectSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncState = SyncService.state;
+    _syncSub = SyncService.stateStream.listen((state) {
+      if (mounted) setState(() => _syncState = state);
+    });
+    _connectSub = ConnectivityService.onConnectivityChanged.listen((online) {
+      if (mounted) setState(() => _isOnline = online);
+    });
+  }
+
+  @override
+  void dispose() {
+    _syncSub.cancel();
+    _connectSub.cancel();
+    super.dispose();
+  }
+
+  Future<void> _logout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Abmelden'),
+        content: const Text('Möchtest du dich wirklich abmelden?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Abmelden'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await SupabaseService.client.auth.signOut();
+    }
+  }
+
+  Widget _buildSyncIndicator() {
+    IconData icon;
+    Color color;
+    String tooltip;
+
+    if (!_isOnline) {
+      icon = Icons.cloud_off;
+      color = AppColors.offline;
+      tooltip = 'Offline';
+    } else {
+      switch (_syncState) {
+        case SyncState.syncing:
+          return Tooltip(
+            message: 'Synchronisiere...',
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.syncing,
+              ),
+            ),
+          );
+        case SyncState.error:
+          icon = Icons.sync_problem;
+          color = AppColors.warning;
+          tooltip = 'Sync-Fehler';
+        case SyncState.idle:
+          icon = Icons.cloud_done;
+          color = AppColors.online;
+          tooltip = 'Synchronisiert';
+      }
+    }
+
+    return Tooltip(
+      message: tooltip,
+      child: Icon(icon, color: color, size: 22),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dashboardAsync = ref.watch(dashboardProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('KMU Tool'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: _buildSyncIndicator(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.sync),
+            tooltip: 'Jetzt synchronisieren',
+            onPressed: () {
+              SyncService.syncAll();
+              ref.invalidate(dashboardProvider);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Abmelden',
+            onPressed: _logout,
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(dashboardProvider);
+          await ref.read(dashboardProvider.future);
+        },
+        child: dashboardAsync.when(
+          data: (data) => _buildDashboard(context, data),
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+          error: (error, _) => _buildErrorState(context, error),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, Object error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Fehler beim Laden',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => ref.invalidate(dashboardProvider),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Erneut versuchen'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboard(BuildContext context, DashboardData data) {
+    final tiles = <_DashboardTileData>[
+      _DashboardTileData(
+        label: 'Kunden',
+        icon: Icons.people,
+        value: '${data.kundenCount}',
+        color: AppColors.primary,
+        route: '/kunden',
+      ),
+      _DashboardTileData(
+        label: 'Offene Offerten',
+        icon: Icons.description,
+        value: '${data.offeneOffertenCount}',
+        color: AppColors.secondary,
+        route: '/offerten',
+      ),
+      _DashboardTileData(
+        label: 'Aktive Aufträge',
+        icon: Icons.work,
+        value: '${data.aktiveAuftraegeCount}',
+        color: AppColors.inBearbeitung,
+        route: '/auftraege',
+      ),
+      _DashboardTileData(
+        label: 'Offene Rechnungen',
+        icon: Icons.receipt_long,
+        value: _formatCHF(data.offeneRechnungenBetrag),
+        color: AppColors.error,
+        route: '/rechnungen',
+      ),
+      _DashboardTileData(
+        label: 'Buchhaltung',
+        icon: Icons.account_balance,
+        value: '',
+        color: const Color(0xFF7C3AED),
+        route: '/buchhaltung',
+      ),
+      _DashboardTileData(
+        label: 'Sync Status',
+        icon: _isOnline ? Icons.cloud_done : Icons.cloud_off,
+        value: _isOnline ? 'Online' : 'Offline',
+        color: _isOnline ? AppColors.online : AppColors.offline,
+        route: null,
+      ),
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Greeting
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _greeting(),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _formattedDate(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+              ),
+            ],
+          ),
+        ),
+
+        // Dashboard Grid
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+            final childAspectRatio =
+                constraints.maxWidth > 600 ? 1.4 : 1.15;
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: childAspectRatio,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: tiles.length,
+              itemBuilder: (context, index) {
+                return _DashboardTile(data: tiles[index]);
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Guten Morgen';
+    if (hour < 17) return 'Guten Nachmittag';
+    return 'Guten Abend';
+  }
+
+  String _formattedDate() {
+    final now = DateTime.now();
+    const weekdays = [
+      'Montag',
+      'Dienstag',
+      'Mittwoch',
+      'Donnerstag',
+      'Freitag',
+      'Samstag',
+      'Sonntag',
+    ];
+    const months = [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ];
+    return '${weekdays[now.weekday - 1]}, ${now.day}. ${months[now.month - 1]} ${now.year}';
+  }
+
+  String _formatCHF(double amount) {
+    if (amount == 0) return 'CHF 0.00';
+    // Format with thousands separator and 2 decimals
+    final parts = amount.toStringAsFixed(2).split('.');
+    final intPart = parts[0];
+    final decPart = parts[1];
+
+    // Add apostrophe as Swiss thousands separator
+    final buffer = StringBuffer();
+    for (var i = 0; i < intPart.length; i++) {
+      if (i > 0 && (intPart.length - i) % 3 == 0) {
+        buffer.write("'");
+      }
+      buffer.write(intPart[i]);
+    }
+    return 'CHF $buffer.$decPart';
+  }
+}
+
+class _DashboardTileData {
+  final String label;
+  final IconData icon;
+  final String value;
+  final Color color;
+  final String? route;
+
+  _DashboardTileData({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.color,
+    required this.route,
+  });
+}
+
+class _DashboardTile extends StatelessWidget {
+  final _DashboardTileData data;
+
+  const _DashboardTile({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: AppColors.divider),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: data.route != null ? () => context.go(data.route!) : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Icon Container
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: data.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  data.icon,
+                  color: data.color,
+                  size: 24,
+                ),
+              ),
+              const Spacer(),
+
+              // Value
+              if (data.value.isNotEmpty)
+                Text(
+                  data.value,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontSize: data.value.length > 10 ? 16 : 22,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              const SizedBox(height: 4),
+
+              // Label
+              Text(
+                data.label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

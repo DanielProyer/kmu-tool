@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.1'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: 04_Entwicklung/kmu_tool_app
+        run: flutter pub get
+
+      - name: Build web (no service worker)
+        working-directory: 04_Entwicklung/kmu_tool_app
+        run: flutter build web --release --pwa-strategy=none --base-href /kmu-tool/
+
+      - name: Write version.json
+        working-directory: 04_Entwicklung/kmu_tool_app
+        run: |
+          echo "{\"version\":\"$(date -u +%Y%m%d%H%M%S)\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > build/web/version.json
+
+      - name: Copy anti-cache headers
+        working-directory: 04_Entwicklung/kmu_tool_app
+        run: cp web/_headers build/web/_headers 2>/dev/null || true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 04_Entwicklung/kmu_tool_app/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
