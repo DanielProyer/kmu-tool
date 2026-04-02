@@ -227,6 +227,12 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/auftraege'),
+        ),
         title: Text(_isEdit ? 'Auftrag bearbeiten' : 'Neuer Auftrag'),
         actions: [
           TextButton.icon(

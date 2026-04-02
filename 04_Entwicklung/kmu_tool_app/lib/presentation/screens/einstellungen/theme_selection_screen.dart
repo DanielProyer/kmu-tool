@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/core/theme/app_theme_registry.dart';
 import 'package:kmu_tool_app/presentation/providers/theme_provider.dart';
@@ -13,7 +14,15 @@ class ThemeSelectionScreen extends ConsumerWidget {
     final themes = AppThemeRegistry.all;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Design waehlen')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/einstellungen'),
+        ),
+        title: const Text('Design waehlen'),
+      ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: themes.length,

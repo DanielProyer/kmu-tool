@@ -94,6 +94,12 @@ class _RapportFormScreenState extends State<RapportFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('Arbeitsrapport'),
       ),
       body: SingleChildScrollView(

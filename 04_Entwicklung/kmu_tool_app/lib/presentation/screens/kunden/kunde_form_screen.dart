@@ -241,6 +241,12 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/kunden'),
+        ),
         title: Text(_isEdit ? 'Kunde bearbeiten' : 'Neuer Kunde'),
         actions: [
           TextButton.icon(

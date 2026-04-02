@@ -290,6 +290,12 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/rechnungen'),
+        ),
         title: rechnungAsync.whenOrNull(
               data: (r) => Text(r?.rechnungsNr ?? 'Rechnung'),
             ) ??

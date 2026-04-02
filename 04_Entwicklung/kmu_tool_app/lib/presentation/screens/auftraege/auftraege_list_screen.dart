@@ -61,6 +61,12 @@ class _AuftraegeListScreenState
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('Auftraege'),
       ),
       body: Column(

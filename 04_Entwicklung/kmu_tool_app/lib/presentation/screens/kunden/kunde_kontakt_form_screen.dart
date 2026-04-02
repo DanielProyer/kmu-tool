@@ -162,6 +162,12 @@ class _KundeKontaktFormScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/kunden'),
+        ),
         title: Text(_isEdit
             ? 'Kontaktperson bearbeiten'
             : 'Neue Kontaktperson'),

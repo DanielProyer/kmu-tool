@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'widgets/notizen_tab.dart';
 import 'widgets/dateien_tab.dart';
 import 'widgets/zugriff_tab.dart';
@@ -15,6 +16,12 @@ class AuftragDashboardScreen extends ConsumerWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.canPop(context)
+                ? context.pop()
+                : context.go('/auftraege'),
+          ),
           title: const Text('Auftrag-Dashboard'),
           bottom: const TabBar(
             tabs: [

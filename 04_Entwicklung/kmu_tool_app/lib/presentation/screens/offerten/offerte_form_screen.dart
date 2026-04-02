@@ -313,6 +313,12 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/offerten'),
+        ),
         title: Text(_isEdit ? 'Offerte bearbeiten' : 'Neue Offerte'),
         actions: [
           TextButton.icon(

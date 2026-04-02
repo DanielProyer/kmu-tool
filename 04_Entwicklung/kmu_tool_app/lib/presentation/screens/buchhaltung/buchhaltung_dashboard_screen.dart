@@ -168,6 +168,12 @@ class BuchhaltungDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('Buchhaltung'),
       ),
       body: RefreshIndicator(

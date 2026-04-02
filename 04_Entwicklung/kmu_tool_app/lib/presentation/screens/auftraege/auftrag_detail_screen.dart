@@ -216,6 +216,12 @@ class _AuftragDetailScreenState
 
         return Scaffold(
           appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.canPop(context)
+                  ? context.pop()
+                  : context.go('/auftraege'),
+            ),
             title: Text(auftrag.auftragsNr ?? 'Auftrag'),
             actions: [
               IconButton(

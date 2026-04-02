@@ -139,6 +139,12 @@ class _MwstEinstellungenScreenState
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('MWST-Einstellungen'),
         actions: [
           TextButton.icon(

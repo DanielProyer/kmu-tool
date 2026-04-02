@@ -15,7 +15,15 @@ class EinstellungenScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Einstellungen')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
+        title: const Text('Einstellungen'),
+      ),
       body: ListView(
         children: [
           // ─── Design ───

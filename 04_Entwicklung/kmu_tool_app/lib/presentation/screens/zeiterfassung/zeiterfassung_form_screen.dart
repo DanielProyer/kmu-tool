@@ -182,6 +182,12 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('Zeit erfassen'),
       ),
       body: SingleChildScrollView(

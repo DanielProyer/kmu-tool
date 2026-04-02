@@ -176,6 +176,12 @@ class _OfferteDetailScreenState
 
         return Scaffold(
           appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.canPop(context)
+                  ? context.pop()
+                  : context.go('/offerten'),
+            ),
             title: Text(offerte.offertNr ?? 'Offerte'),
             actions: [
               IconButton(

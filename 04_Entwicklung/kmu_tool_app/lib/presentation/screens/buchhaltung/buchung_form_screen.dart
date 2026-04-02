@@ -237,6 +237,12 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.canPop(context)
+              ? context.pop()
+              : context.go('/'),
+        ),
         title: const Text('Neue Buchung'),
       ),
       body: kontenAsync.when(
