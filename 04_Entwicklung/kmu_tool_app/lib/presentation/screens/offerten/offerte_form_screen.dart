@@ -6,9 +6,11 @@ import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/offerte_local_export.dart';
 import 'package:kmu_tool_app/data/local/offert_position_local_export.dart';
+import 'package:kmu_tool_app/data/local/artikel_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offert_position_repository.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
+import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 
@@ -104,6 +106,8 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
             einheitspreis:
                 TextEditingController(text: p.einheitspreis.toStringAsFixed(2)),
             einheit: p.einheit ?? 'Stk',
+            typ: p.typ,
+            artikelId: p.artikelId,
           ));
         }
         if (_positionen.isEmpty) {
@@ -240,6 +244,8 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
         position.betrag = double.parse(
             (position.menge * position.einheitspreis)
                 .toStringAsFixed(2));
+        position.typ = pos.typ;
+        position.artikelId = pos.artikelId;
 
         await OffertPositionRepository.save(position);
       }
@@ -463,6 +469,18 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
                         posNr: index + 1,
                         betrag: _calcPositionBetrag(pos),
                         onChanged: () => setState(() {}),
+                        onTypChanged: (typ) {
+                          setState(() => pos.typ = typ);
+                        },
+                        onArtikelSelected: (artikel) {
+                          setState(() {
+                            pos.artikelId = artikel.serverId;
+                            pos.bezeichnungController.text = artikel.bezeichnung;
+                            pos.einheitspreis.text =
+                                artikel.verkaufspreis.toStringAsFixed(2);
+                            pos.einheit = artikel.einheit ?? 'Stk';
+                          });
+                        },
                         onDelete: _positionen.length > 1
                             ? () {
                                 setState(() {
@@ -473,14 +491,38 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
                       );
                     }),
                     const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _positionen.add(_PositionEntry());
-                        });
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Position hinzufuegen'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _positionen.add(_PositionEntry(
+                                  typ: 'arbeit',
+                                  einheit: 'Std',
+                                ));
+                              });
+                            },
+                            icon: const Icon(Icons.build_outlined, size: 18),
+                            label: const Text('+ Arbeit'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _positionen.add(_PositionEntry(
+                                  typ: 'material',
+                                  einheit: 'Stk',
+                                ));
+                              });
+                            },
+                            icon: const Icon(Icons.inventory_2_outlined, size: 18),
+                            label: const Text('+ Material'),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
 
@@ -552,6 +594,8 @@ class _PositionEntry {
   final TextEditingController mengeController;
   final TextEditingController einheitspreis;
   String einheit;
+  String typ;
+  String? artikelId;
 
   _PositionEntry({
     this.existingPosition,
@@ -559,12 +603,17 @@ class _PositionEntry {
     TextEditingController? mengeController,
     TextEditingController? einheitspreis,
     this.einheit = 'Stk',
+    this.typ = 'arbeit',
+    this.artikelId,
   })  : bezeichnungController =
             bezeichnungController ?? TextEditingController(),
         mengeController =
             mengeController ?? TextEditingController(text: '1.00'),
         einheitspreis =
             einheitspreis ?? TextEditingController(text: '0.00');
+
+  bool get isMaterial => typ == 'material';
+  bool get isArbeit => typ == 'arbeit';
 
   void dispose() {
     bezeichnungController.dispose();
@@ -580,6 +629,8 @@ class _PositionCard extends StatelessWidget {
   final int posNr;
   final double betrag;
   final VoidCallback onChanged;
+  final ValueChanged<String> onTypChanged;
+  final ValueChanged<ArtikelLocal> onArtikelSelected;
   final VoidCallback? onDelete;
 
   static const List<String> _einheiten = [
@@ -596,11 +647,18 @@ class _PositionCard extends StatelessWidget {
     required this.posNr,
     required this.betrag,
     required this.onChanged,
+    required this.onTypChanged,
+    required this.onArtikelSelected,
     this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isArbeit = position.isArbeit;
+    final typColor = isArbeit ? AppColors.info : AppColors.secondary;
+    final typIcon = isArbeit ? Icons.build_outlined : Icons.inventory_2_outlined;
+    final typLabel = isArbeit ? 'Arbeit' : 'Material';
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -611,25 +669,46 @@ class _PositionCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 14,
-                  backgroundColor:
-                      AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    '$posNr',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                  backgroundColor: typColor.withValues(alpha: 0.1),
+                  child: Icon(typIcon, size: 14, color: typColor),
+                ),
+                const SizedBox(width: 8),
+                // Type badge
+                GestureDetector(
+                  onTap: () {
+                    onTypChanged(isArbeit ? 'material' : 'arbeit');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: typColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          typLabel,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: typColor,
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        Icon(Icons.swap_horiz, size: 12, color: typColor),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Position $posNr',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                const Spacer(),
+                Text(
+                  'Pos. $posNr',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 if (onDelete != null)
@@ -642,11 +721,24 @@ class _PositionCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
+
+            // Artikel search for material positions
+            if (position.isMaterial) ...[
+              _ArtikelSearchField(
+                onSelected: onArtikelSelected,
+                currentArtikelId: position.artikelId,
+              ),
+              const SizedBox(height: 8),
+            ],
+
             TextFormField(
               controller: position.bezeichnungController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Bezeichnung *',
                 isDense: true,
+                hintText: isArbeit
+                    ? 'z.B. Sanitaerinstallation'
+                    : 'z.B. Kupferrohr 22mm',
               ),
               onChanged: (_) => onChanged(),
               validator: (value) {
@@ -727,6 +819,130 @@ class _PositionCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─── Artikel Search Widget ───
+
+class _ArtikelSearchField extends StatefulWidget {
+  final ValueChanged<ArtikelLocal> onSelected;
+  final String? currentArtikelId;
+
+  const _ArtikelSearchField({
+    required this.onSelected,
+    this.currentArtikelId,
+  });
+
+  @override
+  State<_ArtikelSearchField> createState() => _ArtikelSearchFieldState();
+}
+
+class _ArtikelSearchFieldState extends State<_ArtikelSearchField> {
+  List<ArtikelLocal> _results = [];
+  bool _isSearching = false;
+  final _searchController = TextEditingController();
+
+  Future<void> _search(String query) async {
+    if (query.length < 2) {
+      setState(() => _results = []);
+      return;
+    }
+    setState(() => _isSearching = true);
+    try {
+      final results = await ArtikelRepository.search(query);
+      if (mounted) {
+        setState(() {
+          _results = results;
+          _isSearching = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isSearching = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            labelText: 'Artikel suchen',
+            isDense: true,
+            prefixIcon: const Icon(Icons.search, size: 20),
+            hintText: 'Name oder Artikelnummer...',
+            suffixIcon: _isSearching
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _results = []);
+                        },
+                      )
+                    : null,
+          ),
+          onChanged: _search,
+        ),
+        if (_results.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            constraints: const BoxConstraints(maxHeight: 150),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.textSecondary.withValues(alpha: 0.2),
+              ),
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _results.length,
+              padding: EdgeInsets.zero,
+              itemBuilder: (context, index) {
+                final artikel = _results[index];
+                final name = artikel.bezeichnung;
+                final nr = artikel.artikelNr ?? '';
+                final preis = artikel.verkaufspreis;
+                return ListTile(
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    name,
+                    style: const TextStyle(fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    '$nr · CHF ${preis.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 11),
+                  ),
+                  onTap: () {
+                    widget.onSelected(artikel);
+                    _searchController.clear();
+                    setState(() => _results = []);
+                  },
+                );
+              },
+            ),
+          ),
+      ],
     );
   }
 }

@@ -1,18 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:kmu_tool_app/core/config/router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/presentation/providers/theme_provider.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
-class KmuToolApp extends StatefulWidget {
+class KmuToolApp extends ConsumerStatefulWidget {
   const KmuToolApp({super.key});
 
   @override
-  State<KmuToolApp> createState() => _KmuToolAppState();
+  ConsumerState<KmuToolApp> createState() => _KmuToolAppState();
 }
 
-class _KmuToolAppState extends State<KmuToolApp> {
+class _KmuToolAppState extends ConsumerState<KmuToolApp> {
   late final StreamSubscription<AuthState> _authSub;
 
   @override
@@ -75,7 +77,7 @@ class _KmuToolAppState extends State<KmuToolApp> {
             TextField(
               controller: confirmController,
               decoration: const InputDecoration(
-                labelText: 'Passwort bestätigen',
+                labelText: 'Passwort bestaetigen',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.lock_outlined),
               ),
@@ -101,7 +103,7 @@ class _KmuToolAppState extends State<KmuToolApp> {
               if (passwordController.text != confirmController.text) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Passwörter stimmen nicht überein')),
+                      content: Text('Passwoerter stimmen nicht ueberein')),
                 );
                 return;
               }
@@ -119,7 +121,7 @@ class _KmuToolAppState extends State<KmuToolApp> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Passwort erfolgreich geändert')),
+                content: Text('Passwort erfolgreich geaendert')),
           );
         }
       } catch (e) {
@@ -137,10 +139,12 @@ class _KmuToolAppState extends State<KmuToolApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeConfig = ref.watch(themeConfigProvider);
+
     return MaterialApp.router(
       title: 'KMU Tool',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
+      theme: AppTheme.fromConfig(themeConfig),
       routerConfig: router,
     );
   }

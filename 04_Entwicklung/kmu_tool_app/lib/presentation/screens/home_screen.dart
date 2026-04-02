@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kmu_tool_app/core/config/features.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
+import 'package:kmu_tool_app/presentation/providers/feature_provider.dart';
 import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/sync/sync_service_export.dart';
@@ -125,6 +127,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Einstellungen',
+            onPressed: () => context.push('/einstellungen'),
+          ),
+          IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Abmelden',
             onPressed: _logout,
@@ -185,42 +192,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDashboard(BuildContext context, DashboardData data) {
-    final tiles = <_DashboardTileData>[
-      _DashboardTileData(
-        label: 'Kunden',
-        icon: Icons.people,
-        value: '${data.kundenCount}',
-        color: AppColors.primary,
-        route: '/kunden',
-      ),
-      _DashboardTileData(
-        label: 'Offene Offerten',
-        icon: Icons.description,
-        value: '${data.offeneOffertenCount}',
-        color: AppColors.secondary,
-        route: '/offerten',
-      ),
-      _DashboardTileData(
-        label: 'Aktive Aufträge',
-        icon: Icons.work,
-        value: '${data.aktiveAuftraegeCount}',
-        color: AppColors.inBearbeitung,
-        route: '/auftraege',
-      ),
-      _DashboardTileData(
-        label: 'Offene Rechnungen',
-        icon: Icons.receipt_long,
-        value: _formatCHF(data.offeneRechnungenBetrag),
-        color: AppColors.error,
-        route: '/rechnungen',
-      ),
-      _DashboardTileData(
-        label: 'Buchhaltung',
-        icon: Icons.account_balance,
-        value: '',
-        color: const Color(0xFF7C3AED),
-        route: '/buchhaltung',
-      ),
+    final hasKunden = ref.watch(hasFeatureProvider(AppFeature.kunden));
+    final hasOfferten = ref.watch(hasFeatureProvider(AppFeature.offerten));
+    final hasAuftraege = ref.watch(hasFeatureProvider(AppFeature.auftraege));
+    final hasRechnungen = ref.watch(hasFeatureProvider(AppFeature.rechnungen));
+    final hasBuchhaltung = ref.watch(hasFeatureProvider(AppFeature.buchhaltung));
+
+    final allTiles = <_DashboardTileData>[
+      if (hasKunden)
+        _DashboardTileData(
+          label: 'Kunden',
+          icon: Icons.people,
+          value: '${data.kundenCount}',
+          color: AppColors.primary,
+          route: '/kunden',
+        ),
+      if (hasOfferten)
+        _DashboardTileData(
+          label: 'Offene Offerten',
+          icon: Icons.description,
+          value: '${data.offeneOffertenCount}',
+          color: AppColors.secondary,
+          route: '/offerten',
+        ),
+      if (hasAuftraege)
+        _DashboardTileData(
+          label: 'Aktive Auftraege',
+          icon: Icons.work,
+          value: '${data.aktiveAuftraegeCount}',
+          color: AppColors.inBearbeitung,
+          route: '/auftraege',
+        ),
+      if (hasRechnungen)
+        _DashboardTileData(
+          label: 'Offene Rechnungen',
+          icon: Icons.receipt_long,
+          value: _formatCHF(data.offeneRechnungenBetrag),
+          color: AppColors.error,
+          route: '/rechnungen',
+        ),
+      if (hasBuchhaltung)
+        _DashboardTileData(
+          label: 'Buchhaltung',
+          icon: Icons.account_balance,
+          value: '',
+          color: const Color(0xFF7C3AED),
+          route: '/buchhaltung',
+        ),
       _DashboardTileData(
         label: 'Sync Status',
         icon: _isOnline ? Icons.cloud_done : Icons.cloud_off,
@@ -229,6 +247,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         route: null,
       ),
     ];
+    final tiles = allTiles;
 
     return ListView(
       padding: const EdgeInsets.all(16),

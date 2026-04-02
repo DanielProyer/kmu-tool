@@ -8,6 +8,9 @@ class Buchung {
   final String beschreibung;
   final String? belegNr;
   final String? rechnungId;
+  final String? mwstCode;
+  final double? mwstSatz;
+  final double? mwstBetrag;
   final int? monat; // generated
   final int? quartal; // generated
   final DateTime? createdAt;
@@ -23,6 +26,9 @@ class Buchung {
     required this.beschreibung,
     this.belegNr,
     this.rechnungId,
+    this.mwstCode,
+    this.mwstSatz,
+    this.mwstBetrag,
     this.monat,
     this.quartal,
     this.createdAt,
@@ -40,6 +46,9 @@ class Buchung {
       beschreibung: json['beschreibung'] as String,
       belegNr: json['beleg_nr'] as String?,
       rechnungId: json['rechnung_id'] as String?,
+      mwstCode: json['mwst_code'] as String?,
+      mwstSatz: (json['mwst_satz'] as num?)?.toDouble(),
+      mwstBetrag: (json['mwst_betrag'] as num?)?.toDouble(),
       monat: json['monat'] as int?,
       quartal: json['quartal'] as int?,
       createdAt: json['created_at'] != null
@@ -63,6 +72,9 @@ class Buchung {
       'beschreibung': beschreibung,
       'beleg_nr': belegNr,
       'rechnung_id': rechnungId,
+      'mwst_code': mwstCode,
+      'mwst_satz': mwstSatz,
+      'mwst_betrag': mwstBetrag,
     };
   }
 }

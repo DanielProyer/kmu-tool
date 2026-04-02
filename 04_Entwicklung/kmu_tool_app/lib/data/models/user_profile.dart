@@ -10,6 +10,10 @@ class UserProfile {
   final String? uidNummer;
   final String? iban;
   final String? bankName;
+  final String themeId;
+  final bool mwstPflichtig;
+  final String mwstMethode;
+  final double? mwstSaldosteuersatz;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -25,6 +29,10 @@ class UserProfile {
     this.uidNummer,
     this.iban,
     this.bankName,
+    this.themeId = 'blau_orange',
+    this.mwstPflichtig = false,
+    this.mwstMethode = 'effektiv',
+    this.mwstSaldosteuersatz,
     this.createdAt,
     this.updatedAt,
   });
@@ -42,6 +50,12 @@ class UserProfile {
       uidNummer: json['uid_nummer'] as String?,
       iban: json['iban'] as String?,
       bankName: json['bank_name'] as String?,
+      themeId: json['theme_id'] as String? ?? 'blau_orange',
+      mwstPflichtig: json['mwst_pflichtig'] as bool? ?? false,
+      mwstMethode: json['mwst_methode'] as String? ?? 'effektiv',
+      mwstSaldosteuersatz: json['mwst_saldosteuersatz'] != null
+          ? (json['mwst_saldosteuersatz'] as num).toDouble()
+          : null,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
@@ -64,6 +78,10 @@ class UserProfile {
       'uid_nummer': uidNummer,
       'iban': iban,
       'bank_name': bankName,
+      'theme_id': themeId,
+      'mwst_pflichtig': mwstPflichtig,
+      'mwst_methode': mwstMethode,
+      'mwst_saldosteuersatz': mwstSaldosteuersatz,
     };
   }
 }

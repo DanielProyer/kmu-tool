@@ -34,12 +34,18 @@ dependencies:
   # Datum & Internationalisierung
   intl: any
 
+  # Charts
+  fl_chart: ^0.70.0
+
   # PDF
   pdf: ^3.10.0
   printing: ^5.12.0
 
   # Links
   url_launcher: ^6.2.0
+
+  # Dateien
+  file_picker: ^8.0.0
 
   # Utilities
   uuid: ^4.3.0

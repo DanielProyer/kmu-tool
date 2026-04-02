@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/core/validators/validators.dart';
 import 'package:kmu_tool_app/data/local/kunde_kontakt_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_kontakt_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
@@ -27,13 +28,28 @@ class _KundeKontaktFormScreenState
   final _formKey = GlobalKey<FormState>();
   final _vornameController = TextEditingController();
   final _nachnameController = TextEditingController();
-  final _funktionController = TextEditingController();
   final _telefonController = TextEditingController();
   final _emailController = TextEditingController();
+  final _notizenController = TextEditingController();
+
+  String _anrede = 'sie';
+  String _rolle = 'mitarbeiter';
 
   bool _isLoading = false;
   bool _isEdit = false;
   KundeKontaktLocal? _existingKontakt;
+
+  static const _rolleOptions = <String, String>{
+    'geschaeftsfuehrer': 'Geschaeftsfuehrer/in',
+    'inhaber': 'Inhaber/in',
+    'bauleiter': 'Bauleiter/in',
+    'projektleiter': 'Projektleiter/in',
+    'buchhaltung': 'Buchhaltung',
+    'sekretariat': 'Sekretariat',
+    'mitarbeiter': 'Mitarbeiter/in',
+    'lehrling': 'Lehrling',
+    'sonstige': 'Sonstige',
+  };
 
   @override
   void initState() {
@@ -57,16 +73,18 @@ class _KundeKontaktFormScreenState
         _existingKontakt = kontakt;
         _vornameController.text = kontakt.vorname;
         _nachnameController.text = kontakt.nachname;
-        _funktionController.text = kontakt.funktion ?? '';
         _telefonController.text = kontakt.telefon ?? '';
         _emailController.text = kontakt.email ?? '';
+        _notizenController.text = kontakt.notizen ?? '';
+        _anrede = kontakt.anrede;
+        _rolle = kontakt.rolle;
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Laden: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -90,15 +108,17 @@ class _KundeKontaktFormScreenState
 
       kontakt.vorname = _vornameController.text.trim();
       kontakt.nachname = _nachnameController.text.trim();
-      kontakt.funktion = _funktionController.text.trim().isEmpty
-          ? null
-          : _funktionController.text.trim();
       kontakt.telefon = _telefonController.text.trim().isEmpty
           ? null
-          : _telefonController.text.trim();
+          : PhoneValidator.format(_telefonController.text.trim());
       kontakt.email = _emailController.text.trim().isEmpty
           ? null
           : _emailController.text.trim();
+      kontakt.notizen = _notizenController.text.trim().isEmpty
+          ? null
+          : _notizenController.text.trim();
+      kontakt.anrede = _anrede;
+      kontakt.rolle = _rolle;
 
       await KundeKontaktRepository.save(kontakt);
 
@@ -108,7 +128,7 @@ class _KundeKontaktFormScreenState
             content: Text(_isEdit
                 ? 'Kontaktperson aktualisiert'
                 : 'Kontaktperson hinzugefuegt'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
         ref.invalidate(kundeKontakteProvider(widget.kundeId));
@@ -119,7 +139,7 @@ class _KundeKontaktFormScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -132,9 +152,9 @@ class _KundeKontaktFormScreenState
   void dispose() {
     _vornameController.dispose();
     _nachnameController.dispose();
-    _funktionController.dispose();
     _telefonController.dispose();
     _emailController.dispose();
+    _notizenController.dispose();
     super.dispose();
   }
 
@@ -168,6 +188,24 @@ class _KundeKontaktFormScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Anrede (Sie/Du)
+                    SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(
+                          value: 'sie',
+                          label: Text('Sie'),
+                        ),
+                        ButtonSegment(
+                          value: 'du',
+                          label: Text('Du'),
+                        ),
+                      ],
+                      selected: {_anrede},
+                      onSelectionChanged: (s) =>
+                          setState(() => _anrede = s.first),
+                    ),
+                    const SizedBox(height: 16),
+
                     // Vorname / Nachname
                     Row(
                       children: [
@@ -207,15 +245,24 @@ class _KundeKontaktFormScreenState
                     ),
                     const SizedBox(height: 16),
 
-                    // Funktion
-                    TextFormField(
-                      controller: _funktionController,
+                    // Rolle (Dropdown)
+                    DropdownButtonFormField<String>(
+                      value: _rolle,
                       decoration: const InputDecoration(
-                        labelText: 'Funktion',
+                        labelText: 'Rolle / Funktion',
                         prefixIcon: Icon(Icons.work_outline),
-                        hintText: 'z.B. Geschaeftsfuehrer, Bauleiter',
                       ),
-                      textInputAction: TextInputAction.next,
+                      items: _rolleOptions.entries
+                          .map((e) => DropdownMenuItem(
+                                value: e.key,
+                                child: Text(e.value),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _rolle = value);
+                        }
+                      },
                     ),
                     const SizedBox(height: 16),
 
@@ -229,6 +276,7 @@ class _KundeKontaktFormScreenState
                       ),
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
+                      validator: PhoneValidator.validate,
                     ),
                     const SizedBox(height: 16),
 
@@ -241,16 +289,22 @@ class _KundeKontaktFormScreenState
                         hintText: 'name@firma.ch',
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.done,
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$')
-                              .hasMatch(value.trim())) {
-                            return 'Ungueltige E-Mail';
-                          }
-                        }
-                        return null;
-                      },
+                      textInputAction: TextInputAction.next,
+                      validator: EmailValidator.validate,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Notizen (mehrzeilig)
+                    TextFormField(
+                      controller: _notizenController,
+                      decoration: const InputDecoration(
+                        labelText: 'Notizen',
+                        prefixIcon: Icon(Icons.notes_outlined),
+                        alignLabelWithHint: true,
+                      ),
+                      maxLines: 4,
+                      minLines: 2,
+                      textInputAction: TextInputAction.newline,
                     ),
                     const SizedBox(height: 32),
                   ],

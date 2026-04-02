@@ -14,6 +14,8 @@ import 'package:kmu_tool_app/data/repositories/offert_position_repository.dart';
 import 'package:kmu_tool_app/data/repositories/auftrag_repository.dart';
 import 'package:kmu_tool_app/data/repositories/zeiterfassung_repository.dart';
 import 'package:kmu_tool_app/data/repositories/rapport_repository.dart';
+import 'package:kmu_tool_app/data/local/artikel_local_export.dart';
+import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
 
 // ─── Kunden ───
 
@@ -232,6 +234,48 @@ class AuftraegeByOfferteNotifier
         await AsyncValue.guard(() => AuftragRepository.getByOfferte(arg));
   }
 }
+
+// ─── Artikel (Materialstamm) ───
+
+final artikelListProvider =
+    AsyncNotifierProvider<ArtikelListNotifier, List<ArtikelLocal>>(
+  ArtikelListNotifier.new,
+);
+
+class ArtikelListNotifier extends AsyncNotifier<List<ArtikelLocal>> {
+  @override
+  Future<List<ArtikelLocal>> build() async {
+    return ArtikelRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ArtikelRepository.getAll());
+  }
+}
+
+final artikelProvider =
+    AsyncNotifierProvider.family<ArtikelNotifier, ArtikelLocal?, String>(
+  ArtikelNotifier.new,
+);
+
+class ArtikelNotifier extends FamilyAsyncNotifier<ArtikelLocal?, String> {
+  @override
+  Future<ArtikelLocal?> build(String arg) async {
+    return ArtikelRepository.getById(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => ArtikelRepository.getById(arg));
+  }
+}
+
+final artikelSearchProvider =
+    FutureProvider.family<List<ArtikelLocal>, String>((ref, query) async {
+  if (query.isEmpty) return ArtikelRepository.getAll();
+  return ArtikelRepository.search(query);
+});
 
 // ─── Zeiterfassungen ───
 

@@ -11,6 +11,7 @@ import 'package:kmu_tool_app/presentation/screens/offerten/offerte_form_screen.d
 import 'package:kmu_tool_app/presentation/screens/auftraege/auftraege_list_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/auftraege/auftrag_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/auftraege/auftrag_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/auftraege/auftrag_dashboard/auftrag_dashboard_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/zeiterfassung/zeiterfassung_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/rapporte/rapport_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/rechnungen/rechnungen_list_screen.dart';
@@ -20,7 +21,13 @@ import 'package:kmu_tool_app/presentation/screens/buchhaltung/kontenplan_screen.
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/buchungen_list_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/buchung_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/berichte_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_overview_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_einstellungen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_abrechnung_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/feature/feature_service.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -31,6 +38,14 @@ final router = GoRouter(
 
     if (!isLoggedIn && !isLoginPage) return '/login';
     if (isLoggedIn && isLoginPage) return '/';
+
+    // Feature-Gate: Prüfe ob Route erlaubt ist
+    if (isLoggedIn && !isLoginPage) {
+      final location = state.matchedLocation;
+      if (!FeatureService.instance.isRouteAllowed(location)) {
+        return '/';
+      }
+    }
 
     return null;
   },
@@ -151,6 +166,13 @@ final router = GoRouter(
         return RapportFormScreen(auftragId: auftragId);
       },
     ),
+    GoRoute(
+      path: '/auftraege/:id/dashboard',
+      builder: (context, state) {
+        final auftragId = state.pathParameters['id']!;
+        return AuftragDashboardScreen(auftragId: auftragId);
+      },
+    ),
 
     // ─── Rechnungen ───
     GoRoute(
@@ -188,6 +210,33 @@ final router = GoRouter(
     GoRoute(
       path: '/buchhaltung/berichte',
       builder: (context, state) => const BerichteScreen(),
+    ),
+
+    // ─── MWST ───
+    GoRoute(
+      path: '/buchhaltung/mwst',
+      builder: (context, state) => const MwstOverviewScreen(),
+    ),
+    GoRoute(
+      path: '/buchhaltung/mwst/einstellungen',
+      builder: (context, state) => const MwstEinstellungenScreen(),
+    ),
+    GoRoute(
+      path: '/buchhaltung/mwst/abrechnung/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return MwstAbrechnungDetailScreen(abrechnungId: id);
+      },
+    ),
+
+    // ─── Einstellungen ───
+    GoRoute(
+      path: '/einstellungen',
+      builder: (context, state) => const EinstellungenScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/theme',
+      builder: (context, state) => const ThemeSelectionScreen(),
     ),
   ],
 );

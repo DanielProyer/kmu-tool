@@ -7,6 +7,8 @@ class OffertPosition {
   final String? einheit;
   final double einheitspreis;
   final double betrag;
+  final String typ; // arbeit, material
+  final String? artikelId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -19,6 +21,8 @@ class OffertPosition {
     this.einheit,
     this.einheitspreis = 0.0,
     this.betrag = 0.0,
+    this.typ = 'arbeit',
+    this.artikelId,
     this.createdAt,
     this.updatedAt,
   });
@@ -33,6 +37,8 @@ class OffertPosition {
       einheit: json['einheit'],
       einheitspreis: (json['einheitspreis'] ?? 0).toDouble(),
       betrag: (json['betrag'] ?? 0).toDouble(),
+      typ: json['typ'] ?? 'arbeit',
+      artikelId: json['artikel_id'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -52,6 +58,11 @@ class OffertPosition {
       'einheit': einheit,
       'einheitspreis': einheitspreis,
       'betrag': betrag,
+      'typ': typ,
+      'artikel_id': artikelId,
     };
   }
+
+  bool get isMaterial => typ == 'material';
+  bool get isArbeit => typ == 'arbeit';
 }

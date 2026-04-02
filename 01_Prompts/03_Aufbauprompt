@@ -1,0 +1,26 @@
+Bitte berücksichtige folgendes:
+
+Es gibt Features die nur für Bestimmte User sichtbar (und freigeschalten) sind, berücksichtige das bei den Daten und auch beim Layout
+
+Das Design der App bitte auslagern, das machen wir am schluss, schaue das du flexibel bleibst
+Jeder User soll sein Eigenes Design wählen können 4-5 Designs, diese werden aber von einer anderen Person entwickelt, berücksichtige das
+
+Für jeden Auftrag hätte ich gerne die Möglichkeit verschiedene Notizen (Textz, Foto, pdf) und 
+beliebig viele Dateien (Foto, pdf, Word, Excel usw...), kategorisiert ablegen zu können
+Auf dieses Auftragsdashboard soll es drei Zugriffsstufen geben Vollzugriff (Geschäftsinhaber), Standartzugriff (Mitarbeiter) 
+und Kundenzugriff (nur lesen was freigegeben ist und Files hochladen)
+dieses Dashboard ist ein Zusatzfeature und für die meisten User nicht sichtbar
+
+Für die Bankanbindung die wir später noch machen (Todo) sollen folgende Banken berücksichtigt werden:
+
+    - alle Kantonalbanken
+    - Raifeisenbank
+    - Post
+
+wir benötigen Rechnungen mit QR Code (falls möglich mit Vermerk für die Zuordnung), Auslesen der Bankbewegungen (camt), und was sonst noch Sinn macht. Recherchiere dazu Gründlich und dokumentiere das im Recherche Ordner
+
+Informiere dich auch über die MWST Abrechnung, gibt es hier eine möglichkeit das zu Automatisieren, dokumetiere das auch im Recherche Ordner
+
+Eine weitere Recherche bitte über Sozialversicherungen in der Schweiz, Lohnabrechnung und alles was damit verbunden ist, berücksichtige das bei der App und insbesondere bei der Buchhaltung, auch das Dokumentieren
+
+

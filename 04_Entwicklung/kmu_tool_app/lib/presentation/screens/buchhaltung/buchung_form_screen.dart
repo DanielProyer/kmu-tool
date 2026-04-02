@@ -8,9 +8,12 @@ import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/buchung.dart';
 import 'package:kmu_tool_app/data/models/buchungs_vorlage.dart';
 import 'package:kmu_tool_app/data/models/konto.dart';
+import 'package:kmu_tool_app/data/models/mwst_code.dart';
 import 'package:kmu_tool_app/data/repositories/buchung_repository.dart';
 import 'package:kmu_tool_app/data/repositories/buchungs_vorlage_repository.dart';
 import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
+import 'package:kmu_tool_app/data/repositories/mwst_repository.dart';
+import 'package:kmu_tool_app/services/mwst/mwst_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
 // ─── Providers ───
@@ -20,7 +23,24 @@ final _kontenProvider = FutureProvider<List<Konto>>((ref) async {
 });
 
 final _vorlagenProvider = FutureProvider<List<BuchungsVorlage>>((ref) async {
-  return BuchungsVorlageRepository().getAll();
+  final vorlagen = await BuchungsVorlageRepository().getAll();
+  // Sort by usage frequency: count how often each soll/haben combo appears
+  final buchungen = await BuchungRepository().getAll();
+  final usage = <String, int>{};
+  for (final b in buchungen) {
+    final key = '${b.sollKonto}_${b.habenKonto}';
+    usage[key] = (usage[key] ?? 0) + 1;
+  }
+  vorlagen.sort((a, b) {
+    final aCount = usage['${a.sollKonto}_${a.habenKonto}'] ?? 0;
+    final bCount = usage['${b.sollKonto}_${b.habenKonto}'] ?? 0;
+    return bCount.compareTo(aCount); // Most used first
+  });
+  return vorlagen;
+});
+
+final _mwstCodesProvider = FutureProvider<List<MwstCode>>((ref) async {
+  return MwstRepository().getCodes();
 });
 
 // ─── Screen ───
@@ -45,6 +65,8 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
 
   bool _isSaving = false;
   bool _showVorlagen = false;
+  String? _mwstCode;
+  double? _mwstSatz;
 
   // Search state for account dropdowns
   String _sollSearchQuery = '';
@@ -140,6 +162,12 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
     setState(() => _isSaving = true);
 
     try {
+      // MWST-Betrag berechnen
+      double? mwstBetrag;
+      if (_mwstCode != null && _mwstCode != 'OHNE' && _mwstSatz != null && _mwstSatz! > 0) {
+        mwstBetrag = double.parse((betrag * _mwstSatz! / 100).toStringAsFixed(2));
+      }
+
       final buchung = Buchung(
         id: const Uuid().v4(),
         userId: SupabaseService.currentUser!.id,
@@ -151,6 +179,9 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
         belegNr: _belegNrController.text.trim().isNotEmpty
             ? _belegNrController.text.trim()
             : null,
+        mwstCode: _mwstCode,
+        mwstSatz: _mwstSatz,
+        mwstBetrag: mwstBetrag,
       );
 
       await BuchungRepository().save(buchung);
@@ -182,10 +213,27 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
     }
   }
 
+  void _autoSuggestMwstCode(int kontonummer) {
+    final mwstCodes = ref.read(_mwstCodesProvider).valueOrNull;
+    if (mwstCodes == null) return;
+
+    // TODO: Check user's MWST method setting
+    final suggestedCode = MwstService.defaultMwstCodeForKonto(
+        kontonummer, isEffektiv: true);
+    final code = mwstCodes.where((c) => c.code == suggestedCode).firstOrNull;
+    if (code != null) {
+      setState(() {
+        _mwstCode = code.code;
+        _mwstSatz = code.satz;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final kontenAsync = ref.watch(_kontenProvider);
     final vorlagenAsync = ref.watch(_vorlagenProvider);
+    ref.watch(_mwstCodesProvider); // Preload
 
     return Scaffold(
       appBar: AppBar(
@@ -352,6 +400,7 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                   _sollKonto = konto.kontonummer;
                   _sollSearchQuery = '';
                 });
+                _autoSuggestMwstCode(konto.kontonummer);
               },
               hintText: 'Konto suchen...',
             ),
@@ -378,9 +427,67 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
                   _habenKonto = konto.kontonummer;
                   _habenSearchQuery = '';
                 });
+                _autoSuggestMwstCode(konto.kontonummer);
               },
               hintText: 'Konto suchen...',
             ),
+            const SizedBox(height: 20),
+
+            // ── MWST-Code ──
+            Text(
+              'MWST-Code',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Builder(builder: (context) {
+              final mwstCodesAsync = ref.watch(_mwstCodesProvider);
+              return mwstCodesAsync.when(
+                loading: () => const LinearProgressIndicator(),
+                error: (e, _) => Text('MWST-Codes nicht geladen'),
+                data: (codes) {
+                  return DropdownButtonFormField<String>(
+                    value: _mwstCode,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.percent, size: 20),
+                    ),
+                    items: codes.map((c) {
+                      return DropdownMenuItem(
+                        value: c.code,
+                        child: Text(
+                          '${c.code} (${c.satz.toStringAsFixed(1)}%)',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        final code = codes.firstWhere((c) => c.code == value);
+                        setState(() {
+                          _mwstCode = code.code;
+                          _mwstSatz = code.satz;
+                        });
+                      }
+                    },
+                  );
+                },
+              );
+            }),
+            if (_mwstCode != null && _mwstCode != 'OHNE')
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  'MWST ${_mwstSatz?.toStringAsFixed(1) ?? "-"}% wird automatisch berechnet',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
             const SizedBox(height: 20),
 
             // ── Betrag CHF ──

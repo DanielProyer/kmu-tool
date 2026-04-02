@@ -13,8 +13,9 @@ import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 /// Swiss KMU Kontenrahmen accounts used:
 /// - 1020  Bank (Bankguthaben)
 /// - 1100  Debitoren (Forderungen aus Lieferungen und Leistungen)
+/// - 1170  Vorsteuer MWST
 /// - 2200  MWST (Geschuldete Mehrwertsteuer)
-/// - 3000  Ertrag (Erlöse aus Lieferungen und Leistungen)
+/// - 3000  Ertrag (Erloese aus Lieferungen und Leistungen)
 class BuchungService {
   final BuchungRepository _buchungRepo = BuchungRepository();
   final RechnungRepository _rechnungRepo = RechnungRepository();
@@ -32,9 +33,11 @@ class BuchungService {
   ///
   /// Creates two bookings:
   /// 1. Soll 1100 (Debitoren) / Haben 3000 (Ertrag) - net amount
+  ///    MWST-Code: UST_NORM (Umsatzsteuer Normalsatz)
   /// 2. Soll 1100 (Debitoren) / Haben 2200 (MWST)   - VAT amount
+  ///    MWST-Code: UST_NORM
   Future<void> createBuchungenForRechnung(Rechnung rechnung) async {
-    // Booking 1: Netto-Betrag → Debitoren / Ertrag
+    // Booking 1: Netto-Betrag -> Debitoren / Ertrag
     final buchungNetto = Buchung(
       id: _uuid.v4(),
       userId: _userId,
@@ -46,10 +49,13 @@ class BuchungService {
           'Rechnung ${rechnung.rechnungsNr} - Ertrag (netto)',
       belegNr: rechnung.rechnungsNr,
       rechnungId: rechnung.id,
+      mwstCode: 'UST_NORM',
+      mwstSatz: rechnung.mwstSatz,
+      mwstBetrag: rechnung.mwstBetrag,
     );
     await _buchungRepo.save(buchungNetto);
 
-    // Booking 2: MWST-Betrag → Debitoren / MWST
+    // Booking 2: MWST-Betrag -> Debitoren / MWST
     if (rechnung.mwstBetrag > 0) {
       final buchungMwst = Buchung(
         id: _uuid.v4(),
@@ -62,6 +68,9 @@ class BuchungService {
             'Rechnung ${rechnung.rechnungsNr} - MWST ${rechnung.mwstSatz.toStringAsFixed(1)}%',
         belegNr: rechnung.rechnungsNr,
         rechnungId: rechnung.id,
+        mwstCode: 'UST_NORM',
+        mwstSatz: rechnung.mwstSatz,
+        mwstBetrag: rechnung.mwstBetrag,
       );
       await _buchungRepo.save(buchungMwst);
     }
@@ -82,7 +91,7 @@ class BuchungService {
     // Update invoice status
     await _rechnungRepo.updateStatus(rechnungId, 'bezahlt');
 
-    // Create payment booking: Bank / Debitoren
+    // Create payment booking: Bank / Debitoren (kein MWST-Code bei Zahlung)
     final buchungZahlung = Buchung(
       id: _uuid.v4(),
       userId: _userId,
@@ -94,6 +103,7 @@ class BuchungService {
           'Zahlung Rechnung ${rechnung.rechnungsNr}',
       belegNr: rechnung.rechnungsNr,
       rechnungId: rechnung.id,
+      mwstCode: 'OHNE',
     );
     await _buchungRepo.save(buchungZahlung);
   }
@@ -126,6 +136,9 @@ class BuchungService {
           'Storno Rechnung ${rechnung.rechnungsNr} - Ertrag (netto)',
       belegNr: 'ST-${rechnung.rechnungsNr}',
       rechnungId: rechnung.id,
+      mwstCode: 'UST_NORM',
+      mwstSatz: rechnung.mwstSatz,
+      mwstBetrag: rechnung.mwstBetrag,
     );
     await _buchungRepo.save(stornoNetto);
 
@@ -142,6 +155,9 @@ class BuchungService {
             'Storno Rechnung ${rechnung.rechnungsNr} - MWST',
         belegNr: 'ST-${rechnung.rechnungsNr}',
         rechnungId: rechnung.id,
+        mwstCode: 'UST_NORM',
+        mwstSatz: rechnung.mwstSatz,
+        mwstBetrag: rechnung.mwstBetrag,
       );
       await _buchungRepo.save(stornoMwst);
     }
@@ -159,6 +175,7 @@ class BuchungService {
             'Storno Zahlung Rechnung ${rechnung.rechnungsNr}',
         belegNr: 'ST-${rechnung.rechnungsNr}',
         rechnungId: rechnung.id,
+        mwstCode: 'OHNE',
       );
       await _buchungRepo.save(stornoZahlung);
     }

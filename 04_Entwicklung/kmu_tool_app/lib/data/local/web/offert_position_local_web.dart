@@ -16,6 +16,8 @@ class OffertPositionLocal {
   String? einheit;
   double einheitspreis = 0.0;
   double betrag = 0.0;
+  String typ = 'arbeit';
+  String? artikelId;
   DateTime? createdAt;
   DateTime? updatedAt;
 }

@@ -1,0 +1,51 @@
+Allgemein:
+Backbutton aufs Dashboard
+Bei allen Telefonnummern fehleingaben erkennen 
+Bei allen Ortseingaben diesen Anhand der PLZ Automatisch einfüllen in SBS Projer haben wir das bereits umgesetzt
+
+Neuer Kunde:
+Firma bitte Optional, es kann sich auch um Privatkunden handeln
+Notizen bitte Mehrzeihlig
+Mehrere Kontakte zulassen mit Option Sie/Du, Notiz zu den einzelnen Kontakten, 
+    Auswahl: Geschäftsführer, Mitarbeiter, Buchhaltung usw... überlege dir eine geignete Auswahlliste
+Allgemeine Notiz Mehrzeilig
+Rechnungsadresse ergänzen (mit e-mail) falls Abweichend
+    gewünschte Art der Rechnungsstellung; Barzahler, Post, e-mail, Abgabe vor Ort (habe ich noch was vergessen?)
+
+Neue Offerte:
+Unterscheide bei den Positionen zwischen Dienstleistungen (Arbeit) und Material, Material mit dem Artikelstamm verknüpfen
+Bei Material die Preise direkt aus dem Artikelstamm übernehmen, aber anpassbar lassen
+SQL Fehler beim Abspeichern
+
+Neuer Auftrag:
+Falls vorhanden mit Offerte verknüpfen
+Berücksichtige was ich dir bereits geschrieben habe
+
+Buchhaltung:
+Wir brauchen vordefinierte Buchungsvorlagen (je nach Kunde andere) welche schnell auswählbar sind 
+dabei sollen die am häufigsten vorkommenden Buchungen zuerst kommen 
+bei den Buchungsvorlagen soviel wie möglich vordefinieren
+
+Was noch fehlt ist die MWST Abrechnung dazu hast du ja bereits recherchiert und die Lohnbuchhaltung 
+ergänze das noch falls nicht bereits vorhanden
+
+In der Buchhaltung bitte noch eine Grafik mit den für den Geschäftsführer wichtigsten Kennzahlen über die Zeit
+damit hat man viel schneller einen Überblick über die finanzielle Lage
+
+Kundenverwaltung:
+in einem spätere Schritt müssen wir noch eine Kundenverwaltung aufbauen für uns um die Endkunden zu verwalten mit folgendem:
+
+    - Kunden erfassen, du sollst danach gleich alles für den Kunden Automatisch einrichten User, Datenbank, Webpage usw....
+    - Mitarbeiter
+    - Fatures freischalten
+    - Buchungsvorlagen verwalten
+    - Grundeinstellungen
+    - Design
+    - bestehende Daten erfassen
+    - usw...
+
+gestalte das so das wir möglichst einfach neue Kunden freischalten können, versuche Files die wir vom Kunden erhalten möglichst selbstständig in die Datenbank zu migrieren
+
+Diesen Schritt machen wir später, schreib dir das in die TodoListe und berücksichtige es ab jetzt bei der weiteren Entwicklung
+
+Sicherheit sehr gross schreiben, mache die gesamte App so sicher wie möglich/nötig, wir wollen keine Downzeiten und kein Datenverlust für die Endkunden, bitte berücksichtige das 

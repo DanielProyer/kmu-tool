@@ -15,6 +15,15 @@ class KundeMapper {
     local.telefon = dto.telefon;
     local.email = dto.email;
     local.notizen = dto.notizen;
+    local.reAbweichend = dto.reAbweichend;
+    local.reFirma = dto.reFirma;
+    local.reVorname = dto.reVorname;
+    local.reNachname = dto.reNachname;
+    local.reStrasse = dto.reStrasse;
+    local.rePlz = dto.rePlz;
+    local.reOrt = dto.reOrt;
+    local.reEmail = dto.reEmail;
+    local.rechnungsstellung = dto.rechnungsstellung;
     local.isDeleted = dto.isDeleted;
     local.createdAt = dto.createdAt;
     local.updatedAt = dto.updatedAt;
@@ -35,6 +44,15 @@ class KundeMapper {
       'telefon': local.telefon,
       'email': local.email,
       'notizen': local.notizen,
+      're_abweichend': local.reAbweichend,
+      're_firma': local.reFirma,
+      're_vorname': local.reVorname,
+      're_nachname': local.reNachname,
+      're_strasse': local.reStrasse,
+      're_plz': local.rePlz,
+      're_ort': local.reOrt,
+      're_email': local.reEmail,
+      'rechnungsstellung': local.rechnungsstellung,
       'is_deleted': local.isDeleted,
     };
     if (local.serverId != null) json['id'] = local.serverId;

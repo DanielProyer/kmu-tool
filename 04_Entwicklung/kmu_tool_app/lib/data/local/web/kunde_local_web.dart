@@ -19,6 +19,16 @@ class KundeLocal {
   String? telefon;
   String? email;
   String? notizen;
+  // Rechnungsadresse
+  bool reAbweichend = false;
+  String? reFirma;
+  String? reVorname;
+  String? reNachname;
+  String? reStrasse;
+  String? rePlz;
+  String? reOrt;
+  String? reEmail;
+  String rechnungsstellung = 'email'; // email, post, beides
   bool isDeleted = false;
   DateTime? createdAt;
   DateTime? updatedAt;

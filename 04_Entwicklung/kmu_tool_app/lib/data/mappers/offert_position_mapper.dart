@@ -13,6 +13,8 @@ class OffertPositionMapper {
     local.einheit = dto.einheit;
     local.einheitspreis = dto.einheitspreis;
     local.betrag = dto.betrag;
+    local.typ = dto.typ;
+    local.artikelId = dto.artikelId;
     local.createdAt = dto.createdAt;
     local.updatedAt = dto.updatedAt;
     local.isSynced = true;
@@ -29,6 +31,8 @@ class OffertPositionMapper {
       'einheit': local.einheit,
       'einheitspreis': local.einheitspreis,
       'betrag': local.betrag,
+      'typ': local.typ,
+      'artikel_id': local.artikelId,
     };
     if (local.serverId != null) json['id'] = local.serverId;
     return json;

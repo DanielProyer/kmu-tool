@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:kmu_tool_app/core/config/features.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/auftrag_local_export.dart';
 import 'package:kmu_tool_app/data/local/kunde_local_export.dart';
@@ -9,6 +10,7 @@ import 'package:kmu_tool_app/data/local/zeiterfassung_local_export.dart';
 import 'package:kmu_tool_app/data/local/rapport_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/auftrag_repository.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
+import 'package:kmu_tool_app/presentation/providers/feature_provider.dart';
 import 'package:kmu_tool_app/services/rechnung/rechnung_service.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 
@@ -520,6 +522,28 @@ class _AuftragDetailScreenState
                     ),
                   ),
                 ],
+
+                // ─── Dashboard-Button (Premium) ───
+                Builder(
+                  builder: (context) {
+                    final hasDashboard = ref.watch(
+                        hasFeatureProvider(AppFeature.auftragDashboard));
+                    if (!hasDashboard) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.push(
+                            '/auftraege/${widget.auftragId}/dashboard'),
+                        icon: const Icon(Icons.dashboard_outlined),
+                        label: const Text('Auftrag-Dashboard'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 44),
+                        ),
+                      ),
+                    );
+                  },
+                ),
 
                 // ─── Rechnung erstellen ───
                 if (auftrag.status != 'storniert') ...[

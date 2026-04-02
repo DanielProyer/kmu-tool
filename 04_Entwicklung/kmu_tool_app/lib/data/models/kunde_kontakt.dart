@@ -6,6 +6,9 @@ class KundeKontakt {
   final String? funktion;
   final String? telefon;
   final String? email;
+  final String anrede;
+  final String rolle;
+  final String? notizen;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -17,6 +20,9 @@ class KundeKontakt {
     this.funktion,
     this.telefon,
     this.email,
+    this.anrede = 'sie',
+    this.rolle = 'mitarbeiter',
+    this.notizen,
     this.createdAt,
     this.updatedAt,
   });
@@ -30,6 +36,9 @@ class KundeKontakt {
       funktion: json['funktion'],
       telefon: json['telefon'],
       email: json['email'],
+      anrede: json['anrede'] ?? 'sie',
+      rolle: json['rolle'] ?? 'mitarbeiter',
+      notizen: json['notizen'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -48,6 +57,9 @@ class KundeKontakt {
       'funktion': funktion,
       'telefon': telefon,
       'email': email,
+      'anrede': anrede,
+      'rolle': rolle,
+      'notizen': notizen,
     };
   }
 

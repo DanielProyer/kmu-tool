@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/core/validators/validators.dart';
 import 'package:kmu_tool_app/data/local/kunde_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class KundeFormScreen extends ConsumerStatefulWidget {
   final String? kundeId;
@@ -28,6 +30,18 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
   final _emailController = TextEditingController();
   final _notizenController = TextEditingController();
 
+  // Rechnungsadresse
+  bool _reAbweichend = false;
+  final _reFirmaController = TextEditingController();
+  final _reVornameController = TextEditingController();
+  final _reNachnameController = TextEditingController();
+  final _reStrasseController = TextEditingController();
+  final _rePlzController = TextEditingController();
+  final _reOrtController = TextEditingController();
+  final _reEmailController = TextEditingController();
+
+  String _rechnungsstellung = 'email';
+
   bool _isLoading = false;
   bool _isEdit = false;
   KundeLocal? _existingKunde;
@@ -38,6 +52,30 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
     _isEdit = widget.kundeId != null;
     if (_isEdit) {
       _loadKunde();
+    }
+
+    // PLZ → Ort Auto-Fill
+    _plzController.addListener(_onPlzChanged);
+    _rePlzController.addListener(_onRePlzChanged);
+  }
+
+  void _onPlzChanged() {
+    final plz = _plzController.text.trim();
+    if (plz.length == 4 && _ortController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _ortController.text = ort;
+      }
+    }
+  }
+
+  void _onRePlzChanged() {
+    final plz = _rePlzController.text.trim();
+    if (plz.length == 4 && _reOrtController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _reOrtController.text = ort;
+      }
     }
   }
 
@@ -56,13 +94,22 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
         _telefonController.text = kunde.telefon ?? '';
         _emailController.text = kunde.email ?? '';
         _notizenController.text = kunde.notizen ?? '';
+        _reAbweichend = kunde.reAbweichend;
+        _reFirmaController.text = kunde.reFirma ?? '';
+        _reVornameController.text = kunde.reVorname ?? '';
+        _reNachnameController.text = kunde.reNachname ?? '';
+        _reStrasseController.text = kunde.reStrasse ?? '';
+        _rePlzController.text = kunde.rePlz ?? '';
+        _reOrtController.text = kunde.reOrt ?? '';
+        _reEmailController.text = kunde.reEmail ?? '';
+        _rechnungsstellung = kunde.rechnungsstellung;
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Laden: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -101,13 +148,41 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
           : _ortController.text.trim();
       kunde.telefon = _telefonController.text.trim().isEmpty
           ? null
-          : _telefonController.text.trim();
+          : PhoneValidator.format(_telefonController.text.trim());
       kunde.email = _emailController.text.trim().isEmpty
           ? null
           : _emailController.text.trim();
       kunde.notizen = _notizenController.text.trim().isEmpty
           ? null
           : _notizenController.text.trim();
+
+      // Rechnungsadresse
+      kunde.reAbweichend = _reAbweichend;
+      if (_reAbweichend) {
+        kunde.reFirma = _reFirmaController.text.trim().isEmpty
+            ? null : _reFirmaController.text.trim();
+        kunde.reVorname = _reVornameController.text.trim().isEmpty
+            ? null : _reVornameController.text.trim();
+        kunde.reNachname = _reNachnameController.text.trim().isEmpty
+            ? null : _reNachnameController.text.trim();
+        kunde.reStrasse = _reStrasseController.text.trim().isEmpty
+            ? null : _reStrasseController.text.trim();
+        kunde.rePlz = _rePlzController.text.trim().isEmpty
+            ? null : _rePlzController.text.trim();
+        kunde.reOrt = _reOrtController.text.trim().isEmpty
+            ? null : _reOrtController.text.trim();
+        kunde.reEmail = _reEmailController.text.trim().isEmpty
+            ? null : _reEmailController.text.trim();
+      } else {
+        kunde.reFirma = null;
+        kunde.reVorname = null;
+        kunde.reNachname = null;
+        kunde.reStrasse = null;
+        kunde.rePlz = null;
+        kunde.reOrt = null;
+        kunde.reEmail = null;
+      }
+      kunde.rechnungsstellung = _rechnungsstellung;
 
       await KundeRepository.save(kunde);
 
@@ -116,7 +191,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
           SnackBar(
             content:
                 Text(_isEdit ? 'Kunde aktualisiert' : 'Kunde erstellt'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppStatusColors.success,
           ),
         );
         ref.invalidate(kundenListProvider);
@@ -130,7 +205,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppStatusColors.error,
           ),
         );
       }
@@ -141,6 +216,8 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
 
   @override
   void dispose() {
+    _plzController.removeListener(_onPlzChanged);
+    _rePlzController.removeListener(_onRePlzChanged);
     _firmaController.dispose();
     _vornameController.dispose();
     _nachnameController.dispose();
@@ -150,6 +227,13 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
     _telefonController.dispose();
     _emailController.dispose();
     _notizenController.dispose();
+    _reFirmaController.dispose();
+    _reVornameController.dispose();
+    _reNachnameController.dispose();
+    _reStrasseController.dispose();
+    _rePlzController.dispose();
+    _reOrtController.dispose();
+    _reEmailController.dispose();
     super.dispose();
   }
 
@@ -181,13 +265,13 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ─── Firma ───
+                    // ─── Firma (optional) ───
                     TextFormField(
                       controller: _firmaController,
                       decoration: const InputDecoration(
-                        labelText: 'Firma',
+                        labelText: 'Firma (optional)',
                         prefixIcon: Icon(Icons.business),
-                        hintText: 'Optional',
+                        hintText: 'Leer lassen fuer Privatkunden',
                       ),
                       textInputAction: TextInputAction.next,
                     ),
@@ -226,16 +310,8 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // ─── Abschnitt: Adresse ───
-                    const Text(
-                      'ADRESSE',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                    // ─── Adresse ───
+                    _sectionHeader('ADRESSE'),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _strasseController,
@@ -273,16 +349,8 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // ─── Abschnitt: Kontakt ───
-                    const Text(
-                      'KONTAKT',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                    // ─── Kontakt ───
+                    _sectionHeader('KONTAKT'),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _telefonController,
@@ -293,6 +361,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                       ),
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
+                      validator: PhoneValidator.validate,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -304,44 +373,160 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$')
-                              .hasMatch(value.trim())) {
-                            return 'Ungueltige E-Mail';
-                          }
-                        }
-                        return null;
-                      },
+                      validator: EmailValidator.validate,
                     ),
                     const SizedBox(height: 24),
 
-                    // ─── Notizen ───
-                    const Text(
-                      'NOTIZEN',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                        letterSpacing: 0.5,
+                    // ─── Rechnungsstellung ───
+                    _sectionHeader('RECHNUNGSSTELLUNG'),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: _rechnungsstellung,
+                      decoration: const InputDecoration(
+                        labelText: 'Art der Rechnungsstellung',
+                        prefixIcon: Icon(Icons.receipt_outlined),
                       ),
+                      items: const [
+                        DropdownMenuItem(
+                            value: 'email', child: Text('Per E-Mail')),
+                        DropdownMenuItem(
+                            value: 'post', child: Text('Per Post')),
+                        DropdownMenuItem(
+                            value: 'bar', child: Text('Barzahler')),
+                        DropdownMenuItem(
+                            value: 'abgabe_vor_ort',
+                            child: Text('Abgabe vor Ort')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _rechnungsstellung = value);
+                        }
+                      },
                     ),
+                    const SizedBox(height: 16),
+
+                    // Abweichende Rechnungsadresse
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Abweichende Rechnungsadresse'),
+                      value: _reAbweichend,
+                      onChanged: (value) =>
+                          setState(() => _reAbweichend = value),
+                    ),
+                    if (_reAbweichend) ...[
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _reFirmaController,
+                        decoration: const InputDecoration(
+                          labelText: 'Firma (Rechnung)',
+                          prefixIcon: Icon(Icons.business),
+                        ),
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _reVornameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Vorname',
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _reNachnameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nachname',
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _reStrasseController,
+                        decoration: const InputDecoration(
+                          labelText: 'Strasse',
+                          prefixIcon: Icon(Icons.location_on_outlined),
+                        ),
+                        textInputAction: TextInputAction.next,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: TextFormField(
+                              controller: _rePlzController,
+                              decoration: const InputDecoration(
+                                labelText: 'PLZ',
+                              ),
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _reOrtController,
+                              decoration: const InputDecoration(
+                                labelText: 'Ort',
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _reEmailController,
+                        decoration: const InputDecoration(
+                          labelText: 'E-Mail (Rechnung)',
+                          prefixIcon: Icon(Icons.email_outlined),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        validator: EmailValidator.validate,
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+
+                    // ─── Notizen (mehrzeilig) ───
+                    _sectionHeader('NOTIZEN'),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _notizenController,
                       decoration: const InputDecoration(
-                        labelText: 'Notizen',
+                        labelText: 'Allgemeine Notizen',
                         prefixIcon: Icon(Icons.notes_outlined),
                         alignLabelWithHint: true,
                       ),
-                      maxLines: 4,
-                      textInputAction: TextInputAction.done,
+                      maxLines: 6,
+                      minLines: 3,
+                      textInputAction: TextInputAction.newline,
                     ),
                     const SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        letterSpacing: 0.5,
+      ),
     );
   }
 }

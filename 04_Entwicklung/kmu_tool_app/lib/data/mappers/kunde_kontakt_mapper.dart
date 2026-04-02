@@ -12,6 +12,9 @@ class KundeKontaktMapper {
     local.funktion = dto.funktion;
     local.telefon = dto.telefon;
     local.email = dto.email;
+    local.anrede = dto.anrede;
+    local.rolle = dto.rolle;
+    local.notizen = dto.notizen;
     local.createdAt = dto.createdAt;
     local.updatedAt = dto.updatedAt;
     local.isSynced = true;
@@ -27,6 +30,9 @@ class KundeKontaktMapper {
       'funktion': local.funktion,
       'telefon': local.telefon,
       'email': local.email,
+      'anrede': local.anrede,
+      'rolle': local.rolle,
+      'notizen': local.notizen,
     };
     if (local.serverId != null) json['id'] = local.serverId;
     return json;
