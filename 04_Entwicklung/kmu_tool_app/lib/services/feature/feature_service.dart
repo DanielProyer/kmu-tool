@@ -27,6 +27,8 @@ class FeatureService {
     'lagerorte': true,
     'lieferanten': true,
     'lagerverwaltung': true,
+    'bestellwesen': true,
+    'inventur': true,
     'max_kunden': -1,
     'max_offerten': -1,
   };
@@ -101,6 +103,8 @@ class FeatureService {
       'lagerorte': true,
       'lieferanten': true,
       'lagerverwaltung': true,
+      'bestellwesen': true,
+      'inventur': true,
       'max_kunden': -1,
       'max_offerten': -1,
     };

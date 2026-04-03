@@ -28,6 +28,16 @@ import 'package:kmu_tool_app/data/repositories/artikel_lieferant_repository.dart
 import 'package:kmu_tool_app/data/repositories/artikel_foto_repository.dart';
 import 'package:kmu_tool_app/data/repositories/lagerbestand_repository.dart';
 import 'package:kmu_tool_app/data/repositories/lagerbewegung_repository.dart';
+import 'package:kmu_tool_app/data/models/bestellvorschlag.dart';
+import 'package:kmu_tool_app/data/models/bestellung.dart';
+import 'package:kmu_tool_app/data/models/bestellposition.dart';
+import 'package:kmu_tool_app/data/models/inventur.dart';
+import 'package:kmu_tool_app/data/models/inventur_position.dart';
+import 'package:kmu_tool_app/data/repositories/bestellvorschlag_repository.dart';
+import 'package:kmu_tool_app/data/repositories/bestellung_repository.dart';
+import 'package:kmu_tool_app/data/repositories/bestellposition_repository.dart';
+import 'package:kmu_tool_app/data/repositories/inventur_repository.dart';
+import 'package:kmu_tool_app/data/repositories/inventur_position_repository.dart';
 
 // ─── Kunden ───
 
@@ -425,6 +435,143 @@ class LagerbewegungByArtikelNotifier
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
         () => LagerbewegungRepository.getByArtikel(arg));
+  }
+}
+
+// ─── Bestellvorschläge ───
+
+final bestellvorschlaegeListProvider = AsyncNotifierProvider<
+    BestellvorschlaegeListNotifier, List<Bestellvorschlag>>(
+  BestellvorschlaegeListNotifier.new,
+);
+
+class BestellvorschlaegeListNotifier
+    extends AsyncNotifier<List<Bestellvorschlag>> {
+  @override
+  Future<List<Bestellvorschlag>> build() async {
+    return BestellvorschlagRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state =
+        await AsyncValue.guard(() => BestellvorschlagRepository.getAll());
+  }
+}
+
+// ─── Bestellungen ───
+
+final bestellungenListProvider =
+    AsyncNotifierProvider<BestellungenListNotifier, List<Bestellung>>(
+  BestellungenListNotifier.new,
+);
+
+class BestellungenListNotifier extends AsyncNotifier<List<Bestellung>> {
+  @override
+  Future<List<Bestellung>> build() async {
+    return BestellungRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => BestellungRepository.getAll());
+  }
+}
+
+final bestellungProvider = AsyncNotifierProvider.family<BestellungNotifier,
+    Bestellung?, String>(
+  BestellungNotifier.new,
+);
+
+class BestellungNotifier extends FamilyAsyncNotifier<Bestellung?, String> {
+  @override
+  Future<Bestellung?> build(String arg) async {
+    return BestellungRepository.getById(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state =
+        await AsyncValue.guard(() => BestellungRepository.getById(arg));
+  }
+}
+
+// ─── Bestellpositionen ───
+
+final bestellpositionenProvider = AsyncNotifierProvider.family<
+    BestellpositionenNotifier, List<Bestellposition>, String>(
+  BestellpositionenNotifier.new,
+);
+
+class BestellpositionenNotifier
+    extends FamilyAsyncNotifier<List<Bestellposition>, String> {
+  @override
+  Future<List<Bestellposition>> build(String arg) async {
+    return BestellpositionRepository.getByBestellung(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+        () => BestellpositionRepository.getByBestellung(arg));
+  }
+}
+
+// ─── Inventuren ───
+
+final inventurenListProvider =
+    AsyncNotifierProvider<InventurenListNotifier, List<Inventur>>(
+  InventurenListNotifier.new,
+);
+
+class InventurenListNotifier extends AsyncNotifier<List<Inventur>> {
+  @override
+  Future<List<Inventur>> build() async {
+    return InventurRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => InventurRepository.getAll());
+  }
+}
+
+final inventurProvider =
+    AsyncNotifierProvider.family<InventurNotifier, Inventur?, String>(
+  InventurNotifier.new,
+);
+
+class InventurNotifier extends FamilyAsyncNotifier<Inventur?, String> {
+  @override
+  Future<Inventur?> build(String arg) async {
+    return InventurRepository.getById(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state =
+        await AsyncValue.guard(() => InventurRepository.getById(arg));
+  }
+}
+
+// ─── Inventur-Positionen ───
+
+final inventurPositionenProvider = AsyncNotifierProvider.family<
+    InventurPositionenNotifier, List<InventurPosition>, String>(
+  InventurPositionenNotifier.new,
+);
+
+class InventurPositionenNotifier
+    extends FamilyAsyncNotifier<List<InventurPosition>, String> {
+  @override
+  Future<List<InventurPosition>> build(String arg) async {
+    return InventurPositionRepository.getByInventur(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+        () => InventurPositionRepository.getByInventur(arg));
   }
 }
 

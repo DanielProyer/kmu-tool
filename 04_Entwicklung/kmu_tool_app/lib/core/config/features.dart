@@ -11,6 +11,8 @@ enum AppFeature {
   lagerorte('lagerorte'),
   lieferanten('lieferanten'),
   lagerverwaltung('lagerverwaltung'),
+  bestellwesen('bestellwesen'),
+  inventur('inventur'),
   admin('admin'),
   auftragDashboard('auftrag_dashboard'),
   autoWebsite('auto_website');
@@ -39,6 +41,10 @@ enum AppFeature {
         return ['/lieferanten'];
       case AppFeature.lagerverwaltung:
         return [];
+      case AppFeature.bestellwesen:
+        return ['/bestellungen'];
+      case AppFeature.inventur:
+        return ['/inventur'];
       case AppFeature.admin:
         return ['/admin'];
       case AppFeature.auftragDashboard:

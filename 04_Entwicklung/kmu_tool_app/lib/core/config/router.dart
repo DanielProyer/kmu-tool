@@ -34,6 +34,13 @@ import 'package:kmu_tool_app/presentation/screens/artikel/lagerbewegungen_list_s
 import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferanten_list_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferant_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferant_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/bestellungen/bestellvorschlaege_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/bestellungen/bestellungen_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/bestellungen/bestellung_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/bestellungen/bestellung_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/inventur/inventuren_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/inventur/inventur_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/inventur/inventur_zaehlung_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/admin/admin_dashboard_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/admin/admin_kunden_list_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/admin/admin_kunde_detail_screen.dart';
@@ -324,6 +331,47 @@ final router = GoRouter(
       builder: (context, state) {
         final id = state.pathParameters['id']!;
         return LieferantFormScreen(lieferantId: id);
+      },
+    ),
+
+    // ─── Bestellungen ───
+    GoRoute(
+      path: '/bestellungen',
+      builder: (context, state) => const BestellungenListScreen(),
+    ),
+    GoRoute(
+      path: '/bestellungen/vorschlaege',
+      builder: (context, state) => const BestellvorschlaegeScreen(),
+    ),
+    GoRoute(
+      path: '/bestellungen/neu',
+      builder: (context, state) => const BestellungFormScreen(),
+    ),
+    GoRoute(
+      path: '/bestellungen/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return BestellungDetailScreen(bestellungId: id);
+      },
+    ),
+
+    // ─── Inventur ───
+    GoRoute(
+      path: '/inventur',
+      builder: (context, state) => const InventurenListScreen(),
+    ),
+    GoRoute(
+      path: '/inventur/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return InventurDetailScreen(inventurId: id);
+      },
+    ),
+    GoRoute(
+      path: '/inventur/:id/zaehlung',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return InventurZaehlungScreen(inventurId: id);
       },
     ),
 
