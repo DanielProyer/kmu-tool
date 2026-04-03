@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:kmu_tool_app/data/models/admin/admin_dashboard_stats.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
@@ -10,12 +11,17 @@ class AdminService {
       final userId = SupabaseService.currentUser?.id;
       if (userId == null) {
         _isAdmin = false;
+        debugPrint('[AdminService] checkAdminStatus: kein User eingeloggt');
         return;
       }
+      debugPrint('[AdminService] checkAdminStatus: userId=$userId');
       // is_admin() ist SECURITY DEFINER und umgeht RLS
       final result = await SupabaseService.client.rpc('is_admin');
+      debugPrint('[AdminService] checkAdminStatus: rpc result=$result (${result.runtimeType})');
       _isAdmin = result == true;
-    } catch (_) {
+      debugPrint('[AdminService] checkAdminStatus: _isAdmin=$_isAdmin');
+    } catch (e) {
+      debugPrint('[AdminService] checkAdminStatus ERROR: $e');
       _isAdmin = false;
     }
   }
