@@ -717,78 +717,83 @@ class _LieferantCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor:
-                  colorScheme.secondary.withValues(alpha: 0.1),
-              child: Icon(Icons.local_shipping_outlined,
-                  size: 18, color: colorScheme.secondary),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          lieferant.lieferantFirma ?? 'Unbekannter Lieferant',
-                          style:
-                              const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      if (lieferant.istHauptlieferant)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppStatusColors.success
-                                .withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => context.push('/lieferanten/${lieferant.lieferantId}'),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor:
+                    colorScheme.secondary.withValues(alpha: 0.1),
+                child: Icon(Icons.local_shipping_outlined,
+                    size: 18, color: colorScheme.secondary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
                           child: Text(
-                            'Hauptlieferant',
-                            style: TextStyle(
-                              color: AppStatusColors.success,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                            lieferant.lieferantFirma ?? 'Unbekannter Lieferant',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        if (lieferant.istHauptlieferant)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppStatusColors.success
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Hauptlieferant',
+                              style: TextStyle(
+                                color: AppStatusColors.success,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      if (lieferant.einkaufspreis != null) ...[
-                        Text(
-                          'EK: CHF ${lieferant.einkaufspreis!.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
                       ],
-                      if (lieferant.lieferzeitTage != null)
-                        Text(
-                          'Lieferzeit: ${lieferant.lieferzeitTage} Tage',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        if (lieferant.einkaufspreis != null) ...[
+                          Text(
+                            'EK: CHF ${lieferant.einkaufspreis!.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
-                ],
+                          const SizedBox(width: 12),
+                        ],
+                        if (lieferant.lieferzeitTage != null)
+                          Text(
+                            'Lieferzeit: ${lieferant.lieferzeitTage} Tage',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+            ],
+          ),
         ),
       ),
     );

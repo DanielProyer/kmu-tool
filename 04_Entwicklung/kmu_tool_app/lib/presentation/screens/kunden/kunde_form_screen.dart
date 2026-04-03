@@ -25,6 +25,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
   final _vornameController = TextEditingController();
   final _nachnameController = TextEditingController();
   final _strasseController = TextEditingController();
+  final _hausnummerController = TextEditingController();
   final _plzController = TextEditingController();
   final _ortController = TextEditingController();
   final _telefonController = TextEditingController();
@@ -37,6 +38,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
   final _reVornameController = TextEditingController();
   final _reNachnameController = TextEditingController();
   final _reStrasseController = TextEditingController();
+  final _reHausnummerController = TextEditingController();
   final _rePlzController = TextEditingController();
   final _reOrtController = TextEditingController();
   final _reEmailController = TextEditingController();
@@ -90,6 +92,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
         _vornameController.text = kunde.vorname ?? '';
         _nachnameController.text = kunde.nachname;
         _strasseController.text = kunde.strasse ?? '';
+        _hausnummerController.text = kunde.hausnummer ?? '';
         _plzController.text = kunde.plz ?? '';
         _ortController.text = kunde.ort ?? '';
         _telefonController.text = kunde.telefon ?? '';
@@ -100,6 +103,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
         _reVornameController.text = kunde.reVorname ?? '';
         _reNachnameController.text = kunde.reNachname ?? '';
         _reStrasseController.text = kunde.reStrasse ?? '';
+        _reHausnummerController.text = kunde.reHausnummer ?? '';
         _rePlzController.text = kunde.rePlz ?? '';
         _reOrtController.text = kunde.reOrt ?? '';
         _reEmailController.text = kunde.reEmail ?? '';
@@ -141,6 +145,9 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
       kunde.strasse = _strasseController.text.trim().isEmpty
           ? null
           : _strasseController.text.trim();
+      kunde.hausnummer = _hausnummerController.text.trim().isEmpty
+          ? null
+          : _hausnummerController.text.trim();
       kunde.plz = _plzController.text.trim().isEmpty
           ? null
           : _plzController.text.trim();
@@ -168,6 +175,8 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
             ? null : _reNachnameController.text.trim();
         kunde.reStrasse = _reStrasseController.text.trim().isEmpty
             ? null : _reStrasseController.text.trim();
+        kunde.reHausnummer = _reHausnummerController.text.trim().isEmpty
+            ? null : _reHausnummerController.text.trim();
         kunde.rePlz = _rePlzController.text.trim().isEmpty
             ? null : _rePlzController.text.trim();
         kunde.reOrt = _reOrtController.text.trim().isEmpty
@@ -179,6 +188,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
         kunde.reVorname = null;
         kunde.reNachname = null;
         kunde.reStrasse = null;
+        kunde.reHausnummer = null;
         kunde.rePlz = null;
         kunde.reOrt = null;
         kunde.reEmail = null;
@@ -224,6 +234,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
     _vornameController.dispose();
     _nachnameController.dispose();
     _strasseController.dispose();
+    _hausnummerController.dispose();
     _plzController.dispose();
     _ortController.dispose();
     _telefonController.dispose();
@@ -233,6 +244,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
     _reVornameController.dispose();
     _reNachnameController.dispose();
     _reStrasseController.dispose();
+    _reHausnummerController.dispose();
     _rePlzController.dispose();
     _reOrtController.dispose();
     _reEmailController.dispose();
@@ -321,13 +333,30 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                     // ─── Adresse ───
                     _sectionHeader('ADRESSE'),
                     const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _strasseController,
-                      decoration: const InputDecoration(
-                        labelText: 'Strasse',
-                        prefixIcon: Icon(Icons.location_on_outlined),
-                      ),
-                      textInputAction: TextInputAction.next,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _strasseController,
+                            decoration: const InputDecoration(
+                              labelText: 'Strasse',
+                              prefixIcon: Icon(Icons.location_on_outlined),
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          width: 80,
+                          child: TextFormField(
+                            controller: _hausnummerController,
+                            decoration: const InputDecoration(
+                              labelText: 'Nr.',
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -363,7 +392,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                     TextFormField(
                       controller: _telefonController,
                       decoration: const InputDecoration(
-                        labelText: 'Telefon',
+                        labelText: 'Geschaeftstelefon (Hauptnummer)',
                         prefixIcon: Icon(Icons.phone_outlined),
                         hintText: '+41 79 123 45 67',
                       ),
@@ -456,13 +485,30 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _reStrasseController,
-                        decoration: const InputDecoration(
-                          labelText: 'Strasse',
-                          prefixIcon: Icon(Icons.location_on_outlined),
-                        ),
-                        textInputAction: TextInputAction.next,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _reStrasseController,
+                              decoration: const InputDecoration(
+                                labelText: 'Strasse',
+                                prefixIcon: Icon(Icons.location_on_outlined),
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 80,
+                            child: TextFormField(
+                              controller: _reHausnummerController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nr.',
+                              ),
+                              textInputAction: TextInputAction.next,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Row(

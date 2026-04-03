@@ -13,6 +13,12 @@ class AuftragMapper {
     local.beschreibung = dto.beschreibung;
     local.geplantVon = dto.geplantVon;
     local.geplantBis = dto.geplantBis;
+    local.auftragTyp = dto.auftragTyp;
+    local.intervall = dto.intervall;
+    local.naechsteAusfuehrung = dto.naechsteAusfuehrung;
+    local.vorlaufTage = dto.vorlaufTage;
+    local.periodischBezeichnung = dto.periodischBezeichnung;
+    local.parentAuftragId = dto.parentAuftragId;
     local.isDeleted = dto.isDeleted;
     local.createdAt = dto.createdAt;
     local.updatedAt = dto.updatedAt;
@@ -31,6 +37,13 @@ class AuftragMapper {
       'beschreibung': local.beschreibung,
       'geplant_von': local.geplantVon?.toIso8601String().split('T').first,
       'geplant_bis': local.geplantBis?.toIso8601String().split('T').first,
+      'auftrag_typ': local.auftragTyp,
+      'intervall': local.intervall,
+      'naechste_ausfuehrung':
+          local.naechsteAusfuehrung?.toIso8601String().split('T').first,
+      'vorlauf_tage': local.vorlaufTage,
+      'periodisch_bezeichnung': local.periodischBezeichnung,
+      'parent_auftrag_id': local.parentAuftragId,
       'is_deleted': local.isDeleted,
     };
     if (local.serverId != null) json['id'] = local.serverId;

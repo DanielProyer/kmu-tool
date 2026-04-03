@@ -4,6 +4,7 @@ import 'package:kmu_tool_app/data/models/mwst_einstellung.dart';
 import 'package:kmu_tool_app/data/models/mwst_abrechnung.dart';
 import 'package:kmu_tool_app/data/repositories/mwst_repository.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 /// MWST-Abrechnungsservice.
 ///
@@ -17,8 +18,6 @@ import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 class MwstService {
   final MwstRepository _repo = MwstRepository();
   static const _uuid = Uuid();
-
-  String get _userId => SupabaseService.currentUser!.id;
 
   /// Berechnet und speichert eine MWST-Abrechnung fuer die gegebene Periode.
   Future<MwstAbrechnung> generateAbrechnung({
@@ -38,9 +37,9 @@ class MwstService {
     // 3. Berechnung je nach Methode
     MwstAbrechnung abrechnung;
     if (einstellung.isEffektiv) {
-      abrechnung = _berechneEffektiv(buchungen, einstellung, periodeStart, periodeEnd);
+      abrechnung = await _berechneEffektiv(buchungen, einstellung, periodeStart, periodeEnd);
     } else {
-      abrechnung = _berechneSaldosteuersatz(buchungen, einstellung, periodeStart, periodeEnd);
+      abrechnung = await _berechneSaldosteuersatz(buchungen, einstellung, periodeStart, periodeEnd);
     }
 
     // 4. Speichern
@@ -50,10 +49,11 @@ class MwstService {
 
   /// Laedt alle Buchungen einer Periode.
   Future<List<Buchung>> _loadBuchungen(DateTime start, DateTime end) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from('buchungen')
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .gte('datum', start.toIso8601String().split('T').first)
         .lte('datum', end.toIso8601String().split('T').first)
         .order('datum');
@@ -61,12 +61,13 @@ class MwstService {
   }
 
   /// Effektive Methode: Umsatzsteuer - Vorsteuer = Zahllast
-  MwstAbrechnung _berechneEffektiv(
+  Future<MwstAbrechnung> _berechneEffektiv(
     List<Buchung> buchungen,
     MwstEinstellung einstellung,
     DateTime periodeStart,
     DateTime periodeEnd,
-  ) {
+  ) async {
+    final userId = await BetriebService.getDataOwnerId();
     // Teil I: Umsatz (Ertragsbuchungen auf Konten 3000-3999)
     double totalUmsatz = 0;
     double umsatzNorm = 0;
@@ -147,7 +148,7 @@ class MwstService {
 
     return MwstAbrechnung(
       id: _uuid.v4(),
-      userId: _userId,
+      userId: userId,
       periodeStart: periodeStart,
       periodeEnd: periodeEnd,
       methode: 'effektiv',
@@ -174,12 +175,13 @@ class MwstService {
   }
 
   /// Saldosteuersatz-Methode: Bruttoumsatz x SSS = Zahllast
-  MwstAbrechnung _berechneSaldosteuersatz(
+  Future<MwstAbrechnung> _berechneSaldosteuersatz(
     List<Buchung> buchungen,
     MwstEinstellung einstellung,
     DateTime periodeStart,
     DateTime periodeEnd,
-  ) {
+  ) async {
+    final userId = await BetriebService.getDataOwnerId();
     // Teil I: Gesamtumsatz (brutto, inkl. MWST)
     double totalUmsatzBrutto = 0;
     double steuerbefreit = 0;
@@ -256,7 +258,7 @@ class MwstService {
 
     return MwstAbrechnung(
       id: _uuid.v4(),
-      userId: _userId,
+      userId: userId,
       periodeStart: periodeStart,
       periodeEnd: periodeEnd,
       methode: 'saldosteuersatz',

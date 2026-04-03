@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/services/feature/feature_service.dart';
 import 'package:kmu_tool_app/services/admin/admin_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,9 +39,11 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
-      // Feature-Service + Admin-Check laden nach Login
+      // Feature-Service + Admin-Check + Betrieb-Rolle laden nach Login
       await FeatureService.instance.load();
       await AdminService.checkAdminStatus();
+      await BetriebService.getCurrentRolle();
+      await BetriebService.getDataOwnerId();
 
       if (mounted) {
         context.go('/');

@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/mwst_einstellung.dart';
 import 'package:kmu_tool_app/data/repositories/mwst_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 final _einstellungProvider = FutureProvider<MwstEinstellung?>((ref) async {
   return MwstRepository().getEinstellung();
@@ -80,9 +80,10 @@ class _MwstEinstellungenScreenState
     setState(() => _isSaving = true);
 
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final einstellung = MwstEinstellung(
         id: _existingId ?? const Uuid().v4(),
-        userId: SupabaseService.currentUser!.id,
+        userId: userId,
         methode: _methode,
         abrechnungsperiode: _abrechnungsperiode,
         saldosteuersatz1: _methode == 'saldosteuersatz'

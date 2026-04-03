@@ -5,18 +5,18 @@ import '../../data/models/bestellposition.dart';
 import '../../data/repositories/bestellvorschlag_repository.dart';
 import '../../data/repositories/bestellung_repository.dart';
 import '../../data/repositories/bestellposition_repository.dart';
-import '../../services/supabase/supabase_service.dart';
+import '../supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 class BestellvorschlagService {
-  static String get _userId => SupabaseService.currentUser!.id;
-
-  /// Generiert Bestellvorschläge für alle Artikel unter Mindestbestand.
+  /// Generiert Bestellvorschlaege fuer alle Artikel unter Mindestbestand.
   static Future<int> generateVorschlaege() async {
+    final userId = await BetriebService.getDataOwnerId();
     // Alle Artikel mit mindestbestand > 0 laden
     final artikel = await SupabaseService.client
         .from('artikel')
         .select('id, bezeichnung, mindestbestand, lagerbestand')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('is_deleted', false)
         .gt('mindestbestand', 0);
 
@@ -56,7 +56,7 @@ class BestellvorschlagService {
 
       final vorschlag = Bestellvorschlag(
         id: const Uuid().v4(),
-        userId: _userId,
+        userId: userId,
         artikelId: artikelId,
         lieferantId: lieferantId,
         vorgeschlageneMenge: vorschlagsMenge,
@@ -69,10 +69,11 @@ class BestellvorschlagService {
     return created;
   }
 
-  /// Erstellt Bestellung aus Vorschlägen (gruppiert nach Lieferant).
+  /// Erstellt Bestellung aus Vorschlaegen (gruppiert nach Lieferant).
   static Future<String?> createBestellungFromVorschlaege(
       List<Bestellvorschlag> vorschlaege) async {
     if (vorschlaege.isEmpty) return null;
+    final userId = await BetriebService.getDataOwnerId();
 
     final lieferantId = vorschlaege.first.lieferantId;
     if (lieferantId == null) return null;
@@ -82,7 +83,7 @@ class BestellvorschlagService {
 
     double total = 0;
 
-    // EK-Preise für Positionen laden
+    // EK-Preise fuer Positionen laden
     final positionen = <Bestellposition>[];
     for (final v in vorschlaege) {
       double ekPreis = 0;
@@ -101,7 +102,7 @@ class BestellvorschlagService {
       total += v.vorgeschlageneMenge * ekPreis;
       positionen.add(Bestellposition(
         id: const Uuid().v4(),
-        userId: _userId,
+        userId: userId,
         bestellungId: bestellungId,
         artikelId: v.artikelId,
         menge: v.vorgeschlageneMenge,
@@ -112,7 +113,7 @@ class BestellvorschlagService {
     // Bestellung erstellen
     final bestellung = Bestellung(
       id: bestellungId,
-      userId: _userId,
+      userId: userId,
       lieferantId: lieferantId,
       bestellNr: bestellNr,
       status: 'entwurf',
@@ -126,7 +127,7 @@ class BestellvorschlagService {
       await BestellpositionRepository.save(p);
     }
 
-    // Vorschläge als bestellt markieren
+    // Vorschlaege als bestellt markieren
     for (final v in vorschlaege) {
       await BestellvorschlagRepository.updateStatus(v.id, 'bestellt');
     }
@@ -134,7 +135,7 @@ class BestellvorschlagService {
     return bestellungId;
   }
 
-  /// Registriert Wareneingang für eine Bestellposition.
+  /// Registriert Wareneingang fuer eine Bestellposition.
   static Future<void> registerWareneingang({
     required String bestellungId,
     required String positionId,
@@ -145,7 +146,7 @@ class BestellvorschlagService {
     await BestellpositionRepository.updateGelieferteMenge(
         positionId, gelieferteMenge);
 
-    // Alle Positionen prüfen für Status-Update
+    // Alle Positionen pruefen fuer Status-Update
     final positionen =
         await BestellpositionRepository.getByBestellung(bestellungId);
 

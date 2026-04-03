@@ -2,11 +2,10 @@ import 'package:kmu_tool_app/data/models/mwst_code.dart';
 import 'package:kmu_tool_app/data/models/mwst_einstellung.dart';
 import 'package:kmu_tool_app/data/models/mwst_abrechnung.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class MwstRepository {
-  String get _userId => SupabaseService.currentUser!.id;
-
-  // ─── MWST-Codes (systemweit) ───
+  // --- MWST-Codes (systemweit) ---
 
   Future<List<MwstCode>> getCodes() async {
     try {
@@ -74,14 +73,15 @@ class MwstRepository {
     }
   }
 
-  // ─── MWST-Einstellungen (pro User) ───
+  // --- MWST-Einstellungen (pro User) ---
 
   Future<MwstEinstellung?> getEinstellung() async {
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final data = await SupabaseService.client
           .from('mwst_einstellungen')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .maybeSingle();
       return data != null ? MwstEinstellung.fromJson(data) : null;
     } catch (_) {
@@ -99,14 +99,15 @@ class MwstRepository {
     }
   }
 
-  // ─── MWST-Abrechnungen ───
+  // --- MWST-Abrechnungen ---
 
   Future<List<MwstAbrechnung>> getAbrechnungen() async {
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final data = await SupabaseService.client
           .from('mwst_abrechnungen')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .order('periode_start', ascending: false);
       return data.map((json) => MwstAbrechnung.fromJson(json)).toList();
     } catch (_) {
@@ -116,11 +117,12 @@ class MwstRepository {
 
   Future<MwstAbrechnung?> getAbrechnung(String id) async {
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final data = await SupabaseService.client
           .from('mwst_abrechnungen')
           .select()
           .eq('id', id)
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .maybeSingle();
       return data != null ? MwstAbrechnung.fromJson(data) : null;
     } catch (_) {
@@ -140,6 +142,7 @@ class MwstRepository {
 
   Future<void> updateAbrechnungStatus(String id, String status) async {
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final updates = <String, dynamic>{'status': status};
       if (status == 'eingereicht') {
         updates['eingereicht_am'] = DateTime.now().toIso8601String();
@@ -150,7 +153,7 @@ class MwstRepository {
           .from('mwst_abrechnungen')
           .update(updates)
           .eq('id', id)
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
     } catch (_) {
       // Tabelle existiert noch nicht
     }
@@ -158,11 +161,12 @@ class MwstRepository {
 
   Future<void> deleteAbrechnung(String id) async {
     try {
+      final userId = await BetriebService.getDataOwnerId();
       await SupabaseService.client
           .from('mwst_abrechnungen')
           .delete()
           .eq('id', id)
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
     } catch (_) {
       // Tabelle existiert noch nicht
     }

@@ -4,16 +4,16 @@ import 'package:kmu_tool_app/data/models/offerte.dart';
 import 'package:kmu_tool_app/data/mappers/offerte_mapper.dart';
 import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class OfferteRepository {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<OfferteLocal>> getAll() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('offerten')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows
           .map((r) => OfferteMapper.fromDto(Offerte.fromJson(r)))
@@ -48,10 +48,11 @@ class OfferteRepository {
 
   static Future<List<OfferteLocal>> getByKunde(String kundeId) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('offerten')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('kunde_id', kundeId)
           .eq('is_deleted', false);
       return rows
@@ -68,10 +69,11 @@ class OfferteRepository {
 
   static Future<List<OfferteLocal>> getByStatus(String status) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('offerten')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('status', status)
           .eq('is_deleted', false);
       return rows
@@ -87,7 +89,8 @@ class OfferteRepository {
   }
 
   static Future<void> save(OfferteLocal offerte) async {
-    offerte.userId = _userId;
+    final userId = await BetriebService.getDataOwnerId();
+    offerte.userId = userId;
     if (kIsWeb) {
       final json = OfferteMapper.toJson(offerte);
       await SupabaseService.client.from('offerten').upsert(json);
@@ -117,10 +120,11 @@ class OfferteRepository {
 
   static Future<int> count() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('offerten')
           .select('id')
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows.length;
     }

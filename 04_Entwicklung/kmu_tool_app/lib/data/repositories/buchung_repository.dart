@@ -1,26 +1,27 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/buchung.dart';
 
 class BuchungRepository {
   static const _table = 'buchungen';
 
-  String get _userId => SupabaseService.currentUser!.id;
-
   Future<List<Buchung>> getAll() async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .order('datum', ascending: false);
     return data.map((json) => Buchung.fromJson(json)).toList();
   }
 
   Future<Buchung?> getById(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select()
         .eq('id', id)
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .maybeSingle();
     return data != null ? Buchung.fromJson(data) : null;
   }
@@ -28,20 +29,22 @@ class BuchungRepository {
   /// Returns all Buchungen where soll_konto or haben_konto matches the given
   /// Kontonummer.
   Future<List<Buchung>> getByKonto(int kontonummer) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .or('soll_konto.eq.$kontonummer,haben_konto.eq.$kontonummer')
         .order('datum', ascending: false);
     return data.map((json) => Buchung.fromJson(json)).toList();
   }
 
   Future<List<Buchung>> getByMonat(int monat, {int? jahr}) async {
+    final userId = await BetriebService.getDataOwnerId();
     var query = SupabaseService.client
         .from(_table)
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('monat', monat);
     if (jahr != null) {
       // Filter by year using datum column range
@@ -58,10 +61,11 @@ class BuchungRepository {
   }
 
   Future<List<Buchung>> getByRechnung(String rechnungId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('rechnung_id', rechnungId)
         .order('datum', ascending: false);
     return data.map((json) => Buchung.fromJson(json)).toList();
@@ -72,10 +76,11 @@ class BuchungRepository {
   }
 
   Future<void> delete(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     await SupabaseService.client
         .from(_table)
         .delete()
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 }

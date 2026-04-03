@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/core/validators/validators.dart';
 import 'package:kmu_tool_app/data/models/lieferant.dart';
 import 'package:kmu_tool_app/data/repositories/lieferant_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 class LieferantFormScreen extends ConsumerStatefulWidget {
   final String? lieferantId;
@@ -23,6 +24,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
   final _firmaController = TextEditingController();
   final _kontaktpersonController = TextEditingController();
   final _strasseController = TextEditingController();
+  final _hausnummerController = TextEditingController();
   final _plzController = TextEditingController();
   final _ortController = TextEditingController();
   final _telefonController = TextEditingController();
@@ -54,6 +56,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
         _firmaController.text = lieferant.firma;
         _kontaktpersonController.text = lieferant.kontaktperson ?? '';
         _strasseController.text = lieferant.strasse ?? '';
+        _hausnummerController.text = lieferant.hausnummer ?? '';
         _plzController.text = lieferant.plz ?? '';
         _ortController.text = lieferant.ort ?? '';
         _telefonController.text = lieferant.telefon ?? '';
@@ -83,11 +86,12 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final userId = _isEdit
+          ? _existingLieferant!.userId
+          : await BetriebService.getDataOwnerId();
       final lieferant = Lieferant(
         id: _isEdit ? _existingLieferant!.id : const Uuid().v4(),
-        userId: _isEdit
-            ? _existingLieferant!.userId
-            : SupabaseService.currentUser!.id,
+        userId: userId,
         firma: _firmaController.text.trim(),
         kontaktperson: _kontaktpersonController.text.trim().isEmpty
             ? null
@@ -95,6 +99,9 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
         strasse: _strasseController.text.trim().isEmpty
             ? null
             : _strasseController.text.trim(),
+        hausnummer: _hausnummerController.text.trim().isEmpty
+            ? null
+            : _hausnummerController.text.trim(),
         plz: _plzController.text.trim().isEmpty
             ? null
             : _plzController.text.trim(),
@@ -103,7 +110,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
             : _ortController.text.trim(),
         telefon: _telefonController.text.trim().isEmpty
             ? null
-            : _telefonController.text.trim(),
+            : PhoneValidator.format(_telefonController.text.trim()),
         email: _emailController.text.trim().isEmpty
             ? null
             : _emailController.text.trim(),
@@ -152,6 +159,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
     _firmaController.dispose();
     _kontaktpersonController.dispose();
     _strasseController.dispose();
+    _hausnummerController.dispose();
     _plzController.dispose();
     _ortController.dispose();
     _telefonController.dispose();
@@ -233,6 +241,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
                       ),
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
+                      validator: PhoneValidator.validate,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -261,13 +270,30 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
                     // ─── Adresse ───
                     _sectionHeader('ADRESSE'),
                     const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _strasseController,
-                      decoration: const InputDecoration(
-                        labelText: 'Strasse',
-                        prefixIcon: Icon(Icons.location_on_outlined),
-                      ),
-                      textInputAction: TextInputAction.next,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _strasseController,
+                            decoration: const InputDecoration(
+                              labelText: 'Strasse',
+                              prefixIcon: Icon(Icons.location_on_outlined),
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          width: 80,
+                          child: TextFormField(
+                            controller: _hausnummerController,
+                            decoration: const InputDecoration(
+                              labelText: 'Nr.',
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Row(

@@ -3,7 +3,7 @@ import 'package:kmu_tool_app/data/models/rechnung.dart';
 import 'package:kmu_tool_app/data/models/buchung.dart';
 import 'package:kmu_tool_app/data/repositories/buchung_repository.dart';
 import 'package:kmu_tool_app/data/repositories/rechnung_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 /// Automatic booking service for invoices.
 ///
@@ -21,9 +21,7 @@ class BuchungService {
   final RechnungRepository _rechnungRepo = RechnungRepository();
   static const _uuid = Uuid();
 
-  String get _userId => SupabaseService.currentUser!.id;
-
-  // ─── Kontonummern (Swiss KMU Kontenrahmen) ───
+  // --- Kontonummern (Swiss KMU Kontenrahmen) ---
   static const int _kontoBank = 1020;
   static const int _kontoDebitoren = 1100;
   static const int _kontoMwst = 2200;
@@ -37,10 +35,11 @@ class BuchungService {
   /// 2. Soll 1100 (Debitoren) / Haben 2200 (MWST)   - VAT amount
   ///    MWST-Code: UST_NORM
   Future<void> createBuchungenForRechnung(Rechnung rechnung) async {
+    final userId = await BetriebService.getDataOwnerId();
     // Booking 1: Netto-Betrag -> Debitoren / Ertrag
     final buchungNetto = Buchung(
       id: _uuid.v4(),
-      userId: _userId,
+      userId: userId,
       datum: rechnung.datum,
       sollKonto: _kontoDebitoren,
       habenKonto: _kontoErtrag,
@@ -59,7 +58,7 @@ class BuchungService {
     if (rechnung.mwstBetrag > 0) {
       final buchungMwst = Buchung(
         id: _uuid.v4(),
-        userId: _userId,
+        userId: userId,
         datum: rechnung.datum,
         sollKonto: _kontoDebitoren,
         habenKonto: _kontoMwst,
@@ -83,6 +82,7 @@ class BuchungService {
   ///
   /// Also updates the invoice status to 'bezahlt'.
   Future<void> markAsBezahlt(String rechnungId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final rechnung = await _rechnungRepo.getById(rechnungId);
     if (rechnung == null) {
       throw Exception('Rechnung nicht gefunden: $rechnungId');
@@ -94,7 +94,7 @@ class BuchungService {
     // Create payment booking: Bank / Debitoren (kein MWST-Code bei Zahlung)
     final buchungZahlung = Buchung(
       id: _uuid.v4(),
-      userId: _userId,
+      userId: userId,
       datum: DateTime.now(),
       sollKonto: _kontoBank,
       habenKonto: _kontoDebitoren,
@@ -116,6 +116,7 @@ class BuchungService {
   ///
   /// Also updates the invoice status to 'storniert'.
   Future<void> storniereRechnung(String rechnungId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final rechnung = await _rechnungRepo.getById(rechnungId);
     if (rechnung == null) {
       throw Exception('Rechnung nicht gefunden: $rechnungId');
@@ -127,7 +128,7 @@ class BuchungService {
     // Reverse booking 1: Ertrag / Debitoren (net reversal)
     final stornoNetto = Buchung(
       id: _uuid.v4(),
-      userId: _userId,
+      userId: userId,
       datum: DateTime.now(),
       sollKonto: _kontoErtrag,
       habenKonto: _kontoDebitoren,
@@ -146,7 +147,7 @@ class BuchungService {
     if (rechnung.mwstBetrag > 0) {
       final stornoMwst = Buchung(
         id: _uuid.v4(),
-        userId: _userId,
+        userId: userId,
         datum: DateTime.now(),
         sollKonto: _kontoMwst,
         habenKonto: _kontoDebitoren,
@@ -166,7 +167,7 @@ class BuchungService {
     if (rechnung.status == 'bezahlt') {
       final stornoZahlung = Buchung(
         id: _uuid.v4(),
-        userId: _userId,
+        userId: userId,
         datum: DateTime.now(),
         sollKonto: _kontoDebitoren,
         habenKonto: _kontoBank,

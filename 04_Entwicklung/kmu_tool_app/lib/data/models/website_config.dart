@@ -13,6 +13,7 @@ class WebsiteConfig {
   final String? kontaktEmail;
   final String? kontaktTelefon;
   final String? adresseStrasse;
+  final String? adresseHausnummer;
   final String? adressePlz;
   final String? adresseOrt;
   final String? oeffnungszeiten;
@@ -40,6 +41,7 @@ class WebsiteConfig {
     this.kontaktEmail,
     this.kontaktTelefon,
     this.adresseStrasse,
+    this.adresseHausnummer,
     this.adressePlz,
     this.adresseOrt,
     this.oeffnungszeiten,
@@ -69,6 +71,7 @@ class WebsiteConfig {
       kontaktEmail: json['kontakt_email'],
       kontaktTelefon: json['kontakt_telefon'],
       adresseStrasse: json['adresse_strasse'],
+      adresseHausnummer: json['adresse_hausnummer'],
       adressePlz: json['adresse_plz'],
       adresseOrt: json['adresse_ort'],
       oeffnungszeiten: json['oeffnungszeiten'],
@@ -105,6 +108,7 @@ class WebsiteConfig {
       'kontakt_email': kontaktEmail,
       'kontakt_telefon': kontaktTelefon,
       'adresse_strasse': adresseStrasse,
+      'adresse_hausnummer': adresseHausnummer,
       'adresse_plz': adressePlz,
       'adresse_ort': adresseOrt,
       'oeffnungszeiten': oeffnungszeiten,
@@ -130,6 +134,7 @@ class WebsiteConfig {
     String? kontaktEmail,
     String? kontaktTelefon,
     String? adresseStrasse,
+    String? adresseHausnummer,
     String? adressePlz,
     String? adresseOrt,
     String? oeffnungszeiten,
@@ -154,6 +159,7 @@ class WebsiteConfig {
       kontaktEmail: kontaktEmail ?? this.kontaktEmail,
       kontaktTelefon: kontaktTelefon ?? this.kontaktTelefon,
       adresseStrasse: adresseStrasse ?? this.adresseStrasse,
+      adresseHausnummer: adresseHausnummer ?? this.adresseHausnummer,
       adressePlz: adressePlz ?? this.adressePlz,
       adresseOrt: adresseOrt ?? this.adresseOrt,
       oeffnungszeiten: oeffnungszeiten ?? this.oeffnungszeiten,

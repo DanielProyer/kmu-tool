@@ -4,16 +4,16 @@ import 'package:kmu_tool_app/data/models/auftrag.dart';
 import 'package:kmu_tool_app/data/mappers/auftrag_mapper.dart';
 import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class AuftragRepository {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<AuftragLocal>> getAll() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('auftraege')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows
           .map((r) => AuftragMapper.fromDto(Auftrag.fromJson(r)))
@@ -48,10 +48,11 @@ class AuftragRepository {
 
   static Future<List<AuftragLocal>> getByKunde(String kundeId) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('auftraege')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('kunde_id', kundeId)
           .eq('is_deleted', false);
       return rows
@@ -68,10 +69,11 @@ class AuftragRepository {
 
   static Future<List<AuftragLocal>> getByStatus(String status) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('auftraege')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('status', status)
           .eq('is_deleted', false);
       return rows
@@ -88,10 +90,11 @@ class AuftragRepository {
 
   static Future<List<AuftragLocal>> getByOfferte(String offerteId) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('auftraege')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('offerte_id', offerteId)
           .eq('is_deleted', false);
       return rows
@@ -107,7 +110,8 @@ class AuftragRepository {
   }
 
   static Future<void> save(AuftragLocal auftrag) async {
-    auftrag.userId = _userId;
+    final userId = await BetriebService.getDataOwnerId();
+    auftrag.userId = userId;
     if (kIsWeb) {
       final json = AuftragMapper.toJson(auftrag);
       await SupabaseService.client.from('auftraege').upsert(json);
@@ -137,10 +141,11 @@ class AuftragRepository {
 
   static Future<int> count() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('auftraege')
           .select('id')
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows.length;
     }

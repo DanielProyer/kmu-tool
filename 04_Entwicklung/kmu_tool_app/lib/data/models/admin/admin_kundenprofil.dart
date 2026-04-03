@@ -6,6 +6,7 @@ class AdminKundenprofil {
   final String? email;
   final String? telefon;
   final String? strasse;
+  final String? hausnummer;
   final String? plz;
   final String? ort;
   final String status; // aktiv, inaktiv, gesperrt, test
@@ -30,6 +31,7 @@ class AdminKundenprofil {
     this.email,
     this.telefon,
     this.strasse,
+    this.hausnummer,
     this.plz,
     this.ort,
     this.status = 'aktiv',
@@ -63,6 +65,7 @@ class AdminKundenprofil {
       email: json['email'] as String?,
       telefon: json['telefon'] as String?,
       strasse: json['strasse'] as String?,
+      hausnummer: json['hausnummer'] as String?,
       plz: json['plz'] as String?,
       ort: json['ort'] as String?,
       status: json['status'] as String? ?? 'aktiv',
@@ -94,6 +97,7 @@ class AdminKundenprofil {
       'email': email,
       'telefon': telefon,
       'strasse': strasse,
+      'hausnummer': hausnummer,
       'plz': plz,
       'ort': ort,
       'status': status,
@@ -131,9 +135,16 @@ class AdminKundenprofil {
     }
   }
 
+  String get strasseMitNr {
+    final s = strasse ?? '';
+    final h = hausnummer ?? '';
+    return '$s $h'.trim();
+  }
+
   String get adresseEinzeilig {
     final parts = <String>[];
-    if (strasse != null && strasse!.isNotEmpty) parts.add(strasse!);
+    final sm = strasseMitNr;
+    if (sm.isNotEmpty) parts.add(sm);
     if (plz != null && ort != null) {
       parts.add('$plz $ort');
     } else if (ort != null && ort!.isNotEmpty) {

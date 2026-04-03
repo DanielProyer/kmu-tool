@@ -34,6 +34,9 @@ dependencies:
   # Datum & Internationalisierung
   intl: any
 
+  # Kalender
+  table_calendar: ^3.1.0
+
   # Charts
   fl_chart: ^0.70.0
 

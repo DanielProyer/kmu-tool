@@ -14,7 +14,7 @@ import 'package:kmu_tool_app/data/repositories/buchungs_vorlage_repository.dart'
 import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
 import 'package:kmu_tool_app/data/repositories/mwst_repository.dart';
 import 'package:kmu_tool_app/services/mwst/mwst_service.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 // ─── Providers ───
 
@@ -165,9 +165,10 @@ class _BuchungFormScreenState extends ConsumerState<BuchungFormScreen> {
         mwstBetrag = double.parse((betrag * _mwstSatz! / 100).toStringAsFixed(2));
       }
 
+      final userId = await BetriebService.getDataOwnerId();
       final buchung = Buchung(
         id: const Uuid().v4(),
-        userId: SupabaseService.currentUser!.id,
+        userId: userId,
         datum: _datum,
         sollKonto: _sollKonto!,
         habenKonto: _habenKonto!,

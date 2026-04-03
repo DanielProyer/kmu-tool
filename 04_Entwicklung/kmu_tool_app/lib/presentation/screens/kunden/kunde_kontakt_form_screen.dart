@@ -276,7 +276,7 @@ class _KundeKontaktFormScreenState
                     TextFormField(
                       controller: _telefonController,
                       decoration: const InputDecoration(
-                        labelText: 'Telefon',
+                        labelText: 'Direktnummer / Mobil',
                         prefixIcon: Icon(Icons.phone_outlined),
                         hintText: '+41 79 123 45 67',
                       ),

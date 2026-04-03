@@ -54,11 +54,19 @@ import 'package:kmu_tool_app/presentation/screens/website/website_setup_screen.d
 import 'package:kmu_tool_app/presentation/screens/website/website_design_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/website/website_anfragen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/website/website_vorschau_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/kalender/kalender_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/kalender/termin_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/kalender/termin_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/abo_verwaltung_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/mitarbeiter/mitarbeiter_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/mitarbeiter/mitarbeiter_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/fahrzeuge/fahrzeuge_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/einstellungen/fahrzeuge/fahrzeug_form_screen.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/feature/feature_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -74,6 +82,10 @@ final router = GoRouter(
     if (isLoggedIn && !isLoginPage) {
       final location = state.matchedLocation;
       if (!FeatureService.instance.isRouteAllowed(location)) {
+        return '/';
+      }
+      // Rollen-Gate: Prüfe ob Route für aktuelle Rolle erlaubt ist
+      if (!BetriebService.isRouteAllowed(location)) {
         return '/';
       }
     }
@@ -463,6 +475,30 @@ final router = GoRouter(
       builder: (context, state) => const WebsiteVorschauScreen(),
     ),
 
+    // ─── Kalender ───
+    GoRoute(
+      path: '/kalender',
+      builder: (context, state) => const KalenderScreen(),
+    ),
+    GoRoute(
+      path: '/kalender/neu',
+      builder: (context, state) => const TerminFormScreen(),
+    ),
+    GoRoute(
+      path: '/kalender/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return TerminDetailScreen(terminId: id);
+      },
+    ),
+    GoRoute(
+      path: '/kalender/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return TerminFormScreen(terminId: id);
+      },
+    ),
+
     // ─── Einstellungen ───
     GoRoute(
       path: '/einstellungen',
@@ -475,6 +511,40 @@ final router = GoRouter(
     GoRoute(
       path: '/einstellungen/abo',
       builder: (context, state) => const AboVerwaltungScreen(),
+    ),
+
+    // ─── Mitarbeiter (unter Einstellungen) ───
+    GoRoute(
+      path: '/einstellungen/mitarbeiter',
+      builder: (context, state) => const MitarbeiterListScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/mitarbeiter/neu',
+      builder: (context, state) => const MitarbeiterFormScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/mitarbeiter/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return MitarbeiterFormScreen(mitarbeiterId: id);
+      },
+    ),
+
+    // ─── Fahrzeuge (unter Einstellungen) ───
+    GoRoute(
+      path: '/einstellungen/fahrzeuge',
+      builder: (context, state) => const FahrzeugeListScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/fahrzeuge/neu',
+      builder: (context, state) => const FahrzeugFormScreen(),
+    ),
+    GoRoute(
+      path: '/einstellungen/fahrzeuge/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return FahrzeugFormScreen(fahrzeugId: id);
+      },
     ),
   ],
 );

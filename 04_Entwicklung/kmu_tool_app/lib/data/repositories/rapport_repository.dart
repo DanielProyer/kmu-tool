@@ -4,16 +4,16 @@ import 'package:kmu_tool_app/data/models/rapport.dart';
 import 'package:kmu_tool_app/data/mappers/rapport_mapper.dart';
 import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class RapportRepository {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<RapportLocal>> getAll() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('rapporte')
           .select()
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
       return rows
           .map((r) => RapportMapper.fromDto(Rapport.fromJson(r)))
           .toList();
@@ -45,10 +45,11 @@ class RapportRepository {
   static Future<List<RapportLocal>> getByAuftrag(
       String auftragId) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('rapporte')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('auftrag_id', auftragId);
       return rows
           .map((r) => RapportMapper.fromDto(Rapport.fromJson(r)))
@@ -62,7 +63,8 @@ class RapportRepository {
   }
 
   static Future<void> save(RapportLocal rapport) async {
-    rapport.userId = _userId;
+    final userId = await BetriebService.getDataOwnerId();
+    rapport.userId = userId;
     if (kIsWeb) {
       final json = RapportMapper.toJson(rapport);
       await SupabaseService.client.from('rapporte').upsert(json);
@@ -92,10 +94,11 @@ class RapportRepository {
 
   static Future<int> count() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('rapporte')
           .select('id')
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
       return rows.length;
     }
     final isar = IsarService.instance;

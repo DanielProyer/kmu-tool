@@ -35,6 +35,9 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
   String? _selectedStatus;
   DateTime? _geplantVon;
   DateTime? _geplantBis;
+  String _auftragTyp = 'einmalig';
+  String? _intervall;
+  DateTime? _naechsteAusfuehrung;
 
   // Linked offerte info (if created from an Offerte)
   String? _linkedOfferteNr;
@@ -114,6 +117,9 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
         _beschreibungController.text = auftrag.beschreibung ?? '';
         _geplantVon = auftrag.geplantVon;
         _geplantBis = auftrag.geplantBis;
+        _auftragTyp = auftrag.auftragTyp;
+        _intervall = auftrag.intervall;
+        _naechsteAusfuehrung = auftrag.naechsteAusfuehrung;
         _linkedOfferteId = auftrag.offerteId;
       }
     } catch (e) {
@@ -183,6 +189,10 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
               : _beschreibungController.text.trim();
       auftrag.geplantVon = _geplantVon;
       auftrag.geplantBis = _geplantBis;
+      auftrag.auftragTyp = _auftragTyp;
+      auftrag.intervall = _auftragTyp == 'periodisch' ? _intervall : null;
+      auftrag.naechsteAusfuehrung =
+          _auftragTyp == 'periodisch' ? _naechsteAusfuehrung : null;
       auftrag.offerteId = _linkedOfferteId;
 
       await AuftragRepository.save(auftrag);
@@ -342,6 +352,113 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
+
+                    // ─── Auftragstyp ───
+                    Text(
+                      'AUFTRAGSTYP',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SegmentedButton<String>(
+                      segments: const [
+                        ButtonSegment(
+                          value: 'einmalig',
+                          label: Text('Einmalig'),
+                          icon: Icon(Icons.event_outlined),
+                        ),
+                        ButtonSegment(
+                          value: 'periodisch',
+                          label: Text('Periodisch'),
+                          icon: Icon(Icons.repeat),
+                        ),
+                      ],
+                      selected: {_auftragTyp},
+                      onSelectionChanged: (value) {
+                        setState(() => _auftragTyp = value.first);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ─── Periodisch-Felder ───
+                    if (_auftragTyp == 'periodisch') ...[
+                      DropdownButtonFormField<String>(
+                        value: _intervall,
+                        decoration: const InputDecoration(
+                          labelText: 'Intervall *',
+                          prefixIcon: Icon(Icons.schedule_outlined),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'woechentlich',
+                              child: Text('Woechentlich')),
+                          DropdownMenuItem(
+                              value: 'monatlich',
+                              child: Text('Monatlich')),
+                          DropdownMenuItem(
+                              value: 'quartalsweise',
+                              child: Text('Quartalsweise')),
+                          DropdownMenuItem(
+                              value: 'halbjaehrlich',
+                              child: Text('Halbjaehrlich')),
+                          DropdownMenuItem(
+                              value: 'jaehrlich',
+                              child: Text('Jaehrlich')),
+                        ],
+                        onChanged: (value) {
+                          setState(() => _intervall = value);
+                        },
+                        validator: (value) {
+                          if (_auftragTyp == 'periodisch' &&
+                              (value == null || value.isEmpty)) {
+                            return 'Intervall ist Pflicht bei periodischen Auftraegen';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate:
+                                _naechsteAusfuehrung ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2099),
+                            locale: const Locale('de', 'CH'),
+                            useRootNavigator: false,
+                          );
+                          if (picked != null && mounted) {
+                            setState(
+                                () => _naechsteAusfuehrung = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Naechste Ausfuehrung',
+                            prefixIcon: Icon(Icons.event_repeat),
+                          ),
+                          child: Text(
+                            _naechsteAusfuehrung != null
+                                ? _dateFormat
+                                    .format(_naechsteAusfuehrung!)
+                                : '–',
+                            style: TextStyle(
+                              color: _naechsteAusfuehrung != null
+                                  ? null
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
 
                     // ─── Beschreibung ───
                     Text(

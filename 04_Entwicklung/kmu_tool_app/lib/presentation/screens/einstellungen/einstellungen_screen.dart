@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/presentation/providers/feature_provider.dart';
 import 'package:kmu_tool_app/presentation/providers/theme_provider.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 class EinstellungenScreen extends ConsumerWidget {
   const EinstellungenScreen({super.key});
@@ -12,6 +13,7 @@ class EinstellungenScreen extends ConsumerWidget {
     final themeConfig = ref.watch(themeConfigProvider);
     final planName = ref.watch(currentPlanNameProvider);
     final theme = Theme.of(context);
+    final isGF = BetriebService.cachedRolle == 'geschaeftsfuehrer';
 
     return Scaffold(
       appBar: AppBar(
@@ -58,6 +60,50 @@ class EinstellungenScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/einstellungen/abo'),
           ),
+
+          // ─── Betrieb (nur GF) ───
+          if (isGF) ...[
+            const Divider(height: 1),
+            const _SectionHeader(title: 'BETRIEB'),
+            ListTile(
+              leading: Icon(
+                Icons.receipt_long_outlined,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              title: const Text('MWST-Einstellungen'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/buchhaltung/mwst/einstellungen'),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.people_outline,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              title: const Text('Mitarbeiter'),
+              subtitle: const Text('Verwalten & einladen'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/einstellungen/mitarbeiter'),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.directions_car_outlined,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              title: const Text('Fahrzeuge'),
+              subtitle: const Text('Fuhrpark verwalten'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/einstellungen/fahrzeuge'),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.fact_check_outlined,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              title: const Text('Inventur'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/inventur'),
+            ),
+          ],
 
           const Divider(height: 1),
 

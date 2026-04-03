@@ -4,16 +4,16 @@ import 'package:kmu_tool_app/data/models/zeiterfassung.dart';
 import 'package:kmu_tool_app/data/mappers/zeiterfassung_mapper.dart';
 import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class ZeiterfassungRepository {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<ZeiterfassungLocal>> getAll() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('zeiterfassungen')
           .select()
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
       return rows
           .map((r) =>
               ZeiterfassungMapper.fromDto(Zeiterfassung.fromJson(r)))
@@ -47,10 +47,11 @@ class ZeiterfassungRepository {
   static Future<List<ZeiterfassungLocal>> getByAuftrag(
       String auftragId) async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('zeiterfassungen')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('auftrag_id', auftragId);
       return rows
           .map((r) =>
@@ -65,7 +66,8 @@ class ZeiterfassungRepository {
   }
 
   static Future<void> save(ZeiterfassungLocal zeiterfassung) async {
-    zeiterfassung.userId = _userId;
+    final userId = await BetriebService.getDataOwnerId();
+    zeiterfassung.userId = userId;
     if (kIsWeb) {
       final json = ZeiterfassungMapper.toJson(zeiterfassung);
       await SupabaseService.client.from('zeiterfassungen').upsert(json);
@@ -93,10 +95,11 @@ class ZeiterfassungRepository {
 
   static Future<int> count() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('zeiterfassungen')
           .select('id')
-          .eq('user_id', _userId);
+          .eq('user_id', userId);
       return rows.length;
     }
     final isar = IsarService.instance;

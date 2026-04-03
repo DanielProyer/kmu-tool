@@ -1,33 +1,34 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/buchungs_vorlage.dart';
 
 class BuchungsVorlageRepository {
   static const _table = 'buchungs_vorlagen';
 
-  String get _userId => SupabaseService.currentUser!.id;
-
   Future<List<BuchungsVorlage>> getAll() async {
+    final userId = await BetriebService.getDataOwnerId();
     try {
       final data = await SupabaseService.client
           .from(_table)
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .order('bezeichnung', ascending: true);
       final result =
           data.map((json) => BuchungsVorlage.fromJson(json)).toList();
       if (result.isNotEmpty) return result;
     } catch (_) {
-      // Tabelle existiert noch nicht → Fallback
+      // Tabelle existiert noch nicht -> Fallback
     }
-    return _defaultVorlagen();
+    return _defaultVorlagen(userId);
   }
 
   Future<List<BuchungsVorlage>> getByTrigger(String trigger) async {
+    final userId = await BetriebService.getDataOwnerId();
     try {
       final data = await SupabaseService.client
           .from(_table)
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('auto_trigger', trigger);
       final result =
           data.map((json) => BuchungsVorlage.fromJson(json)).toList();
@@ -35,7 +36,7 @@ class BuchungsVorlageRepository {
     } catch (_) {
       // Fallback
     }
-    return _defaultVorlagen()
+    return _defaultVorlagen(userId)
         .where((v) => v.autoTrigger == trigger)
         .toList();
   }
@@ -46,10 +47,9 @@ class BuchungsVorlageRepository {
 
   /// Hardcoded Standard-Buchungsvorlagen als Fallback,
   /// solange die Supabase-Tabelle noch nicht existiert.
-  List<BuchungsVorlage> _defaultVorlagen() {
-    final uid = _userId;
+  List<BuchungsVorlage> _defaultVorlagen(String uid) {
     return [
-      // ── Automatik-Vorlagen (Rechnungs-Trigger) ──
+      // -- Automatik-Vorlagen (Rechnungs-Trigger) --
       BuchungsVorlage(
         id: 'default_rechnung_erstellt',
         userId: uid,
@@ -95,7 +95,7 @@ class BuchungsVorlageRepository {
         habenKonto: 1100,
         autoTrigger: 'rechnung_storniert',
       ),
-      // ── Manuelle Vorlagen ──
+      // -- Manuelle Vorlagen --
       BuchungsVorlage(
         id: 'default_materialeinkauf_bar',
         userId: uid,

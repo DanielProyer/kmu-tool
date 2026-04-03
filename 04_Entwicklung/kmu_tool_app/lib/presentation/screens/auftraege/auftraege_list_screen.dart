@@ -277,6 +277,15 @@ class _AuftragCard extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  if (auftrag.auftragTyp == 'periodisch')
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Icon(
+                        Icons.repeat,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                   Expanded(
                     child: Text(
                       auftrag.auftragsNr ?? 'Auftrag',

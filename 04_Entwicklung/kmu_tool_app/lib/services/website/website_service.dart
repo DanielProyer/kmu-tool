@@ -9,6 +9,7 @@ import 'package:kmu_tool_app/data/repositories/website_section_repository.dart';
 import 'package:kmu_tool_app/data/repositories/website_gallery_repository.dart';
 import 'package:kmu_tool_app/services/storage/file_storage_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 class WebsiteService {
   static const _uuid = Uuid();
@@ -16,7 +17,7 @@ class WebsiteService {
 
   /// Erstellt eine neue Website-Konfiguration aus dem UserProfile.
   static Future<WebsiteConfig> initializeWebsite(UserProfile profile) async {
-    final userId = SupabaseService.client.auth.currentUser!.id;
+    final userId = await BetriebService.getDataOwnerId();
     final slug = await generateSlug(profile.firmaName);
     final configId = _uuid.v4();
 

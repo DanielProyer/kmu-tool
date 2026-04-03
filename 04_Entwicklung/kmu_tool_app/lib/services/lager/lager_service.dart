@@ -1,11 +1,9 @@
 import 'package:uuid/uuid.dart';
 import '../../data/models/lagerbewegung.dart';
 import '../../data/repositories/lagerbewegung_repository.dart';
-import '../../services/supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 class LagerService {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<void> wareneingang({
     required String artikelId,
     required String lagerortId,
@@ -14,9 +12,10 @@ class LagerService {
     String? referenzTyp,
     String? referenzId,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final bewegung = Lagerbewegung(
       id: const Uuid().v4(),
-      userId: _userId,
+      userId: userId,
       artikelId: artikelId,
       lagerortId: lagerortId,
       bewegungstyp: 'eingang',
@@ -36,9 +35,10 @@ class LagerService {
     String? referenzTyp,
     String? referenzId,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final bewegung = Lagerbewegung(
       id: const Uuid().v4(),
-      userId: _userId,
+      userId: userId,
       artikelId: artikelId,
       lagerortId: lagerortId,
       bewegungstyp: 'ausgang',
@@ -57,9 +57,10 @@ class LagerService {
     required double menge,
     String? bemerkung,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final bewegung = Lagerbewegung(
       id: const Uuid().v4(),
-      userId: _userId,
+      userId: userId,
       artikelId: artikelId,
       lagerortId: vonLagerortId,
       zielLagerortId: nachLagerortId,
@@ -76,9 +77,10 @@ class LagerService {
     required double menge, // positive = Zugang, negative = Abgang
     String? bemerkung,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final bewegung = Lagerbewegung(
       id: const Uuid().v4(),
-      userId: _userId,
+      userId: userId,
       artikelId: artikelId,
       lagerortId: lagerortId,
       bewegungstyp: 'korrektur',

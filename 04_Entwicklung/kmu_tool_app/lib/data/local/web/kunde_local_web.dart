@@ -14,6 +14,7 @@ class KundeLocal {
   String? vorname;
   String nachname = '';
   String? strasse;
+  String? hausnummer;
   String? plz;
   String? ort;
   String? telefon;
@@ -25,6 +26,7 @@ class KundeLocal {
   String? reVorname;
   String? reNachname;
   String? reStrasse;
+  String? reHausnummer;
   String? rePlz;
   String? reOrt;
   String? reEmail;

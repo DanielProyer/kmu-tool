@@ -245,9 +245,9 @@ class KundeDetailScreen extends ConsumerWidget {
                   ),
                 ],
 
-                // ─── Kontaktpersonen ───
+                // ─── Ansprechpersonen ───
                 _SectionHeader(
-                  title: 'Kontaktpersonen',
+                  title: 'Ansprechpersonen',
                   trailing: IconButton(
                     icon: const Icon(Icons.add, size: 20),
                     onPressed: () async {
@@ -273,7 +273,7 @@ class KundeDetailScreen extends ConsumerWidget {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
-                          'Keine Kontaktpersonen',
+                          'Keine Ansprechpersonen',
                           style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       );

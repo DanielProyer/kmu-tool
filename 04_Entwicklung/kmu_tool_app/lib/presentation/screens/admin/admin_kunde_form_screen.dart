@@ -32,6 +32,7 @@ class _AdminKundeFormScreenState
 
   // Adresse
   final _strasseController = TextEditingController();
+  final _hausnummerController = TextEditingController();
   final _plzController = TextEditingController();
   final _ortController = TextEditingController();
 
@@ -72,6 +73,7 @@ class _AdminKundeFormScreenState
         _emailController.text = profil.email ?? '';
         _telefonController.text = profil.telefon ?? '';
         _strasseController.text = profil.strasse ?? '';
+        _hausnummerController.text = profil.hausnummer ?? '';
         _plzController.text = profil.plz ?? '';
         _ortController.text = profil.ort ?? '';
         _mwstMethode = profil.mwstMethode;
@@ -120,6 +122,9 @@ class _AdminKundeFormScreenState
         strasse: _strasseController.text.trim().isEmpty
             ? null
             : _strasseController.text.trim(),
+        hausnummer: _hausnummerController.text.trim().isEmpty
+            ? null
+            : _hausnummerController.text.trim(),
         plz: _plzController.text.trim().isEmpty
             ? null
             : _plzController.text.trim(),
@@ -184,6 +189,7 @@ class _AdminKundeFormScreenState
     _emailController.dispose();
     _telefonController.dispose();
     _strasseController.dispose();
+    _hausnummerController.dispose();
     _plzController.dispose();
     _ortController.dispose();
     _anzahlMitarbeiterController.dispose();
@@ -293,13 +299,30 @@ class _AdminKundeFormScreenState
                     // ─── ADRESSE ───
                     _sectionHeader('ADRESSE'),
                     const SizedBox(height: 12),
-                    TextFormField(
-                      controller: _strasseController,
-                      decoration: const InputDecoration(
-                        labelText: 'Strasse',
-                        prefixIcon: Icon(Icons.location_on_outlined),
-                      ),
-                      textInputAction: TextInputAction.next,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _strasseController,
+                            decoration: const InputDecoration(
+                              labelText: 'Strasse',
+                              prefixIcon: Icon(Icons.location_on_outlined),
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          width: 80,
+                          child: TextFormField(
+                            controller: _hausnummerController,
+                            decoration: const InputDecoration(
+                              labelText: 'Nr.',
+                            ),
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     Row(

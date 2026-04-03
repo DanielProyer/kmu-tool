@@ -8,6 +8,12 @@ class Auftrag {
   final String? beschreibung;
   final DateTime? geplantVon;
   final DateTime? geplantBis;
+  final String auftragTyp;
+  final String? intervall;
+  final DateTime? naechsteAusfuehrung;
+  final int vorlaufTage;
+  final String? periodischBezeichnung;
+  final String? parentAuftragId;
   final bool isDeleted;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -22,6 +28,12 @@ class Auftrag {
     this.beschreibung,
     this.geplantVon,
     this.geplantBis,
+    this.auftragTyp = 'einmalig',
+    this.intervall,
+    this.naechsteAusfuehrung,
+    this.vorlaufTage = 7,
+    this.periodischBezeichnung,
+    this.parentAuftragId,
     this.isDeleted = false,
     this.createdAt,
     this.updatedAt,
@@ -42,6 +54,14 @@ class Auftrag {
       geplantBis: json['geplant_bis'] != null
           ? DateTime.parse(json['geplant_bis'])
           : null,
+      auftragTyp: json['auftrag_typ'] ?? 'einmalig',
+      intervall: json['intervall'],
+      naechsteAusfuehrung: json['naechste_ausfuehrung'] != null
+          ? DateTime.parse(json['naechste_ausfuehrung'])
+          : null,
+      vorlaufTage: json['vorlauf_tage'] ?? 7,
+      periodischBezeichnung: json['periodisch_bezeichnung'],
+      parentAuftragId: json['parent_auftrag_id'],
       isDeleted: json['is_deleted'] ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -63,6 +83,13 @@ class Auftrag {
       'beschreibung': beschreibung,
       'geplant_von': geplantVon?.toIso8601String().split('T').first,
       'geplant_bis': geplantBis?.toIso8601String().split('T').first,
+      'auftrag_typ': auftragTyp,
+      'intervall': intervall,
+      'naechste_ausfuehrung':
+          naechsteAusfuehrung?.toIso8601String().split('T').first,
+      'vorlauf_tage': vorlaufTage,
+      'periodisch_bezeichnung': periodischBezeichnung,
+      'parent_auftrag_id': parentAuftragId,
       'is_deleted': isDeleted,
     };
   }

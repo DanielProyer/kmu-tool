@@ -4,6 +4,7 @@ class UserProfile {
   final String firmaName;
   final String rechtsform;
   final String? strasse;
+  final String? hausnummer;
   final String? plz;
   final String? ort;
   final String? telefon;
@@ -23,6 +24,7 @@ class UserProfile {
     required this.firmaName,
     required this.rechtsform,
     this.strasse,
+    this.hausnummer,
     this.plz,
     this.ort,
     this.telefon,
@@ -44,6 +46,7 @@ class UserProfile {
       firmaName: json['firma_name'] as String,
       rechtsform: json['rechtsform'] as String,
       strasse: json['strasse'] as String?,
+      hausnummer: json['hausnummer'] as String?,
       plz: json['plz'] as String?,
       ort: json['ort'] as String?,
       telefon: json['telefon'] as String?,
@@ -72,6 +75,7 @@ class UserProfile {
       'firma_name': firmaName,
       'rechtsform': rechtsform,
       'strasse': strasse,
+      'hausnummer': hausnummer,
       'plz': plz,
       'ort': ort,
       'telefon': telefon,

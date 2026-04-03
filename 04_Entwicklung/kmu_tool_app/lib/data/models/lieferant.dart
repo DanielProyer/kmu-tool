@@ -4,6 +4,7 @@ class Lieferant {
   final String firma;
   final String? kontaktperson;
   final String? strasse;
+  final String? hausnummer;
   final String? plz;
   final String? ort;
   final String? telefon;
@@ -21,6 +22,7 @@ class Lieferant {
     required this.firma,
     this.kontaktperson,
     this.strasse,
+    this.hausnummer,
     this.plz,
     this.ort,
     this.telefon,
@@ -40,6 +42,7 @@ class Lieferant {
       firma: json['firma'] as String,
       kontaktperson: json['kontaktperson'] as String?,
       strasse: json['strasse'] as String?,
+      hausnummer: json['hausnummer'] as String?,
       plz: json['plz'] as String?,
       ort: json['ort'] as String?,
       telefon: json['telefon'] as String?,
@@ -64,6 +67,7 @@ class Lieferant {
       'firma': firma,
       'kontaktperson': kontaktperson,
       'strasse': strasse,
+      'hausnummer': hausnummer,
       'plz': plz,
       'ort': ort,
       'telefon': telefon,
@@ -75,9 +79,16 @@ class Lieferant {
     };
   }
 
+  String get strasseMitNr {
+    final s = strasse ?? '';
+    final h = hausnummer ?? '';
+    return '$s $h'.trim();
+  }
+
   String get adresseEinzeilig {
     final parts = <String>[];
-    if (strasse != null && strasse!.isNotEmpty) parts.add(strasse!);
+    final sm = strasseMitNr;
+    if (sm.isNotEmpty) parts.add(sm);
     if (plz != null && ort != null) {
       parts.add('$plz $ort');
     } else if (ort != null && ort!.isNotEmpty) {

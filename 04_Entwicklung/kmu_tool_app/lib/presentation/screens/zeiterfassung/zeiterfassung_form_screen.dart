@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/zeiterfassung_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/zeiterfassung_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 class ZeiterfassungFormScreen extends StatefulWidget {
   final String auftragId;
@@ -135,9 +135,10 @@ class _ZeiterfassungFormScreenState extends State<ZeiterfassungFormScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final ze = ZeiterfassungLocal();
       ze.serverId = const Uuid().v4();
-      ze.userId = SupabaseService.currentUser!.id;
+      ze.userId = userId;
       ze.auftragId = widget.auftragId;
       ze.datum = _datum;
       ze.startZeit = _formatTimeOfDay(_startZeit!);

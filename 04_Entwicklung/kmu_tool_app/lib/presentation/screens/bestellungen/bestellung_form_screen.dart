@@ -7,7 +7,7 @@ import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/bestellung.dart';
 import 'package:kmu_tool_app/data/repositories/bestellung_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 class BestellungFormScreen extends ConsumerStatefulWidget {
   const BestellungFormScreen({super.key});
@@ -73,9 +73,10 @@ class _BestellungFormScreenState extends ConsumerState<BestellungFormScreen> {
       final bestellNr = await BestellungRepository.nextBestellNr();
       final bestellungId = const Uuid().v4();
 
+      final userId = await BetriebService.getDataOwnerId();
       final bestellung = Bestellung(
         id: bestellungId,
-        userId: SupabaseService.currentUser!.id,
+        userId: userId,
         lieferantId: _selectedLieferantId!,
         bestellNr: bestellNr,
         status: 'entwurf',

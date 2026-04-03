@@ -17,6 +17,12 @@ class AuftragLocal {
   String? beschreibung;
   DateTime? geplantVon;
   DateTime? geplantBis;
+  String auftragTyp = 'einmalig';
+  String? intervall;
+  DateTime? naechsteAusfuehrung;
+  int vorlaufTage = 7;
+  String? periodischBezeichnung;
+  String? parentAuftragId;
   bool isDeleted = false;
   DateTime? createdAt;
   DateTime? updatedAt;

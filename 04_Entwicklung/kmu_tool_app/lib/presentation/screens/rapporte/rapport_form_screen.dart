@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/local/rapport_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/rapport_repository.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 
 class RapportFormScreen extends StatefulWidget {
   final String auftragId;
@@ -52,9 +52,10 @@ class _RapportFormScreenState extends State<RapportFormScreen> {
     setState(() => _isSaving = true);
 
     try {
+      final userId = await BetriebService.getDataOwnerId();
       final rapport = RapportLocal();
       rapport.serverId = const Uuid().v4();
-      rapport.userId = SupabaseService.currentUser!.id;
+      rapport.userId = userId;
       rapport.auftragId = widget.auftragId;
       rapport.datum = _datum;
       rapport.beschreibung = _beschreibungController.text.trim();

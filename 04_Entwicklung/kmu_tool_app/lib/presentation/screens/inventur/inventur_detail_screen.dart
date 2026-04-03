@@ -197,10 +197,12 @@ class InventurDetailScreen extends ConsumerWidget {
                           }
                         } catch (e) {
                           if (context.mounted) {
+                            final msg = e.toString().replaceFirst('Exception: ', '');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Fehler: $e'),
+                                content: Text(msg),
                                 backgroundColor: AppStatusColors.error,
+                                duration: const Duration(seconds: 5),
                               ),
                             );
                           }

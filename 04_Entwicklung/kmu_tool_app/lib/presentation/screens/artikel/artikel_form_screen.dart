@@ -6,8 +6,10 @@ import 'package:kmu_tool_app/data/local/artikel_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
+import 'package:kmu_tool_app/data/repositories/artikel_lieferant_repository.dart';
+import 'package:kmu_tool_app/presentation/widgets/lieferant_auswahl_dialog.dart';
 
 class ArtikelFormScreen extends ConsumerStatefulWidget {
   final String? artikelId;
@@ -93,7 +95,7 @@ class _ArtikelFormScreenState extends ConsumerState<ArtikelFormScreen> {
 
       if (!_isEdit) {
         artikel.serverId = const Uuid().v4();
-        artikel.userId = SupabaseService.currentUser!.id;
+        artikel.userId = await BetriebService.getDataOwnerId();
       }
 
       artikel.artikelNr = _artikelNrController.text.trim().isEmpty
@@ -347,6 +349,126 @@ class _ArtikelFormScreenState extends ConsumerState<ArtikelFormScreen> {
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 24),
+
+                    // ─── Lieferanten (nur im Edit-Modus) ───
+                    if (_isEdit) ...[
+                      Row(
+                        children: [
+                          Expanded(child: _sectionHeader('LIEFERANTEN')),
+                          TextButton.icon(
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Hinzufuegen'),
+                            onPressed: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                useRootNavigator: false,
+                                builder: (ctx) => LieferantAuswahlDialog(
+                                  artikelId: widget.artikelId!,
+                                ),
+                              );
+                              if (result == true) {
+                                ref.invalidate(
+                                    artikelLieferantenProvider(
+                                        widget.artikelId!));
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ref
+                          .watch(artikelLieferantenProvider(
+                              widget.artikelId!))
+                          .when(
+                            loading: () => const Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2)),
+                            error: (e, _) =>
+                                Text('Fehler: $e'),
+                            data: (lieferanten) {
+                              if (lieferanten.isEmpty) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 16),
+                                  child: Text(
+                                    'Keine Lieferanten verknuepft',
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Column(
+                                children: lieferanten
+                                    .map((l) => Card(
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundColor:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary
+                                                      .withValues(
+                                                          alpha: 0.1),
+                                              child: Icon(
+                                                Icons
+                                                    .local_shipping_outlined,
+                                                size: 18,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                              ),
+                                            ),
+                                            title: Text(
+                                              l.lieferantFirma ??
+                                                  'Unbekannt',
+                                              style: const TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.w600),
+                                            ),
+                                            subtitle: Text(
+                                              [
+                                                if (l.einkaufspreis !=
+                                                    null)
+                                                  'EK: CHF ${l.einkaufspreis!.toStringAsFixed(2)}',
+                                                if (l.lieferzeitTage !=
+                                                    null)
+                                                  '${l.lieferzeitTage} Tage',
+                                                if (l.istHauptlieferant)
+                                                  'Hauptlieferant',
+                                              ].join(' | '),
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                            ),
+                                            trailing: IconButton(
+                                              icon: Icon(
+                                                Icons.delete_outline,
+                                                color: AppStatusColors
+                                                    .error,
+                                                size: 20,
+                                              ),
+                                              onPressed: () async {
+                                                await ArtikelLieferantRepository
+                                                    .delete(l.id);
+                                                ref.invalidate(
+                                                    artikelLieferantenProvider(
+                                                        widget
+                                                            .artikelId!));
+                                              },
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                          ),
+                      const SizedBox(height: 24),
+                    ],
 
                     // ─── Notizen ───
                     _sectionHeader('NOTIZEN'),

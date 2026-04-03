@@ -5,22 +5,22 @@ import '../../data/models/lagerbewegung.dart';
 import '../../data/repositories/inventur_repository.dart';
 import '../../data/repositories/inventur_position_repository.dart';
 import '../../data/repositories/lagerbewegung_repository.dart';
-import '../../services/supabase/supabase_service.dart';
+import '../supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
 class InventurService {
-  static String get _userId => SupabaseService.currentUser!.id;
-
-  /// Erstellt eine Inventur und generiert Positionen aus aktuellen Lagerbeständen.
+  /// Erstellt eine Inventur und generiert Positionen aus aktuellen Lagerbestaenden.
   static Future<String> createInventur({
     required String bezeichnung,
     required DateTime stichtag,
     String? lagerortId,
     String? bemerkung,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final inventurId = const Uuid().v4();
     final inventur = Inventur(
       id: inventurId,
-      userId: _userId,
+      userId: userId,
       bezeichnung: bezeichnung,
       stichtag: stichtag,
       lagerortId: lagerortId,
@@ -29,11 +29,11 @@ class InventurService {
     );
     await InventurRepository.save(inventur);
 
-    // Positionen aus Lagerbeständen generieren
+    // Positionen aus Lagerbestaenden generieren
     var query = SupabaseService.client
         .from('lagerbestaende')
         .select('artikel_id, lagerort_id, menge')
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
     if (lagerortId != null) {
       query = query.eq('lagerort_id', lagerortId);
     }
@@ -59,7 +59,7 @@ class InventurService {
 
       positionen.add(InventurPosition(
         id: const Uuid().v4(),
-        userId: _userId,
+        userId: userId,
         inventurId: inventurId,
         artikelId: artikelId,
         lagerortId: b['lagerort_id'] as String,
@@ -75,13 +75,33 @@ class InventurService {
     return inventurId;
   }
 
-  /// Startet die Zählung (Status: geplant -> aktiv).
+  /// Startet die Zaehlung (Status: geplant -> aktiv).
   static Future<void> startZaehlung(String inventurId) async {
+    // Pruefen ob Inventur existiert und im richtigen Status ist
+    final inventur = await InventurRepository.getById(inventurId);
+    if (inventur == null) {
+      throw Exception('Inventur nicht gefunden (ID: $inventurId)');
+    }
+    if (inventur.status != 'geplant') {
+      throw Exception(
+          'Inventur kann nur aus Status "geplant" gestartet werden '
+          '(aktuell: ${inventur.status})');
+    }
+
+    // Pruefen ob Positionen vorhanden sind
+    final positionen =
+        await InventurPositionRepository.getByInventur(inventurId);
+    if (positionen.isEmpty) {
+      throw Exception(
+          'Keine Positionen vorhanden. Bitte zuerst Lagerbestaende anlegen.');
+    }
+
     await InventurRepository.updateStatus(inventurId, 'aktiv');
   }
 
-  /// Schliesst Inventur ab und erstellt Korrekturbewegungen für Differenzen.
+  /// Schliesst Inventur ab und erstellt Korrekturbewegungen fuer Differenzen.
   static Future<int> abschliessen(String inventurId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final positionen =
         await InventurPositionRepository.getByInventur(inventurId);
 
@@ -94,7 +114,7 @@ class InventurService {
       // Inventur-Lagerbewegung erstellen
       final bewegung = Lagerbewegung(
         id: const Uuid().v4(),
-        userId: _userId,
+        userId: userId,
         artikelId: pos.artikelId,
         lagerortId: pos.lagerortId,
         bewegungstyp: 'inventur',

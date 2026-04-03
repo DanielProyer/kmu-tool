@@ -1,16 +1,16 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/bestellung.dart';
 
 class BestellungRepository {
   static const _table = 'bestellungen';
 
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<Bestellung>> getAll({String? status}) async {
+    final userId = await BetriebService.getDataOwnerId();
     var query = SupabaseService.client
         .from(_table)
         .select('*, lieferanten(firma)')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('is_deleted', false);
     if (status != null) {
       query = query.eq('status', status);
@@ -20,11 +20,12 @@ class BestellungRepository {
   }
 
   static Future<Bestellung?> getById(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select('*, lieferanten(firma)')
         .eq('id', id)
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .maybeSingle();
     return data != null ? Bestellung.fromJson(data) : null;
   }
@@ -34,6 +35,7 @@ class BestellungRepository {
   }
 
   static Future<void> updateStatus(String id, String status) async {
+    final userId = await BetriebService.getDataOwnerId();
     final updates = <String, dynamic>{'status': status};
     if (status == 'geliefert') {
       updates['liefer_datum'] = DateTime.now().toIso8601String().split('T').first;
@@ -42,22 +44,24 @@ class BestellungRepository {
         .from(_table)
         .update(updates)
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 
   static Future<void> delete(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     await SupabaseService.client
         .from(_table)
         .update({'is_deleted': true})
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 
   static Future<String> nextBestellNr() async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select('bestell_nr')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .order('created_at', ascending: false)
         .limit(1);
     if (data.isEmpty) return 'B-0001';
@@ -69,11 +73,12 @@ class BestellungRepository {
   }
 
   static Future<void> updateTotal(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     final positionen = await SupabaseService.client
         .from('bestellpositionen')
         .select('menge, einzelpreis')
         .eq('bestellung_id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
     double total = 0;
     for (final p in positionen) {
       total += ((p['menge'] as num?)?.toDouble() ?? 0) *
@@ -83,6 +88,6 @@ class BestellungRepository {
         .from(_table)
         .update({'total_betrag': total})
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 }

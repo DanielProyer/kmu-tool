@@ -1,16 +1,16 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/inventur.dart';
 
 class InventurRepository {
   static const _table = 'inventuren';
 
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<Inventur>> getAll({String? status}) async {
+    final userId = await BetriebService.getDataOwnerId();
     var query = SupabaseService.client
         .from(_table)
         .select('*, lagerorte(bezeichnung)')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('is_deleted', false);
     if (status != null) {
       query = query.eq('status', status);
@@ -34,11 +34,12 @@ class InventurRepository {
   }
 
   static Future<Inventur?> getById(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select('*, lagerorte(bezeichnung)')
         .eq('id', id)
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .maybeSingle();
     if (data == null) return null;
 
@@ -58,18 +59,24 @@ class InventurRepository {
   }
 
   static Future<void> updateStatus(String id, String status) async {
-    await SupabaseService.client
-        .from(_table)
-        .update({'status': status})
-        .eq('id', id)
-        .eq('user_id', _userId);
+    try {
+      final userId = await BetriebService.getDataOwnerId();
+      await SupabaseService.client
+          .from(_table)
+          .update({'status': status, 'updated_at': DateTime.now().toIso8601String()})
+          .eq('id', id)
+          .eq('user_id', userId);
+    } catch (e) {
+      throw Exception('Status-Update fehlgeschlagen: $e');
+    }
   }
 
   static Future<void> delete(String id) async {
+    final userId = await BetriebService.getDataOwnerId();
     await SupabaseService.client
         .from(_table)
         .update({'is_deleted': true})
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 }

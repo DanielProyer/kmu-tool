@@ -1,11 +1,11 @@
 import 'package:kmu_tool_app/data/models/website_config.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class WebsiteConfigRepository {
   static Future<WebsiteConfig?> getByCurrentUser() async {
     try {
-      final userId = SupabaseService.client.auth.currentUser?.id;
-      if (userId == null) return null;
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('website_configs')
           .select()

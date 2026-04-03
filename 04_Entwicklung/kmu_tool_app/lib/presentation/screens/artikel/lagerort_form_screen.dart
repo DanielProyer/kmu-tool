@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/data/models/lagerort.dart';
 import 'package:kmu_tool_app/data/repositories/lagerort_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 
 class LagerortFormScreen extends ConsumerStatefulWidget {
@@ -75,7 +75,7 @@ class _LagerortFormScreenState extends ConsumerState<LagerortFormScreen> {
           : const Uuid().v4();
       final userId = _isEdit
           ? _existingLagerort!.userId
-          : SupabaseService.currentUser!.id;
+          : await BetriebService.getDataOwnerId();
 
       final lagerort = Lagerort(
         id: id,

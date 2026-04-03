@@ -1,26 +1,27 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/lagerbestand.dart';
 
 class LagerbestandRepository {
   static const _table = 'lagerbestaende';
 
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<Lagerbestand>> getByArtikel(String artikelId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select('*, lagerorte(bezeichnung, typ)')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('artikel_id', artikelId);
     return data.map((json) => Lagerbestand.fromJson(json)).toList();
   }
 
   static Future<Map<String, double>> getGesamtbestand(
       String artikelId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from('v_artikel_gesamtbestand')
         .select()
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('artikel_id', artikelId)
         .maybeSingle();
     if (data == null) {
@@ -34,10 +35,11 @@ class LagerbestandRepository {
   }
 
   static Future<List<Lagerbestand>> getByLagerort(String lagerortId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select('*, lagerorte(bezeichnung, typ)')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('lagerort_id', lagerortId);
     return data.map((json) => Lagerbestand.fromJson(json)).toList();
   }

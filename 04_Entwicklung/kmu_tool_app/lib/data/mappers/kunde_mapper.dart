@@ -10,6 +10,7 @@ class KundeMapper {
     local.vorname = dto.vorname;
     local.nachname = dto.nachname;
     local.strasse = dto.strasse;
+    local.hausnummer = dto.hausnummer;
     local.plz = dto.plz;
     local.ort = dto.ort;
     local.telefon = dto.telefon;
@@ -20,6 +21,7 @@ class KundeMapper {
     local.reVorname = dto.reVorname;
     local.reNachname = dto.reNachname;
     local.reStrasse = dto.reStrasse;
+    local.reHausnummer = dto.reHausnummer;
     local.rePlz = dto.rePlz;
     local.reOrt = dto.reOrt;
     local.reEmail = dto.reEmail;
@@ -39,6 +41,7 @@ class KundeMapper {
       'vorname': local.vorname,
       'nachname': local.nachname,
       'strasse': local.strasse,
+      'hausnummer': local.hausnummer,
       'plz': local.plz,
       'ort': local.ort,
       'telefon': local.telefon,

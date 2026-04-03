@@ -5,6 +5,7 @@ class Kunde {
   final String? vorname;
   final String nachname;
   final String? strasse;
+  final String? hausnummer;
   final String? plz;
   final String? ort;
   final String? telefon;
@@ -17,6 +18,7 @@ class Kunde {
   final String? reVorname;
   final String? reNachname;
   final String? reStrasse;
+  final String? reHausnummer;
   final String? rePlz;
   final String? reOrt;
   final String? reEmail;
@@ -35,6 +37,7 @@ class Kunde {
     this.vorname,
     required this.nachname,
     this.strasse,
+    this.hausnummer,
     this.plz,
     this.ort,
     this.telefon,
@@ -45,6 +48,7 @@ class Kunde {
     this.reVorname,
     this.reNachname,
     this.reStrasse,
+    this.reHausnummer,
     this.rePlz,
     this.reOrt,
     this.reEmail,
@@ -62,6 +66,7 @@ class Kunde {
       vorname: json['vorname'],
       nachname: json['nachname'] ?? '',
       strasse: json['strasse'],
+      hausnummer: json['hausnummer'],
       plz: json['plz'],
       ort: json['ort'],
       telefon: json['telefon'],
@@ -72,6 +77,7 @@ class Kunde {
       reVorname: json['re_vorname'],
       reNachname: json['re_nachname'],
       reStrasse: json['re_strasse'],
+      reHausnummer: json['re_hausnummer'],
       rePlz: json['re_plz'],
       reOrt: json['re_ort'],
       reEmail: json['re_email'],
@@ -94,6 +100,7 @@ class Kunde {
       'vorname': vorname,
       'nachname': nachname,
       'strasse': strasse,
+      'hausnummer': hausnummer,
       'plz': plz,
       'ort': ort,
       'telefon': telefon,
@@ -104,6 +111,7 @@ class Kunde {
       're_vorname': reVorname,
       're_nachname': reNachname,
       're_strasse': reStrasse,
+      're_hausnummer': reHausnummer,
       're_plz': rePlz,
       're_ort': reOrt,
       're_email': reEmail,
@@ -114,9 +122,18 @@ class Kunde {
 
   String get displayName => firma ?? '$vorname $nachname'.trim();
 
+  String get strasseMitNr {
+    final s = strasse ?? '';
+    final h = hausnummer ?? '';
+    return '$s $h'.trim();
+  }
+
   String get vollstaendigeAdresse {
-    final parts = [strasse, plz, ort]
-        .where((p) => p != null && p.isNotEmpty);
+    final parts = <String>[];
+    final sm = strasseMitNr;
+    if (sm.isNotEmpty) parts.add(sm);
+    final plzOrt = [plz, ort].where((p) => p != null && p!.isNotEmpty).join(' ');
+    if (plzOrt.isNotEmpty) parts.add(plzOrt);
     return parts.join(', ');
   }
 }

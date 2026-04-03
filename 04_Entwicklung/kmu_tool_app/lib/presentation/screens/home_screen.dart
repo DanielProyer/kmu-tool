@@ -10,6 +10,9 @@ import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/sync/sync_service_export.dart';
 import 'package:kmu_tool_app/services/admin/admin_service.dart';
+import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
+import 'package:kmu_tool_app/presentation/providers/termin_provider.dart';
+import 'package:kmu_tool_app/services/auftrag/periodischer_auftrag_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -261,14 +264,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: const Color(0xFFD97706),
           route: '/bestellungen',
         ),
-      if (hasInventur)
-        _DashboardTileData(
-          label: 'Inventur',
-          icon: Icons.fact_check,
-          value: '',
-          color: const Color(0xFF6366F1),
-          route: '/inventur',
-        ),
+      // Kalender
+      _DashboardTileData(
+        label: 'Kalender',
+        icon: Icons.calendar_month,
+        value: '',
+        color: const Color(0xFF6366F1),
+        route: '/kalender',
+      ),
+      // Inventur ist jetzt unter Einstellungen > Betrieb
       if (hasWebsite)
         _DashboardTileData(
           label: 'Website',
@@ -293,7 +297,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         route: null,
       ),
     ];
-    final tiles = allTiles;
+    // Rollen-basiertes Filtern: Nur Kacheln anzeigen deren Route erlaubt ist
+    final tiles = allTiles.where((t) {
+      if (t.route == null) return true; // Sync-Kachel immer anzeigen
+      return BetriebService.isRouteAllowed(t.route!);
+    }).toList();
 
     return ListView(
       padding: const EdgeInsets.all(16),

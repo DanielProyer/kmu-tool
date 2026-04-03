@@ -6,9 +6,9 @@ import 'package:kmu_tool_app/data/repositories/rechnung_repository.dart';
 import 'package:kmu_tool_app/data/repositories/rechnungs_position_repository.dart';
 import 'package:kmu_tool_app/data/repositories/zeiterfassung_repository.dart';
 import 'package:kmu_tool_app/services/rechnung/buchung_service.dart';
-import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../auth/betrieb_service.dart';
 
-/// Service for creating invoices from Aufträge (jobs).
+/// Service for creating invoices from Auftraege (jobs).
 ///
 /// Gathers time tracking entries (Zeiterfassungen) and generates an invoice
 /// with line items, totals, and automatic bookkeeping entries.
@@ -18,8 +18,6 @@ class RechnungService {
       RechnungsPositionRepository();
   final BuchungService _buchungService = BuchungService();
   static const _uuid = Uuid();
-
-  String get _userId => SupabaseService.currentUser!.id;
 
   /// Default MWST rate for Switzerland (as of 2024).
   static const double _defaultMwstSatz = 8.1;
@@ -51,6 +49,7 @@ class RechnungService {
     double? stundenansatz,
     List<ManuellePosition>? zusatzPositionen,
   }) async {
+    final userId = await BetriebService.getDataOwnerId();
     final rate = stundenansatz ?? _defaultStundenansatz;
 
     // 1. Load Auftrag
@@ -128,7 +127,7 @@ class RechnungService {
     final now = DateTime.now();
     final rechnung = Rechnung(
       id: rechnungId,
-      userId: _userId,
+      userId: userId,
       kundeId: auftrag.kundeId,
       auftragId: auftragId,
       rechnungsNr: rechnungsNr,
@@ -184,7 +183,7 @@ class RechnungService {
   /// or the Swiss QR-IBAN format with a structured reference (QRR).
   /// For MVP, we generate a unique 26-digit number based on the invoice number.
   String _generateQrReferenz(String rechnungsNr) {
-    // Extract numbers from rechnungsNr (e.g., RE-2026-001 → 20260001)
+    // Extract numbers from rechnungsNr (e.g., RE-2026-001 -> 20260001)
     final digits =
         rechnungsNr.replaceAll(RegExp(r'[^0-9]'), '').padLeft(20, '0');
     // Create a 26-char reference with check digit placeholder

@@ -1,18 +1,18 @@
 import '../../services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 import '../models/inventur_position.dart';
 
 class InventurPositionRepository {
   static const _table = 'inventur_positionen';
 
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<InventurPosition>> getByInventur(
       String inventurId) async {
+    final userId = await BetriebService.getDataOwnerId();
     final data = await SupabaseService.client
         .from(_table)
         .select(
             '*, artikel(bezeichnung, artikelnummer, einheit), lagerorte(bezeichnung)')
-        .eq('user_id', _userId)
+        .eq('user_id', userId)
         .eq('inventur_id', inventurId)
         .order('created_at');
     return data.map((json) => InventurPosition.fromJson(json)).toList();
@@ -25,6 +25,7 @@ class InventurPositionRepository {
 
   static Future<void> erfasseZaehlung(
       String id, double istBestand, {String? bemerkung}) async {
+    final userId = await BetriebService.getDataOwnerId();
     final updates = <String, dynamic>{
       'ist_bestand': istBestand,
       'gezaehlt': true,
@@ -34,7 +35,7 @@ class InventurPositionRepository {
         .from(_table)
         .update(updates)
         .eq('id', id)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 
   static Future<void> bulkCreate(List<InventurPosition> positionen) async {
@@ -44,10 +45,11 @@ class InventurPositionRepository {
   }
 
   static Future<void> deleteByInventur(String inventurId) async {
+    final userId = await BetriebService.getDataOwnerId();
     await SupabaseService.client
         .from(_table)
         .delete()
         .eq('inventur_id', inventurId)
-        .eq('user_id', _userId);
+        .eq('user_id', userId);
   }
 }

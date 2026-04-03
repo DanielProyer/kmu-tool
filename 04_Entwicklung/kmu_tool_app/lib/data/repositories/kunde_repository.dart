@@ -4,16 +4,16 @@ import 'package:kmu_tool_app/data/models/kunde.dart';
 import 'package:kmu_tool_app/data/mappers/kunde_mapper.dart';
 import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import '../../services/auth/betrieb_service.dart';
 
 class KundeRepository {
-  static String get _userId => SupabaseService.currentUser!.id;
-
   static Future<List<KundeLocal>> getAll() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('kunden')
           .select()
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows
           .map((r) => KundeMapper.fromDto(Kunde.fromJson(r)))
@@ -47,7 +47,8 @@ class KundeRepository {
   }
 
   static Future<void> save(KundeLocal kunde) async {
-    kunde.userId = _userId;
+    final userId = await BetriebService.getDataOwnerId();
+    kunde.userId = userId;
     if (kIsWeb) {
       final json = KundeMapper.toJson(kunde);
       await SupabaseService.client.from('kunden').upsert(json);
@@ -77,10 +78,11 @@ class KundeRepository {
 
   static Future<int> count() async {
     if (kIsWeb) {
+      final userId = await BetriebService.getDataOwnerId();
       final rows = await SupabaseService.client
           .from('kunden')
           .select('id')
-          .eq('user_id', _userId)
+          .eq('user_id', userId)
           .eq('is_deleted', false);
       return rows.length;
     }
