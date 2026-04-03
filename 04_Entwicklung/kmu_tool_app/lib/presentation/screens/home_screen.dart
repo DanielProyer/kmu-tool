@@ -199,6 +199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasRechnungen = ref.watch(hasFeatureProvider(AppFeature.rechnungen));
     final hasBuchhaltung = ref.watch(hasFeatureProvider(AppFeature.buchhaltung));
     final hasArtikel = ref.watch(hasFeatureProvider(AppFeature.artikel));
+    final hasBestellwesen = ref.watch(hasFeatureProvider(AppFeature.bestellwesen));
+    final hasInventur = ref.watch(hasFeatureProvider(AppFeature.inventur));
 
     final colorScheme = Theme.of(context).colorScheme;
     final allTiles = <_DashboardTileData>[
@@ -249,6 +251,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           value: '${data.artikelCount}',
           color: const Color(0xFF0D9488),
           route: '/artikel',
+        ),
+      if (hasBestellwesen)
+        _DashboardTileData(
+          label: 'Bestellungen',
+          icon: Icons.shopping_cart,
+          value: '',
+          color: const Color(0xFFD97706),
+          route: '/bestellungen',
+        ),
+      if (hasInventur)
+        _DashboardTileData(
+          label: 'Inventur',
+          icon: Icons.fact_check,
+          value: '',
+          color: const Color(0xFF6366F1),
+          route: '/inventur',
         ),
       if (AdminService.isAdmin)
         _DashboardTileData(
