@@ -2,6 +2,7 @@ import 'package:kmu_tool_app/core/config/features.dart';
 import 'package:kmu_tool_app/data/models/subscription_plan.dart';
 import 'package:kmu_tool_app/data/models/user_subscription.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
+import 'package:kmu_tool_app/services/admin/admin_service.dart';
 
 /// Singleton: Lädt Plan + Subscription, merged Features + Overrides.
 class FeatureService {
@@ -22,6 +23,10 @@ class FeatureService {
     'buchhaltung': true,
     'auftrag_dashboard': true,
     'auto_website': true,
+    'artikel': true,
+    'lagerorte': true,
+    'lieferanten': true,
+    'lagerverwaltung': true,
     'max_kunden': -1,
     'max_offerten': -1,
   };
@@ -92,6 +97,10 @@ class FeatureService {
       'buchhaltung': true,
       'auftrag_dashboard': true,
       'auto_website': true,
+      'artikel': true,
+      'lagerorte': true,
+      'lieferanten': true,
+      'lagerverwaltung': true,
       'max_kunden': -1,
       'max_offerten': -1,
     };
@@ -113,6 +122,11 @@ class FeatureService {
 
   /// Prüft ob eine Route erlaubt ist.
   bool isRouteAllowed(String location) {
+    // Admin-Routen: nur für Admins
+    if (location.startsWith('/admin')) {
+      return AdminService.isAdmin;
+    }
+
     // Dashboard-Route separat prüfen
     if (location.contains('/dashboard')) {
       return hasFeature(AppFeature.auftragDashboard);

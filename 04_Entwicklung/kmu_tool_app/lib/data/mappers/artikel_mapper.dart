@@ -16,6 +16,9 @@ class ArtikelMapper {
     local.mindestbestand = dto.mindestbestand;
     local.lieferant = dto.lieferant;
     local.notizen = dto.notizen;
+    local.materialTyp = dto.materialTyp;
+    local.aufwandkonto = dto.aufwandkonto;
+    local.mwstCode = dto.mwstCode;
     local.isDeleted = dto.isDeleted;
     local.createdAt = dto.createdAt;
     local.updatedAt = dto.updatedAt;
@@ -37,6 +40,9 @@ class ArtikelMapper {
       'mindestbestand': local.mindestbestand,
       'lieferant': local.lieferant,
       'notizen': local.notizen,
+      'material_typ': local.materialTyp,
+      'aufwandkonto': local.aufwandkonto,
+      'mwst_code': local.mwstCode,
       'is_deleted': local.isDeleted,
     };
     if (local.serverId != null) json['id'] = local.serverId;

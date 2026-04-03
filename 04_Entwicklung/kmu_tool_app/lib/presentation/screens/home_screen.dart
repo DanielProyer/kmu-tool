@@ -9,6 +9,7 @@ import 'package:kmu_tool_app/presentation/providers/feature_provider.dart';
 import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 import 'package:kmu_tool_app/services/sync/sync_service_export.dart';
+import 'package:kmu_tool_app/services/admin/admin_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -197,6 +198,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasAuftraege = ref.watch(hasFeatureProvider(AppFeature.auftraege));
     final hasRechnungen = ref.watch(hasFeatureProvider(AppFeature.rechnungen));
     final hasBuchhaltung = ref.watch(hasFeatureProvider(AppFeature.buchhaltung));
+    final hasArtikel = ref.watch(hasFeatureProvider(AppFeature.artikel));
 
     final colorScheme = Theme.of(context).colorScheme;
     final allTiles = <_DashboardTileData>[
@@ -239,6 +241,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           value: '',
           color: const Color(0xFF7C3AED),
           route: '/buchhaltung',
+        ),
+      if (hasArtikel)
+        _DashboardTileData(
+          label: 'Artikelstamm',
+          icon: Icons.inventory_2,
+          value: '${data.artikelCount}',
+          color: const Color(0xFF0D9488),
+          route: '/artikel',
+        ),
+      if (AdminService.isAdmin)
+        _DashboardTileData(
+          label: 'Admin-Panel',
+          icon: Icons.admin_panel_settings,
+          value: '',
+          color: const Color(0xFFDC2626),
+          route: '/admin',
         ),
       _DashboardTileData(
         label: 'Sync Status',

@@ -7,6 +7,11 @@ enum AppFeature {
   rapporte('rapporte'),
   rechnungen('rechnungen'),
   buchhaltung('buchhaltung'),
+  artikel('artikel'),
+  lagerorte('lagerorte'),
+  lieferanten('lieferanten'),
+  lagerverwaltung('lagerverwaltung'),
+  admin('admin'),
   auftragDashboard('auftrag_dashboard'),
   autoWebsite('auto_website');
 
@@ -26,6 +31,16 @@ enum AppFeature {
         return ['/rechnungen'];
       case AppFeature.buchhaltung:
         return ['/buchhaltung'];
+      case AppFeature.artikel:
+        return ['/artikel'];
+      case AppFeature.lagerorte:
+        return ['/lagerorte'];
+      case AppFeature.lieferanten:
+        return ['/lieferanten'];
+      case AppFeature.lagerverwaltung:
+        return [];
+      case AppFeature.admin:
+        return ['/admin'];
       case AppFeature.auftragDashboard:
         return []; // Dynamic route: /auftraege/:id/dashboard
       default:

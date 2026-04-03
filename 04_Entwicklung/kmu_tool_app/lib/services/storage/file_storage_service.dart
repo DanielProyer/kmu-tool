@@ -5,6 +5,7 @@ import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 class FileStorageService {
   static const _notizenBucket = 'auftrag-notizen';
   static const _dateienBucket = 'auftrag-dateien';
+  static const _artikelFotosBucket = 'artikel-fotos';
 
   /// Upload einer Datei. Gibt den Storage-Pfad zurück.
   static Future<String> uploadNotizDatei({
@@ -51,6 +52,25 @@ class FileStorageService {
     await SupabaseService.client.storage.from(bucket).remove([path]);
   }
 
+  static Future<String> uploadArtikelFoto({
+    required String artikelId,
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    final path = '$artikelId/$fileName';
+    await SupabaseService.client.storage
+        .from(_artikelFotosBucket)
+        .uploadBinary(path, bytes, retryAttempts: 2);
+    return path;
+  }
+
+  static Future<void> deleteArtikelFoto(String path) async {
+    await SupabaseService.client.storage
+        .from(_artikelFotosBucket)
+        .remove([path]);
+  }
+
   static String get notizenBucket => _notizenBucket;
   static String get dateienBucket => _dateienBucket;
+  static String get artikelFotosBucket => _artikelFotosBucket;
 }

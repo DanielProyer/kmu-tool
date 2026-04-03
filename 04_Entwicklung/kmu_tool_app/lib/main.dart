@@ -16,6 +16,7 @@ import 'package:kmu_tool_app/services/storage/isar_service_export.dart';
 import 'package:kmu_tool_app/services/connectivity/connectivity_service.dart';
 import 'package:kmu_tool_app/services/sync/sync_service_export.dart';
 import 'package:kmu_tool_app/services/feature/feature_service.dart';
+import 'package:kmu_tool_app/services/admin/admin_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +52,8 @@ Future<void> main() async {
 
     // Feature-Service laden (nach Auth)
     await FeatureService.instance.load();
+    // Admin-Status prüfen
+    await AdminService.checkAdminStatus();
   }
 
   // Connectivity auf allen Plattformen initialisieren

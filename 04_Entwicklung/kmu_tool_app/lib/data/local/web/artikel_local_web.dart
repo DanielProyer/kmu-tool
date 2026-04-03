@@ -20,6 +20,9 @@ class ArtikelLocal {
   double? mindestbestand;
   String? lieferant;
   String? notizen;
+  String? materialTyp;
+  int? aufwandkonto;
+  String? mwstCode;
   bool isDeleted = false;
   DateTime? createdAt;
   DateTime? updatedAt;

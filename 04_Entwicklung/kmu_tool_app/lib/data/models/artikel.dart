@@ -11,6 +11,9 @@ class Artikel {
   final double? mindestbestand;
   final String? lieferant;
   final String? notizen;
+  final String? materialTyp;
+  final int? aufwandkonto;
+  final String? mwstCode;
   final bool isDeleted;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -28,6 +31,9 @@ class Artikel {
     this.mindestbestand,
     this.lieferant,
     this.notizen,
+    this.materialTyp,
+    this.aufwandkonto,
+    this.mwstCode,
     this.isDeleted = false,
     this.createdAt,
     this.updatedAt,
@@ -47,6 +53,9 @@ class Artikel {
       mindestbestand: json['mindestbestand']?.toDouble(),
       lieferant: json['lieferant'],
       notizen: json['notizen'],
+      materialTyp: json['material_typ'] as String?,
+      aufwandkonto: json['aufwandkonto'] as int?,
+      mwstCode: json['mwst_code'] as String?,
       isDeleted: json['is_deleted'] ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -71,6 +80,9 @@ class Artikel {
       'mindestbestand': mindestbestand,
       'lieferant': lieferant,
       'notizen': notizen,
+      'material_typ': materialTyp,
+      'aufwandkonto': aufwandkonto,
+      'mwst_code': mwstCode,
       'is_deleted': isDeleted,
     };
   }

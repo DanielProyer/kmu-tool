@@ -24,6 +24,24 @@ import 'package:kmu_tool_app/presentation/screens/buchhaltung/berichte_screen.da
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_overview_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/buchhaltung/mwst_abrechnung_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/artikel_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/artikel_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/artikel_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/lagerort_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/lagerort_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/lagerbewegung_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/artikel/lagerbewegungen_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferanten_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferant_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/lieferanten/lieferant_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_dashboard_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_kunden_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_kunde_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_kunde_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_rechnungen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_rechnung_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_migrationen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/admin/admin_migration_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/abo_verwaltung_screen.dart';
@@ -227,6 +245,146 @@ final router = GoRouter(
       builder: (context, state) {
         final id = state.pathParameters['id']!;
         return MwstAbrechnungDetailScreen(abrechnungId: id);
+      },
+    ),
+
+    // ─── Artikel ───
+    GoRoute(
+      path: '/artikel',
+      builder: (context, state) => const ArtikelListScreen(),
+    ),
+    GoRoute(
+      path: '/artikel/neu',
+      builder: (context, state) => const ArtikelFormScreen(),
+    ),
+    GoRoute(
+      path: '/artikel/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return ArtikelDetailScreen(artikelId: id);
+      },
+    ),
+    GoRoute(
+      path: '/artikel/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return ArtikelFormScreen(artikelId: id);
+      },
+    ),
+    GoRoute(
+      path: '/artikel/:id/bewegungen',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LagerbewegungenListScreen(artikelId: id);
+      },
+    ),
+    GoRoute(
+      path: '/artikel/:id/bewegungen/neu',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LagerbewegungFormScreen(artikelId: id);
+      },
+    ),
+
+    // ─── Lagerorte ───
+    GoRoute(
+      path: '/lagerorte',
+      builder: (context, state) => const LagerortListScreen(),
+    ),
+    GoRoute(
+      path: '/lagerorte/neu',
+      builder: (context, state) => const LagerortFormScreen(),
+    ),
+    GoRoute(
+      path: '/lagerorte/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LagerortFormScreen(lagerortId: id);
+      },
+    ),
+
+    // ─── Lieferanten ───
+    GoRoute(
+      path: '/lieferanten',
+      builder: (context, state) => const LieferantenListScreen(),
+    ),
+    GoRoute(
+      path: '/lieferanten/neu',
+      builder: (context, state) => const LieferantFormScreen(),
+    ),
+    GoRoute(
+      path: '/lieferanten/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LieferantDetailScreen(lieferantId: id);
+      },
+    ),
+    GoRoute(
+      path: '/lieferanten/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LieferantFormScreen(lieferantId: id);
+      },
+    ),
+
+    // ─── Admin ───
+    GoRoute(
+      path: '/admin',
+      builder: (context, state) => const AdminDashboardScreen(),
+    ),
+    GoRoute(
+      path: '/admin/kunden',
+      builder: (context, state) => const AdminKundenListScreen(),
+    ),
+    GoRoute(
+      path: '/admin/kunden/neu',
+      builder: (context, state) => const AdminKundeFormScreen(),
+    ),
+    GoRoute(
+      path: '/admin/kunden/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return AdminKundeDetailScreen(kundeProfilId: id);
+      },
+    ),
+    GoRoute(
+      path: '/admin/kunden/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return AdminKundeFormScreen(kundeProfilId: id);
+      },
+    ),
+    GoRoute(
+      path: '/admin/rechnungen',
+      builder: (context, state) => const AdminRechnungenScreen(),
+    ),
+    GoRoute(
+      path: '/admin/rechnungen/neu',
+      builder: (context, state) {
+        final kundeProfilId =
+            state.uri.queryParameters['kundeProfilId'];
+        return AdminRechnungFormScreen(
+            kundeProfilId: kundeProfilId);
+      },
+    ),
+    GoRoute(
+      path: '/admin/rechnungen/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return AdminRechnungFormScreen(rechnungId: id);
+      },
+    ),
+    GoRoute(
+      path: '/admin/migrationen',
+      builder: (context, state) => const AdminMigrationenScreen(),
+    ),
+    GoRoute(
+      path: '/admin/migrationen/neu',
+      builder: (context, state) {
+        final kundeProfilId =
+            state.uri.queryParameters['kundeProfilId'];
+        return AdminMigrationFormScreen(
+            kundeProfilId: kundeProfilId);
       },
     ),
 

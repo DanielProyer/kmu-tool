@@ -16,6 +16,18 @@ import 'package:kmu_tool_app/data/repositories/zeiterfassung_repository.dart';
 import 'package:kmu_tool_app/data/repositories/rapport_repository.dart';
 import 'package:kmu_tool_app/data/local/artikel_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
+import 'package:kmu_tool_app/data/models/lagerort.dart';
+import 'package:kmu_tool_app/data/models/lieferant.dart';
+import 'package:kmu_tool_app/data/models/artikel_lieferant.dart';
+import 'package:kmu_tool_app/data/models/artikel_foto.dart';
+import 'package:kmu_tool_app/data/models/lagerbestand.dart';
+import 'package:kmu_tool_app/data/models/lagerbewegung.dart';
+import 'package:kmu_tool_app/data/repositories/lagerort_repository.dart';
+import 'package:kmu_tool_app/data/repositories/lieferant_repository.dart';
+import 'package:kmu_tool_app/data/repositories/artikel_lieferant_repository.dart';
+import 'package:kmu_tool_app/data/repositories/artikel_foto_repository.dart';
+import 'package:kmu_tool_app/data/repositories/lagerbestand_repository.dart';
+import 'package:kmu_tool_app/data/repositories/lagerbewegung_repository.dart';
 
 // ─── Kunden ───
 
@@ -276,6 +288,145 @@ final artikelSearchProvider =
   if (query.isEmpty) return ArtikelRepository.getAll();
   return ArtikelRepository.search(query);
 });
+
+// ─── Lagerorte ───
+
+final lagerortListProvider =
+    AsyncNotifierProvider<LagerortListNotifier, List<Lagerort>>(
+  LagerortListNotifier.new,
+);
+
+class LagerortListNotifier extends AsyncNotifier<List<Lagerort>> {
+  @override
+  Future<List<Lagerort>> build() async {
+    return LagerortRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => LagerortRepository.getAll());
+  }
+}
+
+// ─── Lieferanten ───
+
+final lieferantenListProvider =
+    AsyncNotifierProvider<LieferantenListNotifier, List<Lieferant>>(
+  LieferantenListNotifier.new,
+);
+
+class LieferantenListNotifier extends AsyncNotifier<List<Lieferant>> {
+  @override
+  Future<List<Lieferant>> build() async {
+    return LieferantRepository.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => LieferantRepository.getAll());
+  }
+}
+
+final lieferantProvider =
+    AsyncNotifierProvider.family<LieferantNotifier, Lieferant?, String>(
+  LieferantNotifier.new,
+);
+
+class LieferantNotifier extends FamilyAsyncNotifier<Lieferant?, String> {
+  @override
+  Future<Lieferant?> build(String arg) async {
+    return LieferantRepository.getById(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => LieferantRepository.getById(arg));
+  }
+}
+
+// ─── Artikel-Lieferanten ───
+
+final artikelLieferantenProvider = AsyncNotifierProvider.family<
+    ArtikelLieferantenNotifier, List<ArtikelLieferant>, String>(
+  ArtikelLieferantenNotifier.new,
+);
+
+class ArtikelLieferantenNotifier
+    extends FamilyAsyncNotifier<List<ArtikelLieferant>, String> {
+  @override
+  Future<List<ArtikelLieferant>> build(String arg) async {
+    return ArtikelLieferantRepository.getByArtikel(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+        () => ArtikelLieferantRepository.getByArtikel(arg));
+  }
+}
+
+// ─── Artikel-Fotos ───
+
+final artikelFotosProvider = AsyncNotifierProvider.family<
+    ArtikelFotosNotifier, List<ArtikelFoto>, String>(
+  ArtikelFotosNotifier.new,
+);
+
+class ArtikelFotosNotifier
+    extends FamilyAsyncNotifier<List<ArtikelFoto>, String> {
+  @override
+  Future<List<ArtikelFoto>> build(String arg) async {
+    return ArtikelFotoRepository.getByArtikel(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state =
+        await AsyncValue.guard(() => ArtikelFotoRepository.getByArtikel(arg));
+  }
+}
+
+// ─── Lagerbestände ───
+
+final lagerbestandByArtikelProvider = AsyncNotifierProvider.family<
+    LagerbestandByArtikelNotifier, List<Lagerbestand>, String>(
+  LagerbestandByArtikelNotifier.new,
+);
+
+class LagerbestandByArtikelNotifier
+    extends FamilyAsyncNotifier<List<Lagerbestand>, String> {
+  @override
+  Future<List<Lagerbestand>> build(String arg) async {
+    return LagerbestandRepository.getByArtikel(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+        () => LagerbestandRepository.getByArtikel(arg));
+  }
+}
+
+// ─── Lagerbewegungen ───
+
+final lagerbewegungByArtikelProvider = AsyncNotifierProvider.family<
+    LagerbewegungByArtikelNotifier, List<Lagerbewegung>, String>(
+  LagerbewegungByArtikelNotifier.new,
+);
+
+class LagerbewegungByArtikelNotifier
+    extends FamilyAsyncNotifier<List<Lagerbewegung>, String> {
+  @override
+  Future<List<Lagerbewegung>> build(String arg) async {
+    return LagerbewegungRepository.getByArtikel(arg);
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+        () => LagerbewegungRepository.getByArtikel(arg));
+  }
+}
 
 // ─── Zeiterfassungen ───
 
