@@ -39,6 +39,7 @@ class _RapportFormScreenState extends State<RapportFormScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now().add(const Duration(days: 1)),
       locale: const Locale('de', 'CH'),
+      useRootNavigator: false,
     );
     if (picked != null) {
       setState(() => _datum = picked);

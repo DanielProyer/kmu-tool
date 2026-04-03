@@ -40,6 +40,7 @@ class _BestellungFormScreenState extends ConsumerState<BestellungFormScreen> {
       firstDate: firstDate,
       lastDate: lastDate,
       locale: const Locale('de', 'CH'),
+      useRootNavigator: false,
     );
 
     if (picked != null) {

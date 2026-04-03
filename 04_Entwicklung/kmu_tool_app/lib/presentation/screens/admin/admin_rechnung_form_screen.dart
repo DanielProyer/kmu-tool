@@ -163,6 +163,7 @@ class _AdminRechnungFormScreenState
       firstDate: DateTime(2020),
       lastDate: DateTime(2099, 12, 31),
       locale: const Locale('de', 'CH'),
+      useRootNavigator: false,
     );
     if (picked != null) {
       onPicked(picked);

@@ -68,6 +68,7 @@ class _MwstEinstellungenScreenState
       firstDate: DateTime(2000),
       lastDate: DateTime(2099),
       locale: const Locale('de', 'CH'),
+      useRootNavigator: false,
     );
     if (picked != null) {
       setState(() => _mwstPflichtigSeit = picked);

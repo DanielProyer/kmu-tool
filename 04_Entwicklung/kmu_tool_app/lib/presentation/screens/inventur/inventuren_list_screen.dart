@@ -100,6 +100,7 @@ class _InventurenListScreenState extends ConsumerState<InventurenListScreen> {
                             firstDate: DateTime(2020),
                             lastDate: DateTime(2030),
                             locale: const Locale('de', 'CH'),
+                            useRootNavigator: false,
                           );
                           if (picked != null) {
                             setDialogState(() => selectedDate = picked);

@@ -155,6 +155,7 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2099),
       locale: const Locale('de', 'CH'),
+      useRootNavigator: false,
     );
     if (picked != null && mounted) {
       setState(() {
