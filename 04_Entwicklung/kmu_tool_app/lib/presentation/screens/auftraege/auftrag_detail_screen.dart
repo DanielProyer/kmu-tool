@@ -13,6 +13,7 @@ import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/feature_provider.dart';
 import 'package:kmu_tool_app/services/rechnung/rechnung_service.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 
 class AuftragDetailScreen extends ConsumerStatefulWidget {
   final String auftragId;
@@ -116,6 +117,7 @@ class _AuftragDetailScreenState
       await AuftragRepository.save(auftrag);
       ref.invalidate(auftragProvider(widget.auftragId));
       ref.invalidate(auftraegeListProvider);
+      ref.invalidate(dashboardProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

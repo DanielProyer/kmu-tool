@@ -7,6 +7,7 @@ import 'package:kmu_tool_app/core/validators/validators.dart';
 import 'package:kmu_tool_app/data/local/kunde_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class KundeFormScreen extends ConsumerStatefulWidget {
@@ -195,6 +196,7 @@ class _KundeFormScreenState extends ConsumerState<KundeFormScreen> {
           ),
         );
         ref.invalidate(kundenListProvider);
+        ref.invalidate(dashboardProvider);
         if (_isEdit) {
           ref.invalidate(kundeProvider(widget.kundeId!));
         }

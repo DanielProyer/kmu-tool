@@ -8,6 +8,7 @@ import 'package:kmu_tool_app/data/local/auftrag_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/auftrag_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 
 class AuftragFormScreen extends ConsumerStatefulWidget {
   final String? auftragId;
@@ -194,6 +195,7 @@ class _AuftragFormScreenState extends ConsumerState<AuftragFormScreen> {
           ),
         );
         ref.invalidate(auftraegeListProvider);
+        ref.invalidate(dashboardProvider);
         if (_isEdit) {
           ref.invalidate(auftragProvider(widget.auftragId!));
         }

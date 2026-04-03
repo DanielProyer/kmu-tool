@@ -11,6 +11,7 @@ import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offert_position_repository.dart';
 import 'package:kmu_tool_app/data/repositories/artikel_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 
 class OfferteFormScreen extends ConsumerStatefulWidget {
   final String? offerteId;
@@ -273,6 +274,7 @@ class _OfferteFormScreenState extends ConsumerState<OfferteFormScreen> {
           ),
         );
         ref.invalidate(offertenListProvider);
+        ref.invalidate(dashboardProvider);
         if (_isEdit) {
           ref.invalidate(offerteProvider(widget.offerteId!));
           ref.invalidate(

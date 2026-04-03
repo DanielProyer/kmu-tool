@@ -13,6 +13,7 @@ import 'package:kmu_tool_app/data/repositories/user_profile_repository.dart';
 import 'package:kmu_tool_app/data/models/user_profile.dart';
 import 'package:kmu_tool_app/services/pdf/rechnung_pdf_service.dart';
 import 'package:kmu_tool_app/services/rechnung/buchung_service.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 
 // ─── Providers ───
 
@@ -133,6 +134,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
       final buchungService = BuchungService();
       await buchungService.markAsBezahlt(rechnung.id);
       ref.invalidate(_rechnungProvider(widget.rechnungId));
+      ref.invalidate(dashboardProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -204,6 +206,7 @@ class _RechnungDetailScreenState extends ConsumerState<RechnungDetailScreen> {
       final repo = RechnungRepository();
       await repo.updateStatus(rechnung.id, selected);
       ref.invalidate(_rechnungProvider(widget.rechnungId));
+      ref.invalidate(dashboardProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -9,6 +9,7 @@ import 'package:kmu_tool_app/data/local/kunde_local_export.dart';
 import 'package:kmu_tool_app/data/repositories/kunde_repository.dart';
 import 'package:kmu_tool_app/data/repositories/offerte_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
+import 'package:kmu_tool_app/presentation/providers/dashboard_provider.dart';
 
 class OfferteDetailScreen extends ConsumerStatefulWidget {
   final String offerteId;
@@ -116,6 +117,7 @@ class _OfferteDetailScreenState
       await OfferteRepository.save(offerte);
       ref.invalidate(offerteProvider(widget.offerteId));
       ref.invalidate(offertenListProvider);
+      ref.invalidate(dashboardProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -436,6 +438,7 @@ class _OfferteDetailScreenState
                             await context.push(
                                 '/auftraege/neu?offerteId=${widget.offerteId}');
                             ref.invalidate(auftraegeListProvider);
+                            ref.invalidate(dashboardProvider);
                           },
                           icon: const Icon(Icons.assignment_turned_in),
                           label: const Text('Auftrag erstellen'),
