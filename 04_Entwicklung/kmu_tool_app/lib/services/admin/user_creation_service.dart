@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:kmu_tool_app/services/supabase/supabase_service.dart';
 
 class UserCreationResult {
@@ -14,7 +16,6 @@ class UserCreationResult {
 
 class UserCreationService {
   /// Erstellt einen neuen Auth-User via Edge Function.
-  /// Kann von Admin (GF erstellen) oder GF (Mitarbeiter erstellen) aufgerufen werden.
   static Future<UserCreationResult> createUser({
     required String email,
     String? password,
@@ -38,19 +39,29 @@ class UserCreationService {
         },
       );
 
-      if (response.status != 200) {
-        final data = response.data;
-        final errorMsg = data is Map
-            ? (data['error'] as String?) ?? 'Unbekannter Fehler'
-            : 'Fehler (Status ${response.status})';
-        return UserCreationResult(
-          success: false,
-          message: errorMsg,
-        );
+      debugPrint('[UserCreationService] status=${response.status}');
+      debugPrint('[UserCreationService] data=${response.data} (${response.data.runtimeType})');
+
+      // Response data parsen — kann String oder Map sein
+      Map<String, dynamic>? data;
+      if (response.data is Map<String, dynamic>) {
+        data = response.data as Map<String, dynamic>;
+      } else if (response.data is String) {
+        try {
+          final parsed = jsonDecode(response.data as String);
+          if (parsed is Map<String, dynamic>) {
+            data = parsed;
+          }
+        } catch (_) {}
       }
 
-      final data = response.data;
-      if (data is Map && data['success'] == true) {
+      if (response.status != 200) {
+        final errorMsg = data?['error'] as String? ??
+            'Fehler (Status ${response.status})';
+        return UserCreationResult(success: false, message: errorMsg);
+      }
+
+      if (data != null && data['success'] == true) {
         return UserCreationResult(
           success: true,
           userId: data['user_id'] as String?,
@@ -58,11 +69,12 @@ class UserCreationService {
         );
       }
 
-      return const UserCreationResult(
+      return UserCreationResult(
         success: false,
-        message: 'Unerwartete Antwort vom Server',
+        message: 'Unerwartete Antwort: ${response.data}',
       );
     } catch (e) {
+      debugPrint('[UserCreationService] ERROR: $e');
       return UserCreationResult(
         success: false,
         message: 'Verbindungsfehler: $e',
