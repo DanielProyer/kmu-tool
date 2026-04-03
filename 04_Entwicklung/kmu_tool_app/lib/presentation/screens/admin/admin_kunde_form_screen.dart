@@ -6,6 +6,8 @@ import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/admin/admin_kundenprofil.dart';
 import 'package:kmu_tool_app/data/repositories/admin/admin_kundenprofil_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/admin_providers.dart';
+import 'package:kmu_tool_app/services/admin/user_creation_service.dart';
+import 'package:kmu_tool_app/services/admin/admin_service.dart';
 
 class AdminKundeFormScreen extends ConsumerStatefulWidget {
   final String? kundeProfilId;
@@ -46,6 +48,11 @@ class _AdminKundeFormScreenState
 
   // Notizen
   final _notizenController = TextEditingController();
+
+  // App-Zugang
+  bool _zugangErstellen = false;
+  final _passwordController = TextEditingController();
+  String _plan = 'free';
 
   bool _isLoading = false;
   bool _isEdit = false;
@@ -152,6 +159,48 @@ class _AdminKundeFormScreenState
 
       await AdminKundenprofilRepository.save(profil);
 
+      // App-Zugang erstellen wenn gewuenscht
+      if (_zugangErstellen &&
+          _emailController.text.trim().isNotEmpty &&
+          (_existing?.userId == null)) {
+        final password = _passwordController.text.trim().isEmpty
+            ? null
+            : _passwordController.text.trim();
+
+        final result = await UserCreationService.createUser(
+          email: _emailController.text.trim(),
+          password: password,
+          firmaName: _firmaNameController.text.trim(),
+          rolle: 'geschaeftsfuehrer',
+          adminProfilId: id,
+          sendResetEmail: password == null,
+        );
+
+        if (!result.success && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Kunde gespeichert, aber Zugang-Fehler: ${result.message}'),
+              backgroundColor: AppStatusColors.warning,
+            ),
+          );
+          ref.invalidate(adminKundenListProvider);
+          if (_isEdit) {
+            ref.invalidate(adminKundeProvider(widget.kundeProfilId!));
+          }
+          context.pop();
+          return;
+        }
+
+        // Plan setzen wenn nicht free
+        if (result.success && _plan != 'free' && result.userId != null) {
+          try {
+            await AdminService.changeKundePlan(result.userId!, _plan);
+          } catch (_) {
+            // Plan-Fehler ist nicht kritisch
+          }
+        }
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -195,6 +244,7 @@ class _AdminKundeFormScreenState
     _anzahlMitarbeiterController.dispose();
     _anzahlFahrzeugeController.dispose();
     _notizenController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -275,13 +325,28 @@ class _AdminKundeFormScreenState
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'E-Mail',
-                        prefixIcon: Icon(Icons.email_outlined),
+                      decoration: InputDecoration(
+                        labelText: _zugangErstellen
+                            ? 'E-Mail *'
+                            : 'E-Mail',
+                        prefixIcon: const Icon(Icons.email_outlined),
                         hintText: 'info@firma.ch',
                       ),
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (_zugangErstellen &&
+                            (value == null || value.trim().isEmpty)) {
+                          return 'E-Mail ist fuer App-Zugang erforderlich';
+                        }
+                        if (value != null &&
+                            value.isNotEmpty &&
+                            (!value.contains('@') ||
+                                !value.contains('.'))) {
+                          return 'Ungueltige E-Mail-Adresse';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -460,6 +525,75 @@ class _AdminKundeFormScreenState
                       },
                     ),
                     const SizedBox(height: 24),
+
+                    // ─── APP-ZUGANG ───
+                    if (!_isEdit || _existing?.userId == null) ...[
+                      _sectionHeader('APP-ZUGANG'),
+                      const SizedBox(height: 12),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('App-Zugang erstellen'),
+                        subtitle: const Text(
+                          'Erstellt einen Login fuer den Geschaeftsfuehrer',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        value: _zugangErstellen,
+                        onChanged: (value) {
+                          setState(() => _zugangErstellen = value);
+                        },
+                      ),
+                      if (_zugangErstellen) ...[
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _passwordController,
+                          decoration: const InputDecoration(
+                            labelText: 'Initiales Passwort (optional)',
+                            prefixIcon: Icon(Icons.lock_outline),
+                            helperText:
+                                'Leer lassen = Passwort-Reset-Mail wird gesendet',
+                          ),
+                          obscureText: true,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                value.length < 6) {
+                              return 'Mindestens 6 Zeichen';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _plan,
+                          decoration: const InputDecoration(
+                            labelText: 'Abo-Plan',
+                            prefixIcon:
+                                Icon(Icons.workspace_premium_outlined),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'free',
+                              child: Text('Free'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'standard',
+                              child: Text('Standard'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'premium',
+                              child: Text('Premium'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() => _plan = value);
+                            }
+                          },
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                    ],
 
                     // ─── NOTIZEN ───
                     _sectionHeader('NOTIZEN'),

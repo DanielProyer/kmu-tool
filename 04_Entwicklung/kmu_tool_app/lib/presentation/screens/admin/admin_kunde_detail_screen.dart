@@ -5,6 +5,7 @@ import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/presentation/providers/admin_providers.dart';
 import 'package:kmu_tool_app/data/repositories/admin/admin_kundenprofil_repository.dart';
 import 'package:kmu_tool_app/services/admin/admin_service.dart';
+import 'package:kmu_tool_app/services/admin/user_creation_service.dart';
 import 'package:intl/intl.dart';
 
 class AdminKundeDetailScreen extends ConsumerWidget {
@@ -196,6 +197,16 @@ class AdminKundeDetailScreen extends ConsumerWidget {
                     profil: profil,
                     statusColor: _statusColor(profil.status),
                     colorScheme: colorScheme,
+                  ),
+
+                  // ─── 1b. App-Zugang ───
+                  _AppZugangSection(
+                    profil: profil,
+                    colorScheme: colorScheme,
+                    onZugangErstellt: () {
+                      ref.invalidate(adminKundeProvider(kundeProfilId));
+                      ref.invalidate(adminKundenListProvider);
+                    },
                   ),
 
                   // ─── 2. Kontaktdaten ───
@@ -1109,6 +1120,201 @@ class _DetailRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// ─── App-Zugang Section ───
+
+class _AppZugangSection extends StatelessWidget {
+  final dynamic profil;
+  final ColorScheme colorScheme;
+  final VoidCallback onZugangErstellt;
+
+  const _AppZugangSection({
+    required this.profil,
+    required this.colorScheme,
+    required this.onZugangErstellt,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasZugang = profil.userId != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionHeader(title: 'App-Zugang'),
+        Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: hasZugang
+                ? _buildActiveZugang(context)
+                : _buildNoZugang(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActiveZugang(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.check_circle, size: 20, color: AppStatusColors.success),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Zugang aktiv',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+            ),
+            _Badge(
+              label: 'Aktiv',
+              color: AppStatusColors.success,
+            ),
+          ],
+        ),
+        if (profil.email != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            profil.email!,
+            style: TextStyle(
+              fontSize: 13,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => _sendPasswordReset(context),
+            icon: const Icon(Icons.lock_reset, size: 18),
+            label: const Text('Passwort zuruecksetzen'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoZugang(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(Icons.no_accounts, size: 20, color: colorScheme.onSurfaceVariant),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Kein App-Zugang',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: (profil.email != null && profil.email!.isNotEmpty)
+                ? () => _createZugang(context)
+                : null,
+            icon: const Icon(Icons.person_add, size: 18),
+            label: const Text('Zugang erstellen'),
+          ),
+        ),
+        if (profil.email == null || profil.email!.isEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            'E-Mail-Adresse erforderlich',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppStatusColors.warning,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _createZugang(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      useRootNavigator: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Zugang erstellen'),
+        content: Text(
+          'Fuer "${profil.firmaName}" wird ein App-Zugang erstellt. '
+          'Eine Passwort-Reset-Mail wird an ${profil.email} gesendet.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Erstellen'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final result = await UserCreationService.createUser(
+      email: profil.email!,
+      firmaName: profil.firmaName,
+      rolle: 'geschaeftsfuehrer',
+      adminProfilId: profil.id,
+      sendResetEmail: true,
+    );
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(result.message),
+        backgroundColor:
+            result.success ? AppStatusColors.success : AppStatusColors.error,
+      ),
+    );
+
+    if (result.success) {
+      onZugangErstellt();
+    }
+  }
+
+  Future<void> _sendPasswordReset(BuildContext context) async {
+    if (profil.email == null) return;
+
+    try {
+      await UserCreationService.sendPasswordReset(profil.email!);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Passwort-Reset-Mail an ${profil.email} gesendet'),
+            backgroundColor: AppStatusColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler: $e'),
+            backgroundColor: AppStatusColors.error,
+          ),
+        );
+      }
+    }
   }
 }
 

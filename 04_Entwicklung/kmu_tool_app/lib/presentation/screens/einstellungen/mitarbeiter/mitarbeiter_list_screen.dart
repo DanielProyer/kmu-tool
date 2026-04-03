@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/data/models/mitarbeiter.dart';
 import 'package:kmu_tool_app/presentation/providers/mitarbeiter_provider.dart';
+import 'package:kmu_tool_app/presentation/widgets/mitarbeiter_einladen_dialog.dart';
 
 class MitarbeiterListScreen extends ConsumerWidget {
   const MitarbeiterListScreen({super.key});
@@ -24,7 +25,19 @@ class MitarbeiterListScreen extends ConsumerWidget {
         title: const Text('Mitarbeiter'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.person_add),
+            tooltip: 'App-Zugang einladen',
+            onPressed: () async {
+              final created =
+                  await MitarbeiterEinladenDialog.show(context);
+              if (created == true) {
+                ref.invalidate(mitarbeiterListProvider);
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
+            tooltip: 'Mitarbeiter erfassen',
             onPressed: () async {
               await context.push('/einstellungen/mitarbeiter/neu');
               ref.invalidate(mitarbeiterListProvider);
