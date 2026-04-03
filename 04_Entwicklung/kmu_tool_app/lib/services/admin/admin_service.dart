@@ -12,12 +12,9 @@ class AdminService {
         _isAdmin = false;
         return;
       }
-      final data = await SupabaseService.client
-          .from('admin_users')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
-      _isAdmin = data != null;
+      // is_admin() ist SECURITY DEFINER und umgeht RLS
+      final result = await SupabaseService.client.rpc('is_admin');
+      _isAdmin = result == true;
     } catch (_) {
       _isAdmin = false;
     }
