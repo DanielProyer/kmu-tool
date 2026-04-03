@@ -196,6 +196,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDashboard(BuildContext context, DashboardData data) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Admin-Only: Nur Admin-Panel Kachel anzeigen
+    if (AdminService.isAdmin) {
+      final tiles = <_DashboardTileData>[
+        _DashboardTileData(
+          label: 'Admin-Panel',
+          icon: Icons.admin_panel_settings,
+          value: '',
+          color: const Color(0xFFDC2626),
+          route: '/admin',
+        ),
+      ];
+
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _greeting(),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'SaaS Administration',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final crossAxisCount = constraints.maxWidth > 600 ? 3 : 2;
+              final childAspectRatio =
+                  constraints.maxWidth > 600 ? 1.4 : 1.15;
+
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: childAspectRatio,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: tiles.length,
+                itemBuilder: (context, index) {
+                  return _DashboardTile(data: tiles[index]);
+                },
+              );
+            },
+          ),
+        ],
+      );
+    }
+
     final hasKunden = ref.watch(hasFeatureProvider(AppFeature.kunden));
     final hasOfferten = ref.watch(hasFeatureProvider(AppFeature.offerten));
     final hasAuftraege = ref.watch(hasFeatureProvider(AppFeature.auftraege));
@@ -206,7 +271,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasInventur = ref.watch(hasFeatureProvider(AppFeature.inventur));
     final hasWebsite = ref.watch(hasFeatureProvider(AppFeature.autoWebsite));
 
-    final colorScheme = Theme.of(context).colorScheme;
     final allTiles = <_DashboardTileData>[
       if (hasKunden)
         _DashboardTileData(
@@ -272,7 +336,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         color: const Color(0xFF6366F1),
         route: '/kalender',
       ),
-      // Inventur ist jetzt unter Einstellungen > Betrieb
       if (hasWebsite)
         _DashboardTileData(
           label: 'Website',
@@ -280,14 +343,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           value: '',
           color: const Color(0xFF0891B2),
           route: '/website',
-        ),
-      if (AdminService.isAdmin)
-        _DashboardTileData(
-          label: 'Admin-Panel',
-          icon: Icons.admin_panel_settings,
-          value: '',
-          color: const Color(0xFFDC2626),
-          route: '/admin',
         ),
       _DashboardTileData(
         label: 'Sync Status',
