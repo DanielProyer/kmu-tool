@@ -38,4 +38,4 @@ CREATE POLICY "artikel_delete" ON artikel FOR DELETE USING (auth.uid() = user_id
 -- Updated-At Trigger
 CREATE TRIGGER update_artikel_updated_at
   BEFORE UPDATE ON artikel
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

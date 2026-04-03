@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS bank_konten (
   bezeichnung TEXT NOT NULL,
   iban TEXT,
   bank_name TEXT,
-  konto_nummer INTEGER REFERENCES konten(nummer),
+  konto_nummer INTEGER,  -- Kontonummer aus Kontenrahmen (kein FK wegen composite unique)
   aktiv BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()

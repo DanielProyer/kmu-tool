@@ -135,8 +135,8 @@ CREATE POLICY "mwst_abr_delete" ON mwst_abrechnungen FOR DELETE USING (auth.uid(
 -- Triggers
 CREATE TRIGGER update_mwst_einstellungen_updated_at
   BEFORE UPDATE ON mwst_einstellungen
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_mwst_abrechnungen_updated_at
   BEFORE UPDATE ON mwst_abrechnungen
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
