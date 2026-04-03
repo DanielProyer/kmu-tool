@@ -8,7 +8,7 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 function jsonResponse(body: object, status = 200): Response {
@@ -193,10 +193,10 @@ Deno.serve(async (req) => {
 
     // 9. Optional: Password-Reset-Mail senden
     if (send_reset_email) {
-      const { error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-      });
+      const { error: resetError } = await supabaseAdmin.auth.resetPasswordForEmail(
+        email,
+        { redirectTo: 'https://danielproyer.github.io/kmu-tool/' }
+      );
       if (resetError) {
         console.error('Reset email error:', resetError);
       }

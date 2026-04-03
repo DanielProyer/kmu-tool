@@ -35,7 +35,15 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   await SupabaseService.initialize();
 
-  // Früh auf Recovery-Event lauschen (bevor runApp)
+  // Auf Web: Recovery-Token in URL erkennen (vor refreshSession!)
+  if (kIsWeb) {
+    final fragment = Uri.base.fragment;
+    if (fragment.contains('type=recovery')) {
+      SupabaseService.pendingPasswordRecovery = true;
+    }
+  }
+
+  // Auf Recovery-Event lauschen (fuer zukuenftige Events)
   SupabaseService.client.auth.onAuthStateChange.listen((data) {
     if (data.event == AuthChangeEvent.passwordRecovery) {
       SupabaseService.pendingPasswordRecovery = true;
