@@ -6,6 +6,7 @@ class FileStorageService {
   static const _notizenBucket = 'auftrag-notizen';
   static const _dateienBucket = 'auftrag-dateien';
   static const _artikelFotosBucket = 'artikel-fotos';
+  static const _websiteAssetsBucket = 'website-assets';
 
   /// Upload einer Datei. Gibt den Storage-Pfad zurück.
   static Future<String> uploadNotizDatei({
@@ -70,7 +71,32 @@ class FileStorageService {
         .remove([path]);
   }
 
+  static Future<String> uploadWebsiteAsset({
+    required String entityId,
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    final path = '$entityId/$fileName';
+    await SupabaseService.client.storage
+        .from(_websiteAssetsBucket)
+        .uploadBinary(path, bytes, retryAttempts: 2);
+    return path;
+  }
+
+  static Future<void> deleteWebsiteAsset(String path) async {
+    await SupabaseService.client.storage
+        .from(_websiteAssetsBucket)
+        .remove([path]);
+  }
+
+  static String getWebsiteAssetPublicUrl(String path) {
+    return SupabaseService.client.storage
+        .from(_websiteAssetsBucket)
+        .getPublicUrl(path);
+  }
+
   static String get notizenBucket => _notizenBucket;
   static String get dateienBucket => _dateienBucket;
   static String get artikelFotosBucket => _artikelFotosBucket;
+  static String get websiteAssetsBucket => _websiteAssetsBucket;
 }

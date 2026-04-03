@@ -49,6 +49,11 @@ import 'package:kmu_tool_app/presentation/screens/admin/admin_rechnungen_screen.
 import 'package:kmu_tool_app/presentation/screens/admin/admin_rechnung_form_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/admin/admin_migrationen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/admin/admin_migration_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/website/website_dashboard_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/website/website_setup_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/website/website_design_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/website/website_anfragen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/website/website_vorschau_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/abo_verwaltung_screen.dart';
@@ -434,6 +439,28 @@ final router = GoRouter(
         return AdminMigrationFormScreen(
             kundeProfilId: kundeProfilId);
       },
+    ),
+
+    // ─── Auto-Website ───
+    GoRoute(
+      path: '/website',
+      builder: (context, state) => const WebsiteDashboardScreen(),
+    ),
+    GoRoute(
+      path: '/website/einrichten',
+      builder: (context, state) => const WebsiteSetupScreen(),
+    ),
+    GoRoute(
+      path: '/website/design',
+      builder: (context, state) => const WebsiteDesignScreen(),
+    ),
+    GoRoute(
+      path: '/website/anfragen',
+      builder: (context, state) => const WebsiteAnfragenScreen(),
+    ),
+    GoRoute(
+      path: '/website/vorschau',
+      builder: (context, state) => const WebsiteVorschauScreen(),
     ),
 
     // ─── Einstellungen ───

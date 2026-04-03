@@ -49,6 +49,8 @@ enum AppFeature {
         return ['/admin'];
       case AppFeature.auftragDashboard:
         return []; // Dynamic route: /auftraege/:id/dashboard
+      case AppFeature.autoWebsite:
+        return ['/website'];
       default:
         return [];
     }

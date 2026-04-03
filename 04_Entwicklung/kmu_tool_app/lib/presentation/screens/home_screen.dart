@@ -201,6 +201,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasArtikel = ref.watch(hasFeatureProvider(AppFeature.artikel));
     final hasBestellwesen = ref.watch(hasFeatureProvider(AppFeature.bestellwesen));
     final hasInventur = ref.watch(hasFeatureProvider(AppFeature.inventur));
+    final hasWebsite = ref.watch(hasFeatureProvider(AppFeature.autoWebsite));
 
     final colorScheme = Theme.of(context).colorScheme;
     final allTiles = <_DashboardTileData>[
@@ -267,6 +268,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           value: '',
           color: const Color(0xFF6366F1),
           route: '/inventur',
+        ),
+      if (hasWebsite)
+        _DashboardTileData(
+          label: 'Website',
+          icon: Icons.language,
+          value: '',
+          color: const Color(0xFF0891B2),
+          route: '/website',
         ),
       if (AdminService.isAdmin)
         _DashboardTileData(
