@@ -8,6 +8,8 @@ import 'package:kmu_tool_app/data/repositories/admin/admin_kundenprofil_reposito
 import 'package:kmu_tool_app/presentation/providers/admin_providers.dart';
 import 'package:kmu_tool_app/services/admin/user_creation_service.dart';
 import 'package:kmu_tool_app/services/admin/admin_service.dart';
+import 'package:kmu_tool_app/core/validators/validators.dart';
+import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class AdminKundeFormScreen extends ConsumerStatefulWidget {
   final String? kundeProfilId;
@@ -62,8 +64,19 @@ class _AdminKundeFormScreenState
   void initState() {
     super.initState();
     _isEdit = widget.kundeProfilId != null;
+    _plzController.addListener(_onPlzChanged);
     if (_isEdit) {
       _loadKunde();
+    }
+  }
+
+  void _onPlzChanged() {
+    final plz = _plzController.text.trim();
+    if (plz.length == 4 && _ortController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _ortController.text = ort;
+      }
     }
   }
 
@@ -125,7 +138,7 @@ class _AdminKundeFormScreenState
             : _emailController.text.trim(),
         telefon: _telefonController.text.trim().isEmpty
             ? null
-            : _telefonController.text.trim(),
+            : PhoneValidator.format(_telefonController.text.trim()),
         strasse: _strasseController.text.trim().isEmpty
             ? null
             : _strasseController.text.trim(),
@@ -232,6 +245,7 @@ class _AdminKundeFormScreenState
 
   @override
   void dispose() {
+    _plzController.removeListener(_onPlzChanged);
     _firmaNameController.dispose();
     _kontaktpersonController.dispose();
     _brancheController.dispose();
@@ -358,6 +372,7 @@ class _AdminKundeFormScreenState
                       ),
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
+                      validator: PhoneValidator.validate,
                     ),
                     const SizedBox(height: 24),
 

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/core/validators/validators.dart';
 import 'package:kmu_tool_app/data/repositories/user_profile_repository.dart';
+import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class FirmenprofilScreen extends ConsumerStatefulWidget {
   const FirmenprofilScreen({super.key});
@@ -27,7 +28,18 @@ class _FirmenprofilScreenState extends ConsumerState<FirmenprofilScreen> {
   @override
   void initState() {
     super.initState();
+    _plzController.addListener(_onPlzChanged);
     _loadProfile();
+  }
+
+  void _onPlzChanged() {
+    final plz = _plzController.text.trim();
+    if (plz.length == 4 && _ortController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _ortController.text = ort;
+      }
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -112,6 +124,7 @@ class _FirmenprofilScreenState extends ConsumerState<FirmenprofilScreen> {
 
   @override
   void dispose() {
+    _plzController.removeListener(_onPlzChanged);
     _firmaNameController.dispose();
     _strasseController.dispose();
     _hausnummerController.dispose();

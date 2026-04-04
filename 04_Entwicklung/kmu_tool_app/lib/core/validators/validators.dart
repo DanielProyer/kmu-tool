@@ -60,6 +60,13 @@ class PhoneValidator {
             return 'Ungueltige ${rule.name}-Nummer '
                 '(${rule.digitsAfterPrefix} Ziffern nach $prefix erwartet)';
           }
+          // CH: erste Ziffer nach +41 muss 2-9 sein
+          if (prefix == '+41' && numberDigits.isNotEmpty) {
+            final first = numberDigits[0];
+            if (first == '0' || first == '1') {
+              return 'Ungueltige CH-Nummer (erste Ziffer nach +41 muss 2-9 sein)';
+            }
+          }
         } else {
           if (numberDigits.length < rule.minDigits! ||
               numberDigits.length > rule.maxDigits!) {

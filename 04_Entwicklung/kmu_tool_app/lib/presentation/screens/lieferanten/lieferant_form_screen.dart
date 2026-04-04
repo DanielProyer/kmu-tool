@@ -8,6 +8,7 @@ import 'package:kmu_tool_app/data/models/lieferant.dart';
 import 'package:kmu_tool_app/data/repositories/lieferant_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/providers.dart';
 import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
+import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class LieferantFormScreen extends ConsumerStatefulWidget {
   final String? lieferantId;
@@ -41,8 +42,19 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
   void initState() {
     super.initState();
     _isEdit = widget.lieferantId != null;
+    _plzController.addListener(_onPlzChanged);
     if (_isEdit) {
       _loadLieferant();
+    }
+  }
+
+  void _onPlzChanged() {
+    final plz = _plzController.text.trim();
+    if (plz.length == 4 && _ortController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _ortController.text = ort;
+      }
     }
   }
 
@@ -156,6 +168,7 @@ class _LieferantFormScreenState extends ConsumerState<LieferantFormScreen> {
 
   @override
   void dispose() {
+    _plzController.removeListener(_onPlzChanged);
     _firmaController.dispose();
     _kontaktpersonController.dispose();
     _strasseController.dispose();

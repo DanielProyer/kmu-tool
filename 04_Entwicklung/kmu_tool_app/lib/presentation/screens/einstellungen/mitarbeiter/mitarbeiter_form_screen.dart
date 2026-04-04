@@ -9,6 +9,7 @@ import 'package:kmu_tool_app/data/models/mitarbeiter.dart';
 import 'package:kmu_tool_app/data/repositories/mitarbeiter_repository.dart';
 import 'package:kmu_tool_app/presentation/providers/mitarbeiter_provider.dart';
 import 'package:kmu_tool_app/services/auth/betrieb_service.dart';
+import 'package:kmu_tool_app/services/plz/plz_service.dart';
 
 class MitarbeiterFormScreen extends ConsumerStatefulWidget {
   final String? mitarbeiterId;
@@ -63,8 +64,19 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
   void initState() {
     super.initState();
     _isEdit = widget.mitarbeiterId != null;
+    _plzController.addListener(_onPlzChanged);
     if (_isEdit) {
       _loadMitarbeiter();
+    }
+  }
+
+  void _onPlzChanged() {
+    final plz = _plzController.text.trim();
+    if (plz.length == 4 && _ortController.text.isEmpty) {
+      final ort = PlzService.getOrt(plz);
+      if (ort != null) {
+        _ortController.text = ort;
+      }
     }
   }
 
@@ -217,6 +229,7 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
 
   @override
   void dispose() {
+    _plzController.removeListener(_onPlzChanged);
     _vornameController.dispose();
     _nachnameController.dispose();
     _telefonController.dispose();
