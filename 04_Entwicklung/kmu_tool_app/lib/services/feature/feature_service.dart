@@ -29,6 +29,7 @@ class FeatureService {
     'lagerverwaltung': true,
     'bestellwesen': true,
     'inventur': true,
+    'betriebsverwaltung': true,
     'max_kunden': -1,
     'max_offerten': -1,
   };
@@ -105,6 +106,7 @@ class FeatureService {
       'lagerverwaltung': true,
       'bestellwesen': true,
       'inventur': true,
+      'betriebsverwaltung': true,
       'max_kunden': -1,
       'max_offerten': -1,
     };
