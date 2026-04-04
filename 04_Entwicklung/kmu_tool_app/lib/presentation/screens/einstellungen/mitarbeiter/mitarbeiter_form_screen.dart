@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:kmu_tool_app/core/theme/app_theme.dart';
 import 'package:kmu_tool_app/core/validators/validators.dart';
@@ -30,10 +31,21 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
   final _plzController = TextEditingController();
   final _ortController = TextEditingController();
   final _ahvNummerController = TextEditingController();
+  final _bruttolohnController = TextEditingController();
+  final _anzahlKinderController = TextEditingController();
+  final _anzahlKinderAusbildungController = TextEditingController();
+  final _quellensteuerCodeController = TextEditingController();
+  final _quellensteuerSatzController = TextEditingController();
+  final _nationalitaetController = TextEditingController();
+  final _bewilligungstypController = TextEditingController();
   final _notizenController = TextEditingController();
 
   String _rolle = 'mitarbeiter';
   double _pensum = 1.0;
+  DateTime? _geburtsdatum;
+  DateTime? _eintrittsdatum;
+  DateTime? _austrittsdatum;
+  final _dateFormat = DateFormat('dd.MM.yyyy');
   bool _isLoading = false;
   bool _isEdit = false;
   Mitarbeiter? _existingMitarbeiter;
@@ -72,6 +84,24 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
         _plzController.text = mitarbeiter.plz ?? '';
         _ortController.text = mitarbeiter.ort ?? '';
         _ahvNummerController.text = mitarbeiter.ahvNummer ?? '';
+        _bruttolohnController.text = mitarbeiter.bruttolohnMonat != null
+            ? mitarbeiter.bruttolohnMonat!.toStringAsFixed(0)
+            : '';
+        _geburtsdatum = mitarbeiter.geburtsdatum;
+        _eintrittsdatum = mitarbeiter.eintrittsdatum;
+        _austrittsdatum = mitarbeiter.austrittsdatum;
+        _anzahlKinderController.text =
+            mitarbeiter.anzahlKinder > 0 ? '${mitarbeiter.anzahlKinder}' : '';
+        _anzahlKinderAusbildungController.text =
+            mitarbeiter.anzahlKinderAusbildung > 0
+                ? '${mitarbeiter.anzahlKinderAusbildung}'
+                : '';
+        _quellensteuerCodeController.text =
+            mitarbeiter.quellensteuerCode ?? '';
+        _quellensteuerSatzController.text =
+            mitarbeiter.quellensteuerSatz?.toString() ?? '';
+        _nationalitaetController.text = mitarbeiter.nationalitaet ?? '';
+        _bewilligungstypController.text = mitarbeiter.bewilligungstyp ?? '';
         _notizenController.text = mitarbeiter.notizen ?? '';
         _rolle = mitarbeiter.rolle;
         _pensum = mitarbeiter.pensum;
@@ -128,6 +158,28 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
             ? null
             : _ahvNummerController.text.trim(),
         pensum: _pensum,
+        bruttolohnMonat: _bruttolohnController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_bruttolohnController.text.trim()),
+        geburtsdatum: _geburtsdatum,
+        eintrittsdatum: _eintrittsdatum,
+        austrittsdatum: _austrittsdatum,
+        anzahlKinder:
+            int.tryParse(_anzahlKinderController.text.trim()) ?? 0,
+        anzahlKinderAusbildung:
+            int.tryParse(_anzahlKinderAusbildungController.text.trim()) ?? 0,
+        quellensteuerCode: _quellensteuerCodeController.text.trim().isEmpty
+            ? null
+            : _quellensteuerCodeController.text.trim(),
+        quellensteuerSatz: _quellensteuerSatzController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_quellensteuerSatzController.text.trim()),
+        nationalitaet: _nationalitaetController.text.trim().isEmpty
+            ? null
+            : _nationalitaetController.text.trim(),
+        bewilligungstyp: _bewilligungstypController.text.trim().isEmpty
+            ? null
+            : _bewilligungstypController.text.trim(),
         notizen: _notizenController.text.trim().isEmpty
             ? null
             : _notizenController.text.trim(),
@@ -174,6 +226,13 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
     _plzController.dispose();
     _ortController.dispose();
     _ahvNummerController.dispose();
+    _bruttolohnController.dispose();
+    _anzahlKinderController.dispose();
+    _anzahlKinderAusbildungController.dispose();
+    _quellensteuerCodeController.dispose();
+    _quellensteuerSatzController.dispose();
+    _nationalitaetController.dispose();
+    _bewilligungstypController.dispose();
     _notizenController.dispose();
     super.dispose();
   }
@@ -378,6 +437,63 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
                     ),
                     const SizedBox(height: 24),
 
+                    // --- Lohn ---
+                    _sectionHeader('LOHN'),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _bruttolohnController,
+                      decoration: const InputDecoration(
+                        labelText: 'Bruttolohn / Monat',
+                        prefixIcon: Icon(Icons.payments_outlined),
+                        suffixText: 'CHF',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 16),
+                    _dateField('Geburtsdatum', _geburtsdatum, (date) {
+                      setState(() => _geburtsdatum = date);
+                    }),
+                    const SizedBox(height: 16),
+                    _dateField('Eintrittsdatum', _eintrittsdatum, (date) {
+                      setState(() => _eintrittsdatum = date);
+                    }),
+                    const SizedBox(height: 16),
+                    _dateField('Austrittsdatum', _austrittsdatum, (date) {
+                      setState(() => _austrittsdatum = date);
+                    }),
+                    const SizedBox(height: 24),
+
+                    // --- Kinder ---
+                    _sectionHeader('KINDER (ZULAGEN)'),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _anzahlKinderController,
+                            decoration: const InputDecoration(
+                              labelText: 'Kinder',
+                              prefixIcon: Icon(Icons.child_care_outlined),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _anzahlKinderAusbildungController,
+                            decoration: const InputDecoration(
+                              labelText: 'In Ausbildung',
+                              prefixIcon: Icon(Icons.school_outlined),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
                     // --- Sozialversicherung ---
                     _sectionHeader('SOZIALVERSICHERUNG'),
                     const SizedBox(height: 12),
@@ -389,6 +505,53 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
                         hintText: '756.1234.5678.97',
                       ),
                       textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _nationalitaetController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nationalitaet',
+                        prefixIcon: Icon(Icons.flag_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _bewilligungstypController,
+                      decoration: const InputDecoration(
+                        labelText: 'Bewilligungstyp',
+                        prefixIcon: Icon(Icons.card_membership_outlined),
+                        hintText: 'B, C, L, etc.',
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // --- Quellensteuer ---
+                    _sectionHeader('QUELLENSTEUER'),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quellensteuerCodeController,
+                            decoration: const InputDecoration(
+                              labelText: 'QST-Code',
+                              hintText: 'z.B. A0, B1, C2',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _quellensteuerSatzController,
+                            decoration: const InputDecoration(
+                              labelText: 'QST-Satz',
+                              suffixText: '%',
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
 
@@ -411,6 +574,42 @@ class _MitarbeiterFormScreenState extends ConsumerState<MitarbeiterFormScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  Widget _dateField(String label, DateTime? value, ValueChanged<DateTime?> onChanged) {
+    return InkWell(
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          useRootNavigator: false,
+          initialDate: value ?? DateTime.now(),
+          firstDate: DateTime(1950),
+          lastDate: DateTime(2100),
+          locale: const Locale('de', 'CH'),
+        );
+        onChanged(picked);
+      },
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: const Icon(Icons.calendar_today_outlined),
+          suffixIcon: value != null
+              ? IconButton(
+                  icon: const Icon(Icons.clear, size: 18),
+                  onPressed: () => onChanged(null),
+                )
+              : null,
+        ),
+        child: Text(
+          value != null ? _dateFormat.format(value) : '',
+          style: TextStyle(
+            color: value != null
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
     );
   }
 

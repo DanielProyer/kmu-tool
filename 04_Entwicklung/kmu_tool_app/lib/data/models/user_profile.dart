@@ -15,6 +15,8 @@ class UserProfile {
   final bool mwstPflichtig;
   final String mwstMethode;
   final double? mwstSaldosteuersatz;
+  final String? logoUrl;
+  final String? websiteUrl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -35,6 +37,8 @@ class UserProfile {
     this.mwstPflichtig = false,
     this.mwstMethode = 'effektiv',
     this.mwstSaldosteuersatz,
+    this.logoUrl,
+    this.websiteUrl,
     this.createdAt,
     this.updatedAt,
   });
@@ -59,6 +63,8 @@ class UserProfile {
       mwstSaldosteuersatz: json['mwst_saldosteuersatz'] != null
           ? (json['mwst_saldosteuersatz'] as num).toDouble()
           : null,
+      logoUrl: json['logo_url'] as String?,
+      websiteUrl: json['website_url'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
@@ -86,6 +92,8 @@ class UserProfile {
       'mwst_pflichtig': mwstPflichtig,
       'mwst_methode': mwstMethode,
       'mwst_saldosteuersatz': mwstSaldosteuersatz,
+      'logo_url': logoUrl,
+      'website_url': websiteUrl,
     };
   }
 }

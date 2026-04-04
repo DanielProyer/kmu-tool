@@ -270,6 +270,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasBestellwesen = ref.watch(hasFeatureProvider(AppFeature.bestellwesen));
     final hasInventur = ref.watch(hasFeatureProvider(AppFeature.inventur));
     final hasWebsite = ref.watch(hasFeatureProvider(AppFeature.autoWebsite));
+    final hasBetrieb = ref.watch(hasFeatureProvider(AppFeature.betriebsverwaltung));
 
     final allTiles = <_DashboardTileData>[
       if (hasKunden)
@@ -327,6 +328,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           value: '',
           color: const Color(0xFFD97706),
           route: '/bestellungen',
+        ),
+      if (hasBetrieb)
+        _DashboardTileData(
+          label: 'Betriebsverwaltung',
+          icon: Icons.business,
+          value: '',
+          color: const Color(0xFF7C3AED),
+          route: '/betrieb',
         ),
       // Kalender
       _DashboardTileData(

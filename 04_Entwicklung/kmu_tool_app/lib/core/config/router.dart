@@ -57,6 +57,17 @@ import 'package:kmu_tool_app/presentation/screens/website/website_vorschau_scree
 import 'package:kmu_tool_app/presentation/screens/kalender/kalender_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/kalender/termin_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/kalender/termin_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/betriebsverwaltung_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/firmenprofil_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/bankverbindungen_list_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/bankverbindung_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/logo_upload_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/berechtigungen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/berechtigung_detail_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/sozialversicherungen_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/lohn/lohn_uebersicht_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/lohn/lohn_monat_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/lohn/lohn_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/einstellungen_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/theme_selection_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/einstellungen/abo_verwaltung_screen.dart';
@@ -496,6 +507,69 @@ final router = GoRouter(
       builder: (context, state) {
         final id = state.pathParameters['id']!;
         return TerminFormScreen(terminId: id);
+      },
+    ),
+
+    // ─── Betriebsverwaltung ───
+    GoRoute(
+      path: '/betrieb',
+      builder: (context, state) => const BetriebsverwaltungScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/firmenprofil',
+      builder: (context, state) => const FirmenprofilScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/bankverbindungen',
+      builder: (context, state) => const BankverbindungenListScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/bankverbindungen/neu',
+      builder: (context, state) => const BankverbindungFormScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/bankverbindungen/:id/bearbeiten',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return BankverbindungFormScreen(bankverbindungId: id);
+      },
+    ),
+    GoRoute(
+      path: '/betrieb/logo',
+      builder: (context, state) => const LogoUploadScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/berechtigungen',
+      builder: (context, state) => const BerechtigungenScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/berechtigungen/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return BerechtigungDetailScreen(mitarbeiterId: id);
+      },
+    ),
+    GoRoute(
+      path: '/betrieb/sozialversicherungen',
+      builder: (context, state) => const SozialversicherungenScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/lohn',
+      builder: (context, state) => const LohnUebersichtScreen(),
+    ),
+    GoRoute(
+      path: '/betrieb/lohn/:jahr/:monat',
+      builder: (context, state) {
+        final jahr = int.parse(state.pathParameters['jahr']!);
+        final monat = int.parse(state.pathParameters['monat']!);
+        return LohnMonatScreen(jahr: jahr, monat: monat);
+      },
+    ),
+    GoRoute(
+      path: '/betrieb/lohn/detail/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return LohnDetailScreen(lohnabrechnungId: id);
       },
     ),
 

@@ -15,7 +15,8 @@ enum AppFeature {
   inventur('inventur'),
   admin('admin'),
   auftragDashboard('auftrag_dashboard'),
-  autoWebsite('auto_website');
+  autoWebsite('auto_website'),
+  betriebsverwaltung('betriebsverwaltung');
 
   final String key;
   const AppFeature(this.key);
@@ -51,6 +52,8 @@ enum AppFeature {
         return []; // Dynamic route: /auftraege/:id/dashboard
       case AppFeature.autoWebsite:
         return ['/website'];
+      case AppFeature.betriebsverwaltung:
+        return ['/betrieb'];
       default:
         return [];
     }
