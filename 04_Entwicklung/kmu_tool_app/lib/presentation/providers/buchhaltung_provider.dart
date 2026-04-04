@@ -1,12 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kmu_tool_app/data/models/konto.dart';
 import 'package:kmu_tool_app/data/models/buchung.dart';
+import 'package:kmu_tool_app/data/models/buchungs_beleg.dart';
 import 'package:kmu_tool_app/data/repositories/konto_repository.dart';
 import 'package:kmu_tool_app/data/repositories/buchung_repository.dart';
+import 'package:kmu_tool_app/data/repositories/buchungs_beleg_repository.dart';
 
 /// Singleton instances (instance-method repos).
 final _kontoRepo = KontoRepository();
 final _buchungRepo = BuchungRepository();
+final _belegRepo = BuchungsBelegRepository();
 
 // ──────────────────────────────────────────────
 // Konten
@@ -60,6 +63,16 @@ final buchungenByKontoProvider =
 final buchungenByRechnungProvider =
     FutureProvider.family<List<Buchung>, String>((ref, rechnungId) async {
   return _buchungRepo.getByRechnung(rechnungId);
+});
+
+// ──────────────────────────────────────────────
+// Buchungs-Belege
+// ──────────────────────────────────────────────
+
+/// Provides all Belege for a given Buchung.
+final belegeByBuchungProvider =
+    FutureProvider.family<List<BuchungsBeleg>, String>((ref, buchungId) async {
+  return _belegRepo.getByBuchung(buchungId);
 });
 
 // ──────────────────────────────────────────────

@@ -57,6 +57,7 @@ import 'package:kmu_tool_app/presentation/screens/website/website_vorschau_scree
 import 'package:kmu_tool_app/presentation/screens/kalender/kalender_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/kalender/termin_detail_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/kalender/termin_form_screen.dart';
+import 'package:kmu_tool_app/presentation/screens/spesen/spesen_scanner_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/betriebsverwaltung_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/firmenprofil_screen.dart';
 import 'package:kmu_tool_app/presentation/screens/betriebsverwaltung/bankverbindungen_list_screen.dart';
@@ -510,7 +511,13 @@ final router = GoRouter(
       },
     ),
 
-    // ─── Betriebsverwaltung ───
+    // ──��� Spesen-Scanner ───
+    GoRoute(
+      path: '/spesen-scanner',
+      builder: (context, state) => const SpesenScannerScreen(),
+    ),
+
+    // ─── Betriebsverwaltung ─���─
     GoRoute(
       path: '/betrieb',
       builder: (context, state) => const BetriebsverwaltungScreen(),

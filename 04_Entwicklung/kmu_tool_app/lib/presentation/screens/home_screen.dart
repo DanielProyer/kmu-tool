@@ -337,6 +337,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: const Color(0xFF7C3AED),
           route: '/betrieb',
         ),
+      // Spesen-Scanner
+      _DashboardTileData(
+        label: 'Spesen-Scanner',
+        icon: Icons.receipt_long,
+        value: '',
+        color: const Color(0xFFD97706),
+        route: '/spesen-scanner',
+      ),
       // Kalender
       _DashboardTileData(
         label: 'Kalender',

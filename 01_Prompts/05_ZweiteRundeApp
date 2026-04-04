@@ -1,0 +1,28 @@
+Alle Telefonnummern bitte auf Fehleingaben Prüfen Telefonnummern (Fest und Mobil) aus der Schweiz, Lichtenstein, Deutschland, Frankreich und Italien zulassen
+
+Bei allen Adressen bitte Strasse und Hausnummer Trennen
+Bei den Kunden unter Kontakt wird die Hauptnummer und mailadresse des Betriebs erfasst, Kontakte werden als Kontaktpersonen erfasst, mach das klar kenntlich
+
+Datumseingabe führt immer noch zu grauen Feldern
+
+Ergänze noch um Periodische Auftrage (Service, Kontrolle usw...) mach diese kenntlich und Planbar
+
+Wir brauchen noch einen Terminkalender falls der nicht bereits besteht
+
+Für den Kunden soll es eine Übersicht über die Mitarbeiter und Fahrzeuge geben, nur zugänglich für den Geschäftsführer nicht für die Mitarbeiter
+
+Die Liefernatenerassung bitte direkt im Artikelstamm
+
+Bei der Webseite bitte den Firmenname des AppKunden direkt übernehmen Aus den Eingaben im Adminpanbel, dort stehen dann auch alle Infos fürs Impressum
+
+Damit wir uns richtig verstehen nennen wir meine Kunden welche die App benutzen in Zukunft AppKunden, falls ich nur von Kunden rede meine ich die Kunden in der App
+
+Auf das HauptAdminpanel habe nur ich Zugriff, löse das von der App (separate App?)
+
+In der App soll es ein Adminpanel geben für den Geschäftsführer (AppKunde) wo er alle relevanten Informationen eingibt, MWST Nummer, MWST Abrechnungsart, Anzahl Mitarbeiter mit Anstellungsverhältniss, Fahrzeuge, Angaben zur Lohnbuchhaltung usw... alle Werte die für das Geschäft relevant sind und sich von anderen Geschäften unterscheiden
+
+Inventur kannst du auch gleich in das Adminpanel verschieben, das kann nur der Geschäftsführer auslösen
+Bei Inventur Zählung starten kommt noch ein SQL Fehler
+
+
+

@@ -104,11 +104,11 @@ class BetriebService {
       '/kunden', '/auftraege', '/offerten',
       '/zeiterfassung', '/rapporte',
       '/artikel', '/lagerorte', '/bestellungen',
-      '/kalender', '/einstellungen',
+      '/kalender', '/einstellungen', '/spesen-scanner',
     ],
     'mitarbeiter': [
       '/auftraege', '/zeiterfassung', '/rapporte',
-      '/artikel', '/kalender', '/einstellungen',
+      '/artikel', '/kalender', '/einstellungen', '/spesen-scanner',
     ],
     'kunde': ['/dashboard'],
   };
